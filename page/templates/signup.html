@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TwINSA — Inscription</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+  <h1>Inscription TwINSA</h1>
+  
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, msg in messages %}
+      <div class="flash {{ category }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <form method="POST">
+    <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Mot de passe (min 6 caractères)" required>
+    <button type="submit">S'inscrire</button>
+  </form>
+
+  <p style="text-align:center; margin-top:12px; font-size:14px; color:var(--muted)">
+    Déjà un compte ? <a href="{{ url_for('login') }}">Connectez-vous</a>
+  </p>
+</div>
+</body>
+</html>

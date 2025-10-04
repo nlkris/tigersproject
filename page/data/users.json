@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "username": "jjjjeanne",
+        "email": "jeannemarque@icloud.com",
+        "password": "scrypt:32768:8:1$5h5ih8YDnnogd0V0$89a7ced75363c920d6a514673232c5c92f3c84901fb623ca9e1e0b2c7d6c4349404de8f14f887e4b747f53d69d1efe7250f4f33a699e5cd4b41302c361a58265"
+    },
+    {
+        "id": 2,
+        "username": "jeeaaannnne",
+        "email": "jeanneok@gmail.com",
+        "password": "scrypt:32768:8:1$Pi5yJeq1rV63yLJB$82d3c3a0a6a6bd90b13631cd6ef1b3cd7bcf10504a21fbf51ef47abee33de6a221fe1f2feb0b2cc737807afce82d740eb7d1ed5a87a75ca46f82274a3c53e3bf"
+    }
+]

@@ -8,6 +8,7 @@
 </head>
 <body>
 <div class="container">
+  <img src="{{ url_for('static', filename='tiger.png') }}" alt="Logo TwINSA" class="logo">
   <h1>Inscription TwINSA</h1>
   
   {% with messages = get_flashed_messages(with_categories=true) %}

@@ -32,6 +32,15 @@
         "user_id": 5,
         "username": "claire",
         "content": "coucou",
+        "likes": [
+            3
+        ]
+    },
+    {
+        "id": 6,
+        "user_id": 3,
+        "username": "nlkris",
+        "content": "test 1",
         "likes": []
     }
 ]

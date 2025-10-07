@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TwINSA — Connexion</title>
+<style>
+:root {
+  --bg:#0f1724; --card:#0b1220; --muted:#9aa8bf; --accent:#5eead4;
+  --radius:12px; --shadow:0 6px 18px rgba(2,6,23,0.6);
+  font-family: Inter, sans-serif;
+}
+
+* { box-sizing:border-box; margin:0; padding:0; }
+
+body {
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: linear-gradient(135deg,#071226,#0f1724);
+  color:#e6eef8;
+  font-size:16px;
+}
+
+.container {
+  background:var(--card);
+  padding:32px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  width:100%;
+  max-width:400px;
+  text-align:center;
+}
+
+.logo {
+  display:block;
+  margin:0 auto 16px auto;
+  width:120px;
+  height:auto;
+}
+
+h1 { text-align:center; margin-bottom:24px; color:var(--accent); }
+
+form {
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  text-align:left;
+}
+
+label { font-size:14px; color:var(--muted); }
+
+input[type="text"], input[type="password"], input[type="email"] {
+  padding:10px 12px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.1);
+  background:transparent;
+  color:#e6eef8;
+  outline:none;
+  width:100%;
+}
+
+input::placeholder { color:var(--muted); }
+
+button {
+  padding:12px;
+  background:linear-gradient(90deg,#06b6d4,#7c3aed);
+  border:none;
+  border-radius:8px;
+  color:#021024;
+  font-weight:700;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+button:hover { opacity:0.9; }
+
+.error { color:#f87171; font-size:13px; text-align:center; }
+
+.flashes {
+  list-style:none;
+  padding:0;
+  margin-bottom:8px;
+}
+
+.flashes li {
+  font-size:14px;
+  padding:6px;
+  border-radius:6px;
+  text-align:center;
+}
+
+.flashes li.success { background:#5eead4; color:#021024; }
+.flashes li.error { background:#f87171; color:#021024; }
+
+a { color:var(--accent); text-decoration:none; }
+
+@media (max-width:480px){
+  .container { padding:24px; }
+  h1 { font-size:24px; }
+  .logo { width:100px; margin-bottom:12px; }
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <!-- Logo -->
+    <img src="{{ url_for('static', filename='tiger.png') }}" alt="Logo TwINSA" class="logo">
+
+    <!-- Titre -->
+    <h1>Connexion TwINSA</h1>
+
+    <!-- Messages flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Formulaire de connexion -->
+    <form method="POST" action="{{ url_for('login') }}" id="loginForm">
+      <div>
+        <label for="email">Email ou Nom d'utilisateur</label>
+        <input type="text" id="email" name="email" placeholder="ex: alice@example.com" required>
+      </div>
+      <div>
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password" placeholder="Votre mot de passe" required>
+      </div>
+      <div class="error" id="errorMsg"></div>
+      <button type="submit">Se connecter</button>
+    </form>
+
+    <p style="text-align:center; margin-top:12px; font-size:14px; color:var(--muted)">
+      Pas de compte ? <a href="{{ url_for('signup') }}">Inscrivez-vous</a>
+    </p>
+  </div>
+
+<script>
+// Simple validation front-end
+document.getElementById('loginForm').addEventListener('submit', function(e){
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const errorMsg = document.getElementById('errorMsg');
+
+  if(email === "" || password === ""){
+    e.preventDefault();
+    errorMsg.textContent = "Veuillez remplir tous les champs.";
+  } else {
+    errorMsg.textContent = "";
+  }
+});
+</script>
+</body>
+</html>

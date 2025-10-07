@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TIGNSA — Fil d’actualité</title>
+<style>
+:root {
+  --bg:#0f1724; --card:#0b1220; --muted:#9aa8bf; --accent:#5eead4;
+  --radius:12px; --shadow:0 6px 18px rgba(2,6,23,0.6);
+  font-family: Inter, sans-serif;
+}
+
+* { box-sizing:border-box; margin:0; padding:0; }
+
+body {
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: linear-gradient(135deg,#071226,#0f1724);
+  color:#e6eef8;
+  font-size:16px;
+}
+
+.container {
+  background:var(--card);
+  padding:32px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  width:100%;
+  max-width:500px;
+  text-align:center;
+}
+
+.logo {
+  display:block;
+  margin:0 auto 16px auto;
+  width:120px;
+  height:auto;
+}
+
+h1, h2 {
+  text-align:center;
+  margin-bottom:24px;
+  color:var(--accent);
+}
+
+form {
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  text-align:left;
+}
+
+textarea {
+  padding:10px 12px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.1);
+  background:transparent;
+  color:#e6eef8;
+  outline:none;
+  width:100%;
+  min-height:80px;
+}
+
+button {
+  padding:12px;
+  background:linear-gradient(90deg,#06b6d4,#7c3aed);
+  border:none;
+  border-radius:8px;
+  color:#021024;
+  font-weight:700;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+button:hover { opacity:0.9; }
+
+.flashes {
+  list-style:none;
+  padding:0;
+  margin-bottom:16px;
+}
+
+.flashes li {
+  font-size:14px;
+  padding:6px;
+  border-radius:6px;
+  text-align:center;
+}
+
+.flashes li.success { background:#5eead4; color:#021024; }
+.flashes li.error { background:#f87171; color:#021024; }
+
+#feed {
+  margin-top:16px;
+  max-height:300px;
+  overflow-y:auto;
+}
+
+.post {
+  padding:12px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  margin-bottom:12px;
+  border-radius:8px;
+  background:rgba(255,255,255,0.03);
+}
+
+.post strong {
+  color: var(--accent);
+}
+
+a {
+  color: var(--accent);
+  text-decoration:none;
+}
+
+a:hover {
+  text-decoration:underline;
+}
+
+@media (max-width:480px){
+  .container { padding:24px; }
+  h1, h2 { font-size:22px; }
+  .logo { width:100px; margin-bottom:12px; }
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <!-- Logo -->
+    <img src="{{ url_for('static', filename='tiger.png') }}" alt="Logo TwINSA" class="logo">
+
+    <!-- Bienvenue -->
+    <h1>Bienvenue, {{ username }}</h1>
+
+    <!-- Formulaire pour publier un tweet -->
+    <form method="POST" class="tweet-form">
+      <textarea name="content" placeholder="Quoi de neuf ?" required></textarea>
+      <button type="submit">Publier</button>
+    </form>
+
+    <!-- Messages flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Fil d’actualité -->
+    <h2>Fil d'actualité</h2>
+    <div id="feed">
+      {% if tweets %}
+        {% for post in tweets %}
+          <div class="post">
+            <strong>{{ post.username }}</strong>
+            <p>{{ post.content }}</p>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p style="text-align:center; color:var(--muted);">Aucun tweet pour le moment.</p>
+      {% endif %}
+    </div>
+
+    <!-- Lien de déconnexion -->
+    <p style="text-align:center; margin-top:16px;">
+      <a href="{{ url_for('logout') }}">Déconnexion</a>
+    </p>
+  </div>
+</body>
+</html>

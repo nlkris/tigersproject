@@ -22,5 +22,11 @@
         "user_id": 5,
         "username": "claire",
         "content": "coucou"
+    },
+    {
+        "id": 5,
+        "user_id": 5,
+        "username": "claire",
+        "content": "coucou"
     }
 ]

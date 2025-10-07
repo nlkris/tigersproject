@@ -55,6 +55,11 @@ def signup():
         if not username or not email or not password:
             flash("Tous les champs sont obligatoires.", "error")
             return redirect(url_for('signup'))
+        
+        # Vérification de la longueur du mot de passe
+        if len(password) < 6:
+            flash("Le mot de passe doit contenir au moins 6 caractères.", "error")
+            return redirect(url_for('signup'))
 
         # Vérification de l'unicité de l'email et du nom d'utilisateur
         users = read_users()

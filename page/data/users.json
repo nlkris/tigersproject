@@ -10,5 +10,17 @@
         "username": "jeeaaannnne",
         "email": "jeanneok@gmail.com",
         "password": "scrypt:32768:8:1$Pi5yJeq1rV63yLJB$82d3c3a0a6a6bd90b13631cd6ef1b3cd7bcf10504a21fbf51ef47abee33de6a221fe1f2feb0b2cc737807afce82d740eb7d1ed5a87a75ca46f82274a3c53e3bf"
+    },
+    {
+        "id": 3,
+        "username": "nlkris",
+        "email": "cnguyenluc@gmail.com",
+        "password": "scrypt:32768:8:1$sK4xKROPnmcPMlnN$40a382f141378b3a1972aac5e012d780217bd232d53697fb36dc4284026ca3da0e8a6d3ca612ed847724800761afaf9f1dfa72814c2cc493567e860ffd0f671f"
+    },
+    {
+        "id": 4,
+        "username": "nguye",
+        "email": "nguye@insa-toulouse.fr",
+        "password": "scrypt:32768:8:1$gRTnudlzZlUtt2F8$e4415fa8201ac714e5ac47f1a96dc430fb6f53404cfccfb5b197c1bb71da484f593a011e8f4707eeff99a3b3e8aaa63ec2d4366d3c2caa715de91bacaae944ae"
     }
 ]

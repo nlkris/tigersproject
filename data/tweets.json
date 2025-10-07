@@ -16,5 +16,11 @@
         "user_id": 2,
         "username": "jeeaaannnne",
         "content": "fe,znfjkez"
+    },
+    {
+        "id": 4,
+        "user_id": 5,
+        "username": "claire",
+        "content": "coucou"
     }
 ]

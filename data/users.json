@@ -22,5 +22,11 @@
         "username": "nguye",
         "email": "nguye@insa-toulouse.fr",
         "password": "scrypt:32768:8:1$gRTnudlzZlUtt2F8$e4415fa8201ac714e5ac47f1a96dc430fb6f53404cfccfb5b197c1bb71da484f593a011e8f4707eeff99a3b3e8aaa63ec2d4366d3c2caa715de91bacaae944ae"
+    },
+    {
+        "id": 5,
+        "username": "claire",
+        "email": "claire.soulienavarro@gmail.com",
+        "password": "scrypt:32768:8:1$tusQjC9Z5EgWUQow$2d4d57856bf44a0c7daab2c1be1dc3c1b843013e6c28191759dd0d37810625e6c93e8324d14db65d41a7ee6af79a9f2c54ac24a75046eb0f570402ad04af23a6"
     }
 ]

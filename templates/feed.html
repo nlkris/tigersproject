@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TIGNSA — Fil d’actualité</title>
+<title>TIGINSA — Fil d’actualité</title>
 <style>
 :root {
   --bg:#0f1724; --card:#0b1220; --muted:#9aa8bf; --accent:#5eead4;
@@ -36,7 +36,7 @@ body {
 .logo {
   display:block;
   margin:0 auto 16px auto;
-  width:120px;
+  width:240px;  /* logo deux fois plus grand */
   height:auto;
 }
 
@@ -123,14 +123,14 @@ a:hover {
 @media (max-width:480px){
   .container { padding:24px; }
   h1, h2 { font-size:22px; }
-  .logo { width:100px; margin-bottom:12px; }
+  .logo { width:200px; margin-bottom:12px; } /* logo mobile aussi 2x plus grand */
 }
 </style>
 </head>
 <body>
   <div class="container">
     <!-- Logo -->
-    <img src="{{ url_for('static', filename='tiger.png') }}" alt="Logo TwINSA" class="logo">
+    <img src="{{ url_for('static', filename='tiger.png') }}" alt="Logo TIGINSA" class="logo">
 
     <!-- Bienvenue -->
     <h1>Bienvenue, {{ username }}</h1>

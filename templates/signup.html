@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inscription — TIGNSA</title>
+<title>Inscription — TIGINSA</title>
 <style>
 :root {
   --bg:#0f1724; --card:#0b1220; --muted:#9aa8bf; --accent:#5eead4;
@@ -36,11 +36,15 @@ body {
 .logo {
   display:block;
   margin:0 auto 16px auto;
-  width:120px;
+  width:240px; /* logo deux fois plus grand */
   height:auto;
 }
 
-h1 { text-align:center; margin-bottom:24px; color:var(--accent); }
+h1 {
+  text-align:center;
+  margin-bottom:24px;
+  color:var(--accent);
+}
 
 form {
   display:flex;
@@ -49,7 +53,10 @@ form {
   text-align:left;
 }
 
-label { font-size:14px; color:var(--muted); }
+label {
+  font-size:14px;
+  color:var(--muted);
+}
 
 input[type="text"], input[type="password"], input[type="email"] {
   padding:10px 12px;
@@ -61,7 +68,9 @@ input[type="text"], input[type="password"], input[type="email"] {
   width:100%;
 }
 
-input::placeholder { color:var(--muted); }
+input::placeholder {
+  color:var(--muted);
+}
 
 button {
   padding:12px;
@@ -74,9 +83,15 @@ button {
   transition:0.2s;
 }
 
-button:hover { opacity:0.9; }
+button:hover {
+  opacity:0.9;
+}
 
-.error { color:#f87171; font-size:13px; text-align:center; }
+.error {
+  color:#f87171;
+  font-size:13px;
+  text-align:center;
+}
 
 .flashes {
   list-style:none;
@@ -91,22 +106,36 @@ button:hover { opacity:0.9; }
   text-align:center;
 }
 
-.flashes li.success { background:#5eead4; color:#021024; }
-.flashes li.error { background:#f87171; color:#021024; }
+.flashes li.success {
+  background:#5eead4;
+  color:#021024;
+}
 
-a { color:var(--accent); text-decoration:none; }
+.flashes li.error {
+  background:#f87171;
+  color:#021024;
+}
+
+a {
+  color:var(--accent);
+  text-decoration:none;
+}
+
+a:hover {
+  text-decoration:underline;
+}
 
 @media (max-width:480px){
   .container { padding:24px; }
   h1 { font-size:24px; }
-  .logo { width:100px; margin-bottom:12px; }
+  .logo { width:200px; margin-bottom:12px; }
 }
 </style>
 </head>
 <body>
   <div class="container">
     <!-- Logo -->
-    <img src="{{ url_for('static', filename='tiger.png') }}" alt="Logo TwINSA" class="logo">
+    <img src="{{ url_for('static', filename='tiger.png') }}" alt="Logo TIGNSA" class="logo">
 
     <!-- Titre -->
     <h1>Inscription</h1>
@@ -146,7 +175,7 @@ a { color:var(--accent); text-decoration:none; }
   </div>
 
 <script>
-// Simple validation front-end
+// Validation front-end simple
 document.getElementById('signupForm').addEventListener('submit', function(e){
   const username = document.getElementById('username').value.trim();
   const email = document.getElementById('email').value.trim();

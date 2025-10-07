@@ -36,7 +36,7 @@ body {
 .logo {
   display:block;
   margin:0 auto 16px auto;
-  width:240px; /* logo deux fois plus grand */
+  width:240px;
   height:auto;
 }
 
@@ -83,9 +83,7 @@ button {
   transition:0.2s;
 }
 
-button:hover {
-  opacity:0.9;
-}
+button:hover { opacity:0.9; }
 
 .error {
   color:#f87171;
@@ -121,14 +119,12 @@ a {
   text-decoration:none;
 }
 
-a:hover {
-  text-decoration:underline;
-}
+a:hover { text-decoration:underline; }
 
 @media (max-width:480px){
   .container { padding:24px; }
   h1 { font-size:24px; }
-  .logo { width:200px; margin-bottom:12px; } /* version mobile plus grande aussi */
+  .logo { width:200px; margin-bottom:12px; }
 }
 </style>
 </head>
@@ -152,7 +148,7 @@ a:hover {
     {% endwith %}
 
     <!-- Formulaire de connexion -->
-    <form method="POST" action="{{ url_for('login') }}" id="loginForm">
+    <form method="POST" action="{{ url_for('routes.login') }}" id="loginForm">
       <div>
         <label for="email">Email ou Nom d'utilisateur</label>
         <input type="text" id="email" name="email" placeholder="ex: alice@example.com" required>
@@ -166,7 +162,7 @@ a:hover {
     </form>
 
     <p style="text-align:center; margin-top:12px; font-size:14px; color:var(--muted)">
-      Pas de compte ? <a href="{{ url_for('signup') }}">Inscrivez-vous</a>
+      Pas de compte ? <a href="{{ url_for('routes.signup') }}">Inscrivez-vous</a>
     </p>
   </div>
 

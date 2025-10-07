@@ -3,30 +3,35 @@
         "id": 1,
         "user_id": 2,
         "username": "jeeaaannnne",
-        "content": "hjkhhjk\r\nkjhjkh"
+        "content": "hjkhhjk\r\nkjhjkh",
+        "likes": []
     },
     {
         "id": 2,
         "user_id": 2,
         "username": "jeeaaannnne",
-        "content": "orieziorozei"
+        "content": "orieziorozei",
+        "likes": []
     },
     {
         "id": 3,
         "user_id": 2,
         "username": "jeeaaannnne",
-        "content": "fe,znfjkez"
+        "content": "fe,znfjkez",
+        "likes": []
     },
     {
         "id": 4,
         "user_id": 5,
         "username": "claire",
-        "content": "coucou"
+        "content": "coucou",
+        "likes": []
     },
     {
         "id": 5,
         "user_id": 5,
         "username": "claire",
-        "content": "coucou"
+        "content": "coucou",
+        "likes": []
     }
 ]

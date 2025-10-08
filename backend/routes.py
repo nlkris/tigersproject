@@ -1,44 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
-import json
-import os
+from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field
 
 routes = Blueprint('routes', __name__)
 
-# Chemins vers les fichiers JSON
-DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
-USERS_FILE = os.path.join(DATA_DIR, 'users.json')
-TWEETS_FILE = os.path.join(DATA_DIR, 'tweets.json')
-
-# Initialisation des fichiers JSON
-def init_files():
-    if not os.path.exists(DATA_DIR):
-        os.makedirs(DATA_DIR)
-    if not os.path.exists(USERS_FILE):
-        with open(USERS_FILE, 'w') as f:
-            json.dump([], f)
-    if not os.path.exists(TWEETS_FILE):
-        with open(TWEETS_FILE, 'w') as f:
-            json.dump([], f)
-
+# Initialisation
 init_files()
-
-# Fonctions utilitaires
-def read_users():
-    with open(USERS_FILE, 'r') as f:
-        return json.load(f)
-
-def write_users(users):
-    with open(USERS_FILE, 'w') as f:
-        json.dump(users, f, indent=4)
-
-def read_tweets():
-    with open(TWEETS_FILE, 'r') as f:
-        return json.load(f)
-
-def write_tweets(tweets):
-    with open(TWEETS_FILE, 'w') as f:
-        json.dump(tweets, f, indent=4)
+ensure_likes_field()
 
 # ------------------- ROUTES -------------------
 
@@ -62,15 +30,14 @@ def signup():
             return redirect(url_for('routes.signup'))
 
         users = read_users()
-        if any(user['email'] == email for user in users):
+        if any(u['email'] == email for u in users):
             flash("Cet email est déjà utilisé.", "error")
             return redirect(url_for('routes.signup'))
-        if any(user['username'] == username for user in users):
+        if any(u['username'] == username for u in users):
             flash("Ce nom d'utilisateur est déjà utilisé.", "error")
             return redirect(url_for('routes.signup'))
 
         hashed_password = generate_password_hash(password)
-
         new_user = {
             'id': len(users) + 1,
             'username': username,
@@ -85,6 +52,7 @@ def signup():
 
     return render_template('signup.html')
 
+
 @routes.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -92,7 +60,7 @@ def login():
         password = request.form.get('password').strip()
 
         users = read_users()
-        user = next((user for user in users if user['email'] == email), None)
+        user = next((u for u in users if u['email'] == email), None)
 
         if user and check_password_hash(user['password'], password):
             session['user_id'] = user['id']
@@ -104,6 +72,7 @@ def login():
             return redirect(url_for('routes.login'))
 
     return render_template('login.html')
+
 
 @routes.route('/feed', methods=['GET', 'POST'])
 def feed():
@@ -119,7 +88,8 @@ def feed():
                 'id': len(tweets) + 1,
                 'user_id': session['user_id'],
                 'username': session['username'],
-                'content': content
+                'content': content,
+                'likes': []
             }
             tweets.append(new_tweet)
             write_tweets(tweets)
@@ -128,8 +98,34 @@ def feed():
 
     return render_template('feed.html', tweets=tweets, username=session['username'])
 
+
 @routes.route('/logout')
 def logout():
     session.clear()
     flash("Vous êtes déconnecté.", "info")
     return redirect(url_for('routes.login'))
+
+
+@routes.route('/like/<int:tweet_id>', methods=['POST'])
+def like_tweet(tweet_id):
+    if 'user_id' not in session:
+        flash("Veuillez vous connecter pour liker un tweet.", "error")
+        return redirect(url_for('routes.login'))
+
+    tweets = read_tweets()
+    user_id = session['user_id']
+
+    for tweet in tweets:
+        if tweet['id'] == tweet_id:
+            if 'likes' not in tweet:
+                tweet['likes'] = []
+
+            if user_id in tweet['likes']:
+                tweet['likes'].remove(user_id)
+            else:
+                tweet['likes'].append(user_id)
+
+            write_tweets(tweets)
+            break
+
+    return redirect(url_for('routes.feed'))

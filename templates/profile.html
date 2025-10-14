@@ -16,9 +16,11 @@ body {
   min-height:100vh;
   display:flex;
   justify-content:center;
-  align-items:center;
+  align-items:flex-start;
   background: linear-gradient(135deg,#071226,#0f1724);
   color:#e6eef8;
+  font-size:16px;
+  padding:20px;
 }
 
 .container {
@@ -88,9 +90,32 @@ h2 {
   border-radius:8px;
   background:rgba(255,255,255,0.03);
   text-align:left;
+  position:relative;
 }
 
-.post strong { color:var(--accent); }
+.post strong { color:var(--accent); cursor:pointer; }
+
+.like-section {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:8px;
+}
+
+.like-button {
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-size:18px;
+  transition:transform 0.2s;
+  color:#ffffff; /* cœur blanc par défaut */
+}
+
+.like-button.liked { color:#f87171; }
+
+.like-button:hover { transform:scale(1.2); }
+
+.like-count { color:var(--muted); font-size:14px; }
 
 .follow-lists {
   display:flex;
@@ -106,89 +131,73 @@ h2 {
 
 .follow-lists a:hover { text-decoration:underline; }
 
-.like-section {
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-top:8px;
-}
-
-.like-button {
-  background:none;
-  border:none;
-  cursor:pointer;
-  font-size:18px;
-  transition:transform 0.2s;
-  color:var(--accent);
-}
-
-.like-button:hover { transform:scale(1.2); }
-
-.like-count {
-  color:var(--muted);
-  font-size:14px;
-}
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
 </style>
 </head>
 <body>
-  <div class="container">
+<div class="container">
 
-    <div class="profile-header">
-      <img src="{{ profile_user.profile_pic_url or url_for('static', filename='default-avatar.png') }}" alt="Photo de profil" class="profile-picture">
-      <h1>{{ profile_user.username }}</h1>
+  <!-- Header profil -->
+  <div class="profile-header">
+    <img src="{{ profile_user.profile_pic_url or url_for('static', filename='default-avatar.png') }}" alt="Photo de profil" class="profile-picture">
+    <h1>{{ profile_user.username }}</h1>
 
-      <div class="stats">
-        <span><strong>{{ profile_user.followers|length }}</strong> abonnés</span>
-        <span><strong>{{ profile_user.following|length }}</strong> abonnements</span>
-        <span><strong>{{ user_tweets|length }}</strong> publications</span>
-      </div>
-
-      {% if is_current_user %}
-        <a href="{{ url_for('routes.edit_profile') }}" class="btn">✏️ Modifier le profil</a>
-      {% else %}
-        <form action="{{ url_for('routes.toggle_follow', username=profile_user.username) }}" method="POST">
-          {% if is_following %}
-            <button type="submit">Se désabonner</button>
-          {% else %}
-            <button type="submit">Suivre</button>
-          {% endif %}
-        </form>
-      {% endif %}
+    <div class="stats">
+      <span><strong>{{ profile_user.followers|length }}</strong> abonnés</span>
+      <span><strong>{{ profile_user.following|length }}</strong> abonnements</span>
+      <span><strong>{{ user_tweets|length }}</strong> publications</span>
     </div>
 
-    <div class="follow-lists">
-      <a href="{{ url_for('routes.followers', username=profile_user.username) }}">Voir les abonnés</a>
-      <a href="{{ url_for('routes.following', username=profile_user.username) }}">Voir les abonnements</a>
-    </div>
-
-    <h2>Tweets</h2>
-    {% if user_tweets %}
-      {% for post in user_tweets %}
-        <div class="post">
-          <strong>{{ post.username }}</strong>
-          <p>{{ post.content }}</p>
-
-          <div class="like-section">
-            {% set user_liked = session['user_id'] in post.likes %}
-            <form action="{{ url_for('routes.like_tweet', tweet_id=post.id) }}" method="POST" style="display:inline;">
-              {% if user_liked %}
-                <button class="like-button" type="submit" title="Retirer le like">❤️</button>
-              {% else %}
-                <button class="like-button" type="submit" title="Aimer">🤍</button>
-              {% endif %}
-            </form>
-            <span class="like-count">{{ post.likes|length }} like{% if post.likes|length > 1 %}s{% endif %}</span>
-          </div>
-        </div>
-      {% endfor %}
+    {% if is_current_user %}
+      <a href="{{ url_for('edit_profile') }}" class="btn">✏️ Modifier le profil</a>
     {% else %}
-      <p style="color:var(--muted);">Aucun tweet pour le moment.</p>
+      <form action="{{ url_for('toggle_follow', username=profile_user.username) }}" method="POST">
+        {% if is_following %}
+          <button type="submit">Se désabonner</button>
+        {% else %}
+          <button type="submit">Suivre</button>
+        {% endif %}
+      </form>
     {% endif %}
-
-    <p style="text-align:center; margin-top:16px;">
-      <a href="{{ url_for('routes.feed') }}">⬅ Retour au fil</a>
-    </p>
-
   </div>
+
+  <!-- Liens abonnés / abonnements -->
+  <div class="follow-lists">
+    <a href="{{ url_for('followers', username=profile_user.username) }}">Voir les abonnés</a>
+    <a href="{{ url_for('following', username=profile_user.username) }}">Voir les abonnements</a>
+  </div>
+
+  <!-- Tweets -->
+  <h2>Tweets</h2>
+  {% if user_tweets %}
+    {% for post in user_tweets %}
+      <div class="post" data-post-id="{{ post.id }}">
+        <strong onclick="window.location.href='{{ url_for('profile', username=post.username) }}'">{{ post.username }}</strong>
+        <p>{{ post.content }}</p>
+
+        <div class="like-section">
+          <form action="{{ url_for('like_tweet', tweet_id=post.id) }}" method="POST" style="display:inline;">
+            {% set user_liked = session['user_id'] in post.likes %}
+            {% if user_liked %}
+              <button class="like-button liked" type="submit" title="Retirer le like">❤️</button>
+            {% else %}
+              <button class="like-button" type="submit" title="Aimer">🤍</button>
+            {% endif %}
+          </form>
+          <span class="like-count">{{ post.likes|length }} like{% if post.likes|length > 1 %}s{% endif %}</span>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p style="color:var(--muted);">Aucun tweet pour le moment.</p>
+  {% endif %}
+
+  <p style="text-align:center; margin-top:16px;">
+    <a href="{{ url_for('feed') }}">⬅ Retour au fil</a>
+  </p>
+
+</div>
+
 </body>
 </html>

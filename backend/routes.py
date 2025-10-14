@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
-from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field
+from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field, follow_user, unfollow_user
 
 routes = Blueprint('routes', __name__)
 
@@ -212,6 +212,55 @@ def toggle_follow(username):
 
     write_users(users)
     return redirect(request.referrer or url_for('routes.profile', username=username))
+
+
+# Route pour suivre un utilisateur
+@app.route('/users/<int:user_id>/follow/<int:followed_id>', methods=['POST'])
+def follow_user_route(user_id, followed_id):
+    if follow_user(user_id, followed_id):
+        return jsonify({
+            'message': f"L'utilisateur {user_id} suit maintenant {followed_id}.",
+            'success': True
+        }), 200
+    else:
+        return jsonify({
+            'error': "Impossible de suivre cet utilisateur (IDs invalides).",
+            'success': False
+        }), 404
+
+# Route pour ne plus suivre un utilisateur
+@app.route('/users/<int:user_id>/unfollow/<int:followed_id>', methods=['POST'])
+def unfollow_user_route(user_id, followed_id):
+    if unfollow_user(user_id, followed_id):
+        return jsonify({
+            'message': f"L'utilisateur {user_id} ne suit plus {followed_id}.",
+            'success': True
+        }), 200
+    else:
+        return jsonify({
+            'error': "Impossible de ne plus suivre cet utilisateur (IDs invalides).",
+            'success': False
+        }), 404
+
+# Route pour obtenir la liste des abonnements d'un utilisateur
+@app.route('/users/<int:user_id>/following', methods=['GET'])
+def get_following_route(user_id):
+    following = get_following_details(user_id)
+    return jsonify({
+        'user_id': user_id,
+        'following': following,
+        'success': True
+    }), 200
+
+# Route pour obtenir la liste des abonnés d'un utilisateur
+@app.route('/users/<int:user_id>/followers', methods=['GET'])
+def get_followers_route(user_id):
+    followers = get_followers_details(user_id)
+    return jsonify({
+        'user_id': user_id,
+        'followers': followers,
+        'success': True
+    }), 200
 
 
 # ------------------- SEARCH -------------------

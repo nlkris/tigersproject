@@ -48,3 +48,45 @@ def ensure_likes_field():
     if modified:
         write_tweets(tweets)
         print("Tweets mis à jour avec le champ 'likes'.")
+
+
+def follow_user(follower_id, followed_id):
+    users = read_users()
+    follower = next((u for u in users if u['id'] == follower_id), None)
+    followed = next((u for u in users if u['id'] == followed_id), None)
+
+    if not follower or not followed:
+        return False
+
+    # Initialise les listes si elles n'existent pas
+    if 'following' not in follower:
+        follower['following'] = []
+    if 'followers' not in followed:
+        followed['followers'] = []
+
+    if followed_id not in follower['following']:
+        follower['following'].append(followed_id)
+    if follower_id not in followed['followers']:
+        followed['followers'].append(follower_id)
+
+    write_users(users)
+    return True
+
+def unfollow_user(follower_id, followed_id):
+    """Supprime un abonnement : follower_id ne suit plus followed_id."""
+    users = read_users()
+    follower = next((u for u in users if u['id'] == follower_id), None)
+    followed = next((u for u in users if u['id'] == followed_id), None)
+
+    if not follower or not followed:
+        return False
+
+    if 'following' in follower and followed_id in follower['following']:
+        follower['following'].remove(followed_id)
+    if 'followers' in followed and follower_id in followed['followers']:
+        followed['followers'].remove(follower_id)
+
+    write_users(users, USER_JSON_PATH)
+    return True
+
+

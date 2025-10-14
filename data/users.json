@@ -9,7 +9,10 @@
         "id": 2,
         "username": "jeeaaannnne",
         "email": "jeanneok@gmail.com",
-        "password": "scrypt:32768:8:1$Pi5yJeq1rV63yLJB$82d3c3a0a6a6bd90b13631cd6ef1b3cd7bcf10504a21fbf51ef47abee33de6a221fe1f2feb0b2cc737807afce82d740eb7d1ed5a87a75ca46f82274a3c53e3bf"
+        "password": "scrypt:32768:8:1$Pi5yJeq1rV63yLJB$82d3c3a0a6a6bd90b13631cd6ef1b3cd7bcf10504a21fbf51ef47abee33de6a221fe1f2feb0b2cc737807afce82d740eb7d1ed5a87a75ca46f82274a3c53e3bf",
+        "following": [
+            5
+        ]
     },
     {
         "id": 3,
@@ -27,6 +30,9 @@
         "id": 5,
         "username": "claire",
         "email": "claire.soulienavarro@gmail.com",
-        "password": "scrypt:32768:8:1$tusQjC9Z5EgWUQow$2d4d57856bf44a0c7daab2c1be1dc3c1b843013e6c28191759dd0d37810625e6c93e8324d14db65d41a7ee6af79a9f2c54ac24a75046eb0f570402ad04af23a6"
+        "password": "scrypt:32768:8:1$tusQjC9Z5EgWUQow$2d4d57856bf44a0c7daab2c1be1dc3c1b843013e6c28191759dd0d37810625e6c93e8324d14db65d41a7ee6af79a9f2c54ac24a75046eb0f570402ad04af23a6",
+        "followers": [
+            2
+        ]
     }
 ]

@@ -13,14 +13,26 @@
         "user_id": 2,
         "username": "jeeaaannnne",
         "content": "orieziorozei",
-        "likes": []
+        "likes": [
+            5
+        ],
+        "reactions": {
+            "\ud83d\ude2e": [
+                5
+            ]
+        }
     },
     {
         "id": 3,
         "user_id": 2,
         "username": "jeeaaannnne",
         "content": "fe,znfjkez",
-        "likes": []
+        "likes": [],
+        "reactions": {
+            "\ud83d\udd25": [
+                5
+            ]
+        }
     },
     {
         "id": 4,
@@ -52,5 +64,60 @@
         "username": "claire",
         "content": "coucou cela fonctionne !",
         "likes": []
+    },
+    {
+        "id": 8,
+        "user_id": 5,
+        "username": "claire",
+        "content": "test",
+        "likes": [],
+        "created_at": "2025-10-14T14:44:27.676306",
+        "reactions": {
+            "\u2764\ufe0f": [],
+            "\ud83d\udd25": [],
+            "\ud83d\ude2e": [],
+            "\ud83d\ude02": []
+        }
+    },
+    {
+        "id": 9,
+        "user_id": 5,
+        "username": "claire",
+        "content": "coucou",
+        "likes": [],
+        "reactions": {
+            "\ud83d\udd25": [
+                5
+            ]
+        },
+        "created_at": "2025-10-14T14:49:20.209048"
+    },
+    {
+        "id": 10,
+        "user_id": 5,
+        "username": "claire",
+        "content": "tweet",
+        "likes": [],
+        "created_at": "2025-10-14T14:57:57.782891"
+    },
+    {
+        "id": 11,
+        "user_id": 5,
+        "username": "claire",
+        "content": "test mess",
+        "likes": [
+            5
+        ],
+        "reactions": {},
+        "created_at": "2025-10-14T15:01:44.166193"
+    },
+    {
+        "id": 12,
+        "user_id": 5,
+        "username": "claire",
+        "content": "ok ok",
+        "likes": [],
+        "reactions": {},
+        "created_at": "2025-10-14T15:02:28.813005"
     }
 ]

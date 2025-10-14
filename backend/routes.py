@@ -262,7 +262,6 @@ def get_followers_route(user_id):
 
 =======
 # ------------------- RECHERCHE -------------------
->>>>>>> 1d0325562ca5b08423fc335ed3acd9ac7f64f367
 @routes.route('/search', methods=['GET'])
 def search():
     if 'user_id' not in session:

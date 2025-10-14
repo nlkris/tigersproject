@@ -4,7 +4,9 @@
         "user_id": 2,
         "username": "jeeaaannnne",
         "content": "hjkhhjk\r\nkjhjkh",
-        "likes": []
+        "likes": [
+            5
+        ]
     },
     {
         "id": 2,
@@ -33,7 +35,8 @@
         "username": "claire",
         "content": "coucou",
         "likes": [
-            3
+            3,
+            5
         ]
     },
     {
@@ -41,6 +44,13 @@
         "user_id": 3,
         "username": "nlkris",
         "content": "test 1",
+        "likes": []
+    },
+    {
+        "id": 7,
+        "user_id": 5,
+        "username": "claire",
+        "content": "coucou cela fonctionne !",
         "likes": []
     }
 ]

@@ -39,10 +39,7 @@ body {
   margin-bottom:16px;
 }
 
-.header-left {
-  text-align:center;
-  flex:1;
-}
+.header-left { text-align:center; flex:1; }
 
 .header-right a {
   display:flex;
@@ -106,7 +103,6 @@ h1, h2 { color:var(--accent); margin-bottom:16px; }
 }
 
 .post strong { color: var(--accent); }
-
 .post p { margin:6px 0; }
 
 .like-btn {
@@ -170,7 +166,7 @@ a:hover { text-decoration:underline; }
       <h1>Bienvenue, {{ username }}</h1>
     </div>
     <div class="header-right">
-      <a href="{{ url_for('profile', username=username) }}">
+      <a href="{{ url_for('routes.profile', username=username) }}">
         <img src="{{ url_for('static', filename='tiger.png') }}" alt="Profil">
         <span>Mon profil</span>
       </a>
@@ -179,82 +175,43 @@ a:hover { text-decoration:underline; }
 
   <!-- Barre de recherche -->
   <div class="search-bar">
-    <form method="GET" action="{{ url_for('search') }}">
+    <form method="GET" action="{{ url_for('routes.search') }}">
       <input type="text" name="q" placeholder="Rechercher des utilisateurs..." required>
     </form>
   </div>
 
   <!-- Formulaire publier un tweet -->
-  <form method="POST" action="{{ url_for('tweet') }}">
+  <form method="POST" action="{{ url_for('routes.feed') }}">
     <textarea name="content" placeholder="Quoi de neuf ?" required></textarea>
     <button type="submit">Publier</button>
   </form>
 
   <div class="feed-container">
-    <!-- Abonnements -->
+    <!-- Tous les tweets -->
     <div class="feed">
-      <h2>Vos abonnements</h2>
-      {% if following_feed %}
-        {% for post in following_feed %}
-          <div class="post" onclick="window.location.href='{{ url_for('profile', username=post.username) }}'" data-post-id="{{ post.id }}">
+      <h2>Tous les tweets</h2>
+      {% if tweets %}
+        {% for post in tweets %}
+          <div class="post" onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'" data-post-id="{{ post.id }}">
             <strong>{{ post.username }}</strong>
             <p>{{ post.content }}</p>
-            <button class="like-btn {% if post.liked %}liked{% endif %}" onclick="event.stopPropagation();">
-              ❤️ <span class="like-count">{{ post.likes }}</span>
-            </button>
+            <form action="{{ url_for('routes.like_tweet', tweet_id=post.id) }}" method="POST" style="display:inline;">
+              <button class="like-btn {% if session['user_id'] in post.likes %}liked{% endif %}" type="submit" onclick="event.stopPropagation();">
+                ❤️ <span class="like-count">{{ post.likes|length }}</span>
+              </button>
+            </form>
           </div>
         {% endfor %}
       {% else %}
         <p style="text-align:center; color:var(--muted);">Aucun tweet à afficher.</p>
       {% endif %}
     </div>
-
-    <!-- Recommandations -->
-    <div class="feed">
-      <h2>Recommandations</h2>
-      {% if recommended_feed %}
-        {% for post in recommended_feed %}
-          <div class="post" onclick="window.location.href='{{ url_for('profile', username=post.username) }}'" data-post-id="{{ post.id }}">
-            <strong>{{ post.username }}</strong>
-            <p>{{ post.content }}</p>
-            <button class="like-btn {% if post.liked %}liked{% endif %}" onclick="event.stopPropagation();">
-              ❤️ <span class="like-count">{{ post.likes }}</span>
-            </button>
-          </div>
-        {% endfor %}
-      {% else %}
-        <p style="text-align:center; color:var(--muted);">Aucune recommandation pour le moment.</p>
-      {% endif %}
-    </div>
   </div>
 
-  <!-- Déconnexion -->
   <p style="text-align:center; margin-top:24px;">
-    <a href="{{ url_for('logout') }}">Déconnexion</a>
+    <a href="{{ url_for('routes.logout') }}">Déconnexion</a>
   </p>
 
 </div>
-
-<script>
-// Gestion likes (AJAX)
-document.querySelectorAll('.like-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const post = btn.closest('.post');
-    const postId = post.dataset.postId;
-    const countEl = btn.querySelector('.like-count');
-    let count = parseInt(countEl.textContent);
-
-    if(btn.classList.contains('liked')){
-      btn.classList.remove('liked');
-      countEl.textContent = count - 1;
-    } else {
-      btn.classList.add('liked');
-      countEl.textContent = count + 1;
-    }
-
-    fetch(`/like/${postId}`, { method:'POST' });
-  });
-});
-</script>
 </body>
 </html>

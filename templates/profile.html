@@ -49,10 +49,7 @@ body {
   margin-bottom:12px;
 }
 
-h1 {
-  color:var(--accent);
-  margin-bottom:8px;
-}
+h1 { color:var(--accent); margin-bottom:8px; }
 
 .stats {
   display:flex;
@@ -77,11 +74,7 @@ button, .btn {
 
 button:hover, .btn:hover { opacity:0.9; }
 
-h2 {
-  color:var(--accent);
-  margin:24px 0 12px;
-  text-align:left;
-}
+h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
 
 .post {
   padding:12px;
@@ -108,11 +101,10 @@ h2 {
   cursor:pointer;
   font-size:18px;
   transition:transform 0.2s;
-  color:#ffffff; /* cœur blanc par défaut */
+  color:#ffffff;
 }
 
 .like-button.liked { color:#f87171; }
-
 .like-button:hover { transform:scale(1.2); }
 
 .like-count { color:var(--muted); font-size:14px; }
@@ -123,12 +115,7 @@ h2 {
   margin-bottom:12px;
 }
 
-.follow-lists a {
-  color:var(--accent);
-  text-decoration:none;
-  font-size:14px;
-}
-
+.follow-lists a { color:var(--accent); text-decoration:none; font-size:14px; }
 .follow-lists a:hover { text-decoration:underline; }
 
 a { color:var(--accent); text-decoration:none; }
@@ -138,7 +125,6 @@ a:hover { text-decoration:underline; }
 <body>
 <div class="container">
 
-  <!-- Header profil -->
   <div class="profile-header">
     <img src="{{ profile_user.profile_pic_url or url_for('static', filename='default-avatar.png') }}" alt="Photo de profil" class="profile-picture">
     <h1>{{ profile_user.username }}</h1>
@@ -150,42 +136,33 @@ a:hover { text-decoration:underline; }
     </div>
 
     {% if is_current_user %}
-      <a href="{{ url_for('edit_profile') }}" class="btn">✏️ Modifier le profil</a>
+      <!-- Modifier le profil non implémenté : lien temporaire -->
+      <a href="#" class="btn">✏️ Modifier le profil</a>
     {% else %}
-      <form action="{{ url_for('toggle_follow', username=profile_user.username) }}" method="POST">
-        {% if is_following %}
-          <button type="submit">Se désabonner</button>
-        {% else %}
-          <button type="submit">Suivre</button>
-        {% endif %}
-      </form>
+      <button id="follow-btn" data-following="{{ is_following|tojson }}">
+        {% if is_following %}Se désabonner{% else %}Suivre{% endif %}
+      </button>
     {% endif %}
   </div>
 
-  <!-- Liens abonnés / abonnements -->
   <div class="follow-lists">
-    <a href="{{ url_for('followers', username=profile_user.username) }}">Voir les abonnés</a>
-    <a href="{{ url_for('following', username=profile_user.username) }}">Voir les abonnements</a>
+    <!-- Liens abonnés / abonnements non implémentés -->
+    <a href="#">Voir les abonnés</a>
+    <a href="#">Voir les abonnements</a>
   </div>
 
-  <!-- Tweets -->
   <h2>Tweets</h2>
   {% if user_tweets %}
     {% for post in user_tweets %}
       <div class="post" data-post-id="{{ post.id }}">
-        <strong onclick="window.location.href='{{ url_for('profile', username=post.username) }}'">{{ post.username }}</strong>
+        <strong onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'">{{ post.username }}</strong>
         <p>{{ post.content }}</p>
 
         <div class="like-section">
-          <form action="{{ url_for('like_tweet', tweet_id=post.id) }}" method="POST" style="display:inline;">
-            {% set user_liked = session['user_id'] in post.likes %}
-            {% if user_liked %}
-              <button class="like-button liked" type="submit" title="Retirer le like">❤️</button>
-            {% else %}
-              <button class="like-button" type="submit" title="Aimer">🤍</button>
-            {% endif %}
-          </form>
-          <span class="like-count">{{ post.likes|length }} like{% if post.likes|length > 1 %}s{% endif %}</span>
+          <button class="like-button {% if session['user_id'] in post.likes %}liked{% endif %}" data-tweet-id="{{ post.id }}">
+            ❤️
+          </button>
+          <span class="like-count">{{ post.likes|length }}</span>
         </div>
       </div>
     {% endfor %}
@@ -194,10 +171,49 @@ a:hover { text-decoration:underline; }
   {% endif %}
 
   <p style="text-align:center; margin-top:16px;">
-    <a href="{{ url_for('feed') }}">⬅ Retour au fil</a>
+    <a href="{{ url_for('routes.feed') }}">⬅ Retour au fil</a>
   </p>
 
 </div>
+
+<script>
+// --------------------- Likes AJAX ---------------------
+document.querySelectorAll('.like-button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tweetId = btn.dataset.tweetId;
+    const countEl = btn.nextElementSibling;
+    let count = parseInt(countEl.textContent);
+
+    fetch(`/like/${tweetId}`, { method:'POST' })
+      .then(() => {
+        if(btn.classList.contains('liked')){
+          btn.classList.remove('liked');
+          countEl.textContent = count - 1;
+        } else {
+          btn.classList.add('liked');
+          countEl.textContent = count + 1;
+        }
+      });
+  });
+});
+
+// --------------------- Follow/Unfollow AJAX ---------------------
+const followBtn = document.getElementById('follow-btn');
+if(followBtn){
+  followBtn.addEventListener('click', () => {
+    fetch(`/toggle_follow/{{ profile_user.username }}`, { method:'POST' })
+      .then(() => {
+        if(followBtn.dataset.following === 'true'){
+          followBtn.textContent = 'Suivre';
+          followBtn.dataset.following = 'false';
+        } else {
+          followBtn.textContent = 'Se désabonner';
+          followBtn.dataset.following = 'true';
+        }
+      });
+  });
+}
+</script>
 
 </body>
 </html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TIGINSA — Profil</title>
+<style>
+:root {
+  --bg:#0f1724; --card:#0b1220; --muted:#9aa8bf; --accent:#5eead4;
+  --radius:12px; --shadow:0 6px 18px rgba(2,6,23,0.6);
+  font-family: Inter, sans-serif;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+
+body {
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: linear-gradient(135deg,#071226,#0f1724);
+  color:#e6eef8;
+}
+
+.container {
+  background:var(--card);
+  padding:32px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  width:100%;
+  max-width:600px;
+  text-align:center;
+}
+
+.profile-header {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  margin-bottom:24px;
+}
+
+.profile-picture {
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid var(--accent);
+  margin-bottom:12px;
+}
+
+h1 {
+  color:var(--accent);
+  margin-bottom:8px;
+}
+
+.stats {
+  display:flex;
+  gap:16px;
+  justify-content:center;
+  margin-bottom:16px;
+  color:var(--muted);
+  font-size:14px;
+}
+
+button, .btn {
+  padding:10px 16px;
+  background:linear-gradient(90deg,#06b6d4,#7c3aed);
+  border:none;
+  border-radius:8px;
+  color:#021024;
+  font-weight:700;
+  cursor:pointer;
+  transition:0.2s;
+  text-decoration:none;
+}
+
+button:hover, .btn:hover { opacity:0.9; }
+
+h2 {
+  color:var(--accent);
+  margin:24px 0 12px;
+  text-align:left;
+}
+
+.post {
+  padding:12px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  margin-bottom:12px;
+  border-radius:8px;
+  background:rgba(255,255,255,0.03);
+  text-align:left;
+}
+
+.post strong { color:var(--accent); }
+
+.follow-lists {
+  display:flex;
+  justify-content:space-around;
+  margin-bottom:12px;
+}
+
+.follow-lists a {
+  color:var(--accent);
+  text-decoration:none;
+  font-size:14px;
+}
+
+.follow-lists a:hover { text-decoration:underline; }
+
+.like-section {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:8px;
+}
+
+.like-button {
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-size:18px;
+  transition:transform 0.2s;
+  color:var(--accent);
+}
+
+.like-button:hover { transform:scale(1.2); }
+
+.like-count {
+  color:var(--muted);
+  font-size:14px;
+}
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="profile-header">
+      <img src="{{ profile_user.profile_pic_url or url_for('static', filename='default-avatar.png') }}" alt="Photo de profil" class="profile-picture">
+      <h1>{{ profile_user.username }}</h1>
+
+      <div class="stats">
+        <span><strong>{{ profile_user.followers|length }}</strong> abonnés</span>
+        <span><strong>{{ profile_user.following|length }}</strong> abonnements</span>
+        <span><strong>{{ user_tweets|length }}</strong> publications</span>
+      </div>
+
+      {% if is_current_user %}
+        <a href="{{ url_for('routes.edit_profile') }}" class="btn">✏️ Modifier le profil</a>
+      {% else %}
+        <form action="{{ url_for('routes.toggle_follow', username=profile_user.username) }}" method="POST">
+          {% if is_following %}
+            <button type="submit">Se désabonner</button>
+          {% else %}
+            <button type="submit">Suivre</button>
+          {% endif %}
+        </form>
+      {% endif %}
+    </div>
+
+    <div class="follow-lists">
+      <a href="{{ url_for('routes.followers', username=profile_user.username) }}">Voir les abonnés</a>
+      <a href="{{ url_for('routes.following', username=profile_user.username) }}">Voir les abonnements</a>
+    </div>
+
+    <h2>Tweets</h2>
+    {% if user_tweets %}
+      {% for post in user_tweets %}
+        <div class="post">
+          <strong>{{ post.username }}</strong>
+          <p>{{ post.content }}</p>
+
+          <div class="like-section">
+            {% set user_liked = session['user_id'] in post.likes %}
+            <form action="{{ url_for('routes.like_tweet', tweet_id=post.id) }}" method="POST" style="display:inline;">
+              {% if user_liked %}
+                <button class="like-button" type="submit" title="Retirer le like">❤️</button>
+              {% else %}
+                <button class="like-button" type="submit" title="Aimer">🤍</button>
+              {% endif %}
+            </form>
+            <span class="like-count">{{ post.likes|length }} like{% if post.likes|length > 1 %}s{% endif %}</span>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p style="color:var(--muted);">Aucun tweet pour le moment.</p>
+    {% endif %}
+
+    <p style="text-align:center; margin-top:16px;">
+      <a href="{{ url_for('routes.feed') }}">⬅ Retour au fil</a>
+    </p>
+
+  </div>
+</body>
+</html>

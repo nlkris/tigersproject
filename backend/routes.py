@@ -207,7 +207,7 @@ def profile(username):
 # ------------------- SUIVRE / SE DÉSABONNER -------------------
 
 
-<<<<<<< HEAD
+
 
 # Route pour suivre un utilisateur
 @app.route('/users/<int:user_id>/follow/<int:followed_id>', methods=['POST'])

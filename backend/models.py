@@ -33,4 +33,23 @@ def get_tweets_by_user(user_id):
     tweets = load_data(TWEETS_JSON_PATH)
     return [tweet for tweet in tweets if tweet['user_id'] == user_id]
 
+def print_user_tweets(user_id):
+    """Affiche les tweets d'un utilisateur dans le terminal."""
+    user = get_user_by_id(user_id)
+    if not user:
+        print(f"Utilisateur avec l'ID {user_id} non trouvé.")
+        return
+
+    print(f"\n--- Tweets de {user['username']} ---")
+    print(f"Email : {user['email']}")
+    print(f"Bio : {user['bio']}\n")
+
+    tweets = get_tweets_by_user(user_id)
+    if not tweets:
+        print("Aucun tweet trouvé.")
+    else:
+        for tweet in tweets:
+            print(f"Tweet ID {tweet['id']} :")
+            print(f"  Contenu : {tweet['content']}")
+            print(f"  Posté le : {tweet['timestamp']}\n")
 

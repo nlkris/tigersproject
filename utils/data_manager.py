@@ -51,40 +51,66 @@ def ensure_likes_field():
 
 
 def follow_user(follower_id, followed_id):
+    """
+    Ajoute un abonnement : follower_id suit followed_id.
+    Retourne True si la mise à jour a réussi, False sinon.
+    """
     users = read_users()
     follower = next((u for u in users if u['id'] == follower_id), None)
     followed = next((u for u in users if u['id'] == followed_id), None)
-
     if not follower or not followed:
+        print("Erreur : utilisateur non trouvé.")
         return False
-
-    # Initialise les listes si elles n'existent pas
-    if 'following' not in follower:
-        follower['following'] = []
-    if 'followers' not in followed:
-        followed['followers'] = []
-
     if followed_id not in follower['following']:
         follower['following'].append(followed_id)
     if follower_id not in followed['followers']:
         followed['followers'].append(follower_id)
+    write_users(users)
+    print(f"{follower_id} suit maintenant {followed_id}.")
+    return True
+
+    # Initialise les listes si elles n'existent pas
+def ensure_follow_fields():
+    """
+    Ajoute les champs 'follower' et 'following' à tous les utilisateurs
+    s'ils n'existent pas.
+    """
+    users = read_users()
+    modified = False
+    for user in users:
+        if 'followers' not in user:
+            user['followers'] = []
+            modified = True
+        if 'following' not in user:
+            user['following'] = []
+            modified = True
+    if modified:
+        write_users(users)
+        print("Champs 'followers' et 'following' ajoutés aux utilisateurs.")
+    else:
+        print("Tous les utilisateurs ont déjà les champs 'followers' et 'following'.")
 
     write_users(users)
     return True
 
 def unfollow_user(follower_id, followed_id):
-    """Supprime un abonnement : follower_id ne suit plus followed_id."""
+    """
+    Supprime un abonnement : follower_id ne suit plus followed_id.
+    Retourne True si la mise à jour a réussi, False sinon.
+    """
     users = read_users()
     follower = next((u for u in users if u['id'] == follower_id), None)
     followed = next((u for u in users if u['id'] == followed_id), None)
-
     if not follower or not followed:
+        print("Erreur : utilisateur non trouvé.")
         return False
-
-    if 'following' in follower and followed_id in follower['following']:
+    if followed_id in follower['following']:
         follower['following'].remove(followed_id)
-    if 'followers' in followed and follower_id in followed['followers']:
+    if follower_id in followed['followers']:
         followed['followers'].remove(follower_id)
+    write_users(users)
+    print(f"{follower_id} ne suit plus {followed_id}.")
+    return True
 
     write_users(users, USER_JSON_PATH)
     return True

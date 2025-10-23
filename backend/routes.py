@@ -1,17 +1,14 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-<<<<<<< HEAD
-from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field, follow_user, unfollow_user
-=======
-from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field
+from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field, ensure_follow_fields
 from datetime import datetime
->>>>>>> 1d0325562ca5b08423fc335ed3acd9ac7f64f367
 
 routes = Blueprint('routes', __name__)
 
 # Initialisation des fichiers et champs
 init_files()
 ensure_likes_field()
+ensure_follow_fields()
 
 # ------------------- ACCUEIL -------------------
 @routes.route('/')
@@ -210,7 +207,7 @@ def profile(username):
 
 
 # Route pour suivre un utilisateur
-@app.route('/users/<int:user_id>/follow/<int:followed_id>', methods=['POST'])
+@routes.route('/users/<int:user_id>/follow/<int:followed_id>', methods=['POST'])
 def follow_user_route(user_id, followed_id):
     if follow_user(user_id, followed_id):
         return jsonify({
@@ -224,7 +221,7 @@ def follow_user_route(user_id, followed_id):
         }), 404
 
 # Route pour ne plus suivre un utilisateur
-@app.route('/users/<int:user_id>/unfollow/<int:followed_id>', methods=['POST'])
+@routes.route('/users/<int:user_id>/unfollow/<int:followed_id>', methods=['POST'])
 def unfollow_user_route(user_id, followed_id):
     if unfollow_user(user_id, followed_id):
         return jsonify({
@@ -238,7 +235,7 @@ def unfollow_user_route(user_id, followed_id):
         }), 404
 
 # Route pour obtenir la liste des abonnements d'un utilisateur
-@app.route('/users/<int:user_id>/following', methods=['GET'])
+@routes.route('/users/<int:user_id>/following', methods=['GET'])
 def get_following_route(user_id):
     following = get_following_details(user_id)
     return jsonify({
@@ -248,7 +245,7 @@ def get_following_route(user_id):
     }), 200
 
 # Route pour obtenir la liste des abonnés d'un utilisateur
-@app.route('/users/<int:user_id>/followers', methods=['GET'])
+@routes.route('/users/<int:user_id>/followers', methods=['GET'])
 def get_followers_route(user_id):
     followers = get_followers_details(user_id)
     return jsonify({
@@ -260,7 +257,7 @@ def get_followers_route(user_id):
 
 # ------------------- SEARCH -------------------
 
-=======
+
 # ------------------- RECHERCHE -------------------
 @routes.route('/search', methods=['GET'])
 def search():

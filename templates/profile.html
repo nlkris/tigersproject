@@ -60,6 +60,10 @@ h1 { color:var(--accent); margin-bottom:8px; }
   font-size:14px;
 }
 
+.stats strong {
+  color: #e6eef8;
+}
+
 button, .btn {
   padding:10px 16px;
   background:linear-gradient(90deg,#06b6d4,#7c3aed);
@@ -130,23 +134,21 @@ a:hover { text-decoration:underline; }
     <h1>{{ profile_user.username }}</h1>
 
     <div class="stats">
-      <span><strong>{{ profile_user.followers|length }}</strong> abonnés</span>
-      <span><strong>{{ profile_user.following|length }}</strong> abonnements</span>
+      <span><strong id="followers-count">{{ profile_user.followers|length }}</strong> abonnés</span>
+      <span><strong id="following-count">{{ profile_user.following|length }}</strong> abonnements</span>
       <span><strong>{{ user_tweets|length }}</strong> publications</span>
     </div>
 
     {% if is_current_user %}
-      <!-- Modifier le profil non implémenté : lien temporaire -->
       <a href="#" class="btn">✏️ Modifier le profil</a>
     {% else %}
-      <button id="follow-btn" data-following="{{ is_following|tojson }}">
+      <button id="follow-btn" type="button" data-following="{{ is_following|tojson }}">
         {% if is_following %}Se désabonner{% else %}Suivre{% endif %}
       </button>
     {% endif %}
   </div>
 
   <div class="follow-lists">
-    <!-- Liens abonnés / abonnements non implémentés -->
     <a href="#">Voir les abonnés</a>
     <a href="#">Voir les abonnements</a>
   </div>
@@ -177,42 +179,60 @@ a:hover { text-decoration:underline; }
 </div>
 
 <script>
-// --------------------- Likes AJAX ---------------------
-document.querySelectorAll('.like-button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const tweetId = btn.dataset.tweetId;
-    const countEl = btn.nextElementSibling;
-    let count = parseInt(countEl.textContent);
+document.addEventListener('DOMContentLoaded', () => {
 
-    fetch(`/like/${tweetId}`, { method:'POST' })
-      .then(() => {
-        if(btn.classList.contains('liked')){
+  // --- Likes AJAX ---
+  document.querySelectorAll('.like-button').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const tweetId = btn.dataset.tweetId;
+      const countEl = btn.nextElementSibling;
+      let count = parseInt(countEl.textContent) || 0;
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/like/${tweetId}`, { method: 'POST' });
+        if (!res.ok) throw new Error('Erreur réseau');
+        if (btn.classList.contains('liked')) {
           btn.classList.remove('liked');
           countEl.textContent = count - 1;
         } else {
           btn.classList.add('liked');
           countEl.textContent = count + 1;
         }
-      });
+      } catch (err) {
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+      }
+    });
   });
-});
 
-// --------------------- Follow/Unfollow AJAX ---------------------
-const followBtn = document.getElementById('follow-btn');
-if(followBtn){
-  followBtn.addEventListener('click', () => {
-    fetch(`/toggle_follow/{{ profile_user.username }}`, { method:'POST' })
-      .then(() => {
-        if(followBtn.dataset.following === 'true'){
-          followBtn.textContent = 'Suivre';
-          followBtn.dataset.following = 'false';
-        } else {
-          followBtn.textContent = 'Se désabonner';
-          followBtn.dataset.following = 'true';
-        }
-      });
-  });
-}
+  // --- Follow AJAX ---
+  const followBtn = document.getElementById('follow-btn');
+  if (followBtn) {
+    followBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      followBtn.disabled = true;
+
+      try {
+        const username = "{{ profile_user.username }}";
+        const res = await fetch(`/toggle_follow/${username}`, { method: 'POST' });
+        if (!res.ok) throw new Error('Erreur réseau');
+        const data = await res.json();
+
+        followBtn.textContent = data.is_following ? 'Se désabonner' : 'Suivre';
+        followBtn.dataset.following = data.is_following ? 'true' : 'false';
+        document.getElementById('followers-count').textContent = data.followers_count;
+        document.getElementById('following-count').textContent = data.following_count;
+      } catch (err) {
+        console.error('Erreur follow:', err);
+      } finally {
+        followBtn.disabled = false;
+      }
+    });
+  }
+
+});
 </script>
 
 </body>

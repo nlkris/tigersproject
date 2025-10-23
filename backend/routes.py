@@ -113,7 +113,6 @@ def feed():
         post.setdefault('reactions', {})
         post['liked'] = session['user_id'] in post['likes']
 
-    # Pas de filtrage pour following/recommended → tous les tweets affichés immédiatement
     return render_template('feed.html', username=session['username'], tweets=tweets)
 
 # ------------------- DÉCONNEXION -------------------
@@ -201,62 +200,45 @@ def profile(username):
                            is_current_user=is_current_user,
                            is_following=is_following)
 
-# ------------------- SUIVRE / SE DÉSABONNER -------------------
+# ------------------- SUIVRE / SE DÉSABONNER (corrigé AJAX) -------------------
+@routes.route('/toggle_follow/<username>', methods=['POST'])
+def toggle_follow(username):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non connecté'}), 401
 
+    users = read_users()
+    current_user_id = session['user_id']
 
+    # Trouver l'utilisateur actuel et celui du profil
+    current_user = next((u for u in users if u['id'] == current_user_id), None)
+    target_user = next((u for u in users if u['username'] == username), None)
 
+    if not current_user or not target_user:
+        return jsonify({'error': 'Utilisateur introuvable'}), 404
 
-# Route pour suivre un utilisateur
-@routes.route('/users/<int:user_id>/follow/<int:followed_id>', methods=['POST'])
-def follow_user_route(user_id, followed_id):
-    if follow_user(user_id, followed_id):
-        return jsonify({
-            'message': f"L'utilisateur {user_id} suit maintenant {followed_id}.",
-            'success': True
-        }), 200
+    # Initialiser les listes si manquantes
+    current_user.setdefault('following', [])
+    target_user.setdefault('followers', [])
+
+    # Déterminer s’il suit déjà
+    if target_user['id'] in current_user['following']:
+        current_user['following'].remove(target_user['id'])
+        if current_user['id'] in target_user['followers']:
+            target_user['followers'].remove(current_user['id'])
+        is_following = False
     else:
-        return jsonify({
-            'error': "Impossible de suivre cet utilisateur (IDs invalides).",
-            'success': False
-        }), 404
+        current_user['following'].append(target_user['id'])
+        if current_user['id'] not in target_user['followers']:
+            target_user['followers'].append(current_user['id'])
+        is_following = True
 
-# Route pour ne plus suivre un utilisateur
-@routes.route('/users/<int:user_id>/unfollow/<int:followed_id>', methods=['POST'])
-def unfollow_user_route(user_id, followed_id):
-    if unfollow_user(user_id, followed_id):
-        return jsonify({
-            'message': f"L'utilisateur {user_id} ne suit plus {followed_id}.",
-            'success': True
-        }), 200
-    else:
-        return jsonify({
-            'error': "Impossible de ne plus suivre cet utilisateur (IDs invalides).",
-            'success': False
-        }), 404
+    write_users(users)
 
-# Route pour obtenir la liste des abonnements d'un utilisateur
-@routes.route('/users/<int:user_id>/following', methods=['GET'])
-def get_following_route(user_id):
-    following = get_following_details(user_id)
     return jsonify({
-        'user_id': user_id,
-        'following': following,
-        'success': True
-    }), 200
-
-# Route pour obtenir la liste des abonnés d'un utilisateur
-@routes.route('/users/<int:user_id>/followers', methods=['GET'])
-def get_followers_route(user_id):
-    followers = get_followers_details(user_id)
-    return jsonify({
-        'user_id': user_id,
-        'followers': followers,
-        'success': True
-    }), 200
-
-
-# ------------------- SEARCH -------------------
-
+        'is_following': is_following,
+        'followers_count': len(target_user['followers']),
+        'following_count': len(current_user['following'])
+    })
 
 # ------------------- RECHERCHE -------------------
 @routes.route('/search', methods=['GET'])

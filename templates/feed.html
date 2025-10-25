@@ -88,10 +88,51 @@ button {
 button:hover { opacity:0.9; }
 a { color:var(--accent); text-decoration:none; }
 a:hover { text-decoration:underline; }
+
+.flashes {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.flashes li {
+  font-size: 14px;
+  margin-bottom: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  display: inline-block;
+  opacity: 1;                 /* Opaque dès l'affichage */
+  transition: opacity 0.5s ease;
+}
+
+.flashes li.success {
+  color: #021024;
+  background: rgba(94, 234, 212, 1);  /* <-- alpha = 1 pour opacité totale */
+}
+
+.flashes li.error {
+  color: #021024;
+  background: rgba(248, 113, 113, 1); /* <-- alpha = 1 pour opacité totale */
+}
+
+
 </style>
 </head>
 <body>
 <div class="container">
+
+  <!-- --- FLASH MESSAGES --- -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
 
   <!-- Header -->
   <div class="header">
@@ -200,6 +241,17 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = false;
       }
     });
+  });
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const flashes = document.querySelectorAll('.flashes li');
+  flashes.forEach(flash => {
+    setTimeout(() => {
+      flash.style.opacity = '0';
+      setTimeout(() => flash.remove(), 500); // supprime après la transition
+    }, 3000); // disparait après 3 secondes
   });
 });
 

@@ -32,37 +32,11 @@ body {
   max-width:1100px;
 }
 
-.header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:16px;
-}
-
+.header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
 .header-left { text-align:center; flex:1; }
-
-.header-right a {
-  display:flex;
-  align-items:center;
-  gap:8px;
-  color:var(--accent);
-  text-decoration:none;
-  font-weight:600;
-}
-
-.header-right a img {
-  width:60px;
-  height:auto;
-  border-radius:50%;
-  cursor:pointer;
-  transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-.header-right a:hover img {
-  transform: scale(1.05);
-  filter: drop-shadow(0 0 8px var(--accent));
-}
-
+.header-right a { display:flex; align-items:center; gap:8px; color:var(--accent); text-decoration:none; font-weight:600; }
+.header-right a img { width:60px; height:auto; border-radius:50%; cursor:pointer; transition: transform 0.3s ease, filter 0.3s ease; }
+.header-right a:hover img { transform: scale(1.05); filter: drop-shadow(0 0 8px var(--accent)); }
 .header-right a:hover span { text-decoration:underline; }
 
 .logo { display:block; margin:0 auto 16px auto; width:200px; height:auto; }
@@ -70,90 +44,50 @@ body {
 
 .search-bar { margin:16px 0; display:flex; justify-content:center; }
 .search-bar input[type="text"] {
-  padding:10px 12px;
+  padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.1);
+  background:transparent; color:#e6eef8; outline:none; width:300px;
+}
+
+h1,h2 { color:var(--accent); margin-bottom:16px; }
+
+.switch-container { display:flex; justify-content:center; gap:12px; margin-bottom:24px; }
+.switch-btn {
+  padding:10px 20px;
   border-radius:8px;
-  border:1px solid rgba(255,255,255,0.1);
-  background:transparent;
-  color:#e6eef8;
-  outline:none;
-  width:300px;
+  background: rgba(255,255,255,0.05);
+  color: var(--accent);
+  text-decoration: none;
+  font-weight:600;
+  transition: all 0.2s ease;
 }
+.switch-btn:hover { background: rgba(255,255,255,0.15); }
+.switch-btn.active { background: linear-gradient(90deg,#06b6d4,#7c3aed); color: #021024; box-shadow: var(--shadow); }
 
-h1, h2 { color:var(--accent); margin-bottom:16px; }
-
-.feed-container { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
-
-.feed {
-  background:rgba(255,255,255,0.03);
-  border-radius:var(--radius);
-  padding:16px;
-  box-shadow:var(--shadow);
-  max-height:600px;
-  overflow-y:auto;
-}
-
-.post {
-  padding:12px;
-  border-bottom:1px solid rgba(255,255,255,0.1);
-  margin-bottom:12px;
-  border-radius:8px;
-  background:rgba(255,255,255,0.02);
-  cursor:pointer;
-  position:relative;
-}
-
+.feed { background:rgba(255,255,255,0.03); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); max-height:600px; overflow-y:auto; }
+.post { padding:12px; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:12px; border-radius:8px; background:rgba(255,255,255,0.02); cursor:pointer; position:relative; }
 .post strong { color: var(--accent); }
 .post p { margin:6px 0; }
 
 .like-btn {
-  position:absolute;
-  top:12px;
-  right:12px;
-  background:none;
-  border:none;
-  color:#ffffff;
-  cursor:pointer;
-  font-size:18px;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  transition:color 0.2s ease;
-  z-index:1;
+  position:absolute; top:12px; right:12px;
+  background:none; border:none;
+  color:#ffffff; cursor:pointer; font-size:18px;
+  display:flex; align-items:center; gap:6px; transition:color 0.2s ease, transform 0.2s ease; z-index:1;
 }
-
+.like-btn:hover { transform: scale(1.1); }
 .like-btn.liked { color:#f87171; }
-.like-btn:hover { color:#f87171; }
 
 form { display:flex; flex-direction:column; gap:16px; margin-bottom:32px; }
-
-textarea {
-  padding:10px 12px;
-  border-radius:8px;
-  border:1px solid rgba(255,255,255,0.1);
-  background:transparent;
-  color:#e6eef8;
-  outline:none;
-  width:100%;
-  min-height:80px;
+textarea { padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.1);
+  background:transparent; color:#e6eef8; outline:none; width:100%; min-height:80px;
 }
-
 button {
-  padding:12px;
-  background:linear-gradient(90deg,#06b6d4,#7c3aed);
-  border:none;
-  border-radius:8px;
-  color:#021024;
-  font-weight:700;
-  cursor:pointer;
-  transition:0.2s;
+  padding:12px; background:linear-gradient(90deg,#06b6d4,#7c3aed);
+  border:none; border-radius:8px; color:#021024; font-weight:700; cursor:pointer; transition:0.2s;
 }
-
 button:hover { opacity:0.9; }
-
 a { color:var(--accent); text-decoration:none; }
 a:hover { text-decoration:underline; }
-
-@media (max-width:900px) { .feed-container { grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
@@ -186,26 +120,49 @@ a:hover { text-decoration:underline; }
     <button type="submit">Publier</button>
   </form>
 
+  <!-- Boutons pour switcher -->
+  <div class="switch-container">
+    <a href="{{ url_for('routes.feed', view='followed') }}" class="switch-btn {% if view == 'followed' %}active{% endif %}">Abonnements</a>
+    <a href="{{ url_for('routes.feed', view='recommended') }}" class="switch-btn {% if view == 'recommended' %}active{% endif %}">Recommandations</a>
+  </div>
+
+  <!-- Contenu du fil -->
   <div class="feed-container">
-    <!-- Tous les tweets -->
-    <div class="feed">
-      <h2>Tous les tweets</h2>
-      {% if tweets %}
-        {% for post in tweets %}
-          <div class="post" onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'" data-post-id="{{ post.id }}">
-            <strong>{{ post.username }}</strong>
-            <p>{{ post.content }}</p>
-            <form action="{{ url_for('routes.like_tweet', tweet_id=post.id) }}" method="POST" style="display:inline;">
-              <button class="like-btn {% if session['user_id'] in post.likes %}liked{% endif %}" type="submit" onclick="event.stopPropagation();">
+    {% if view == 'followed' %}
+      <div class="feed">
+        <h2>Abonnements</h2>
+        {% if followed_tweets %}
+          {% for post in followed_tweets %}
+            <div class="post" onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'">
+              <strong>{{ post.username }}</strong>
+              <p>{{ post.content }}</p>
+              <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
                 ❤️ <span class="like-count">{{ post.likes|length }}</span>
               </button>
-            </form>
-          </div>
-        {% endfor %}
-      {% else %}
-        <p style="text-align:center; color:var(--muted);">Aucun tweet à afficher.</p>
-      {% endif %}
-    </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p style="text-align:center; color:var(--muted);">Aucun tweet de vos abonnements.</p>
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="feed">
+        <h2>Recommandations</h2>
+        {% if recommended_tweets %}
+          {% for post in recommended_tweets %}
+            <div class="post" onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'">
+              <strong>{{ post.username }}</strong>
+              <p>{{ post.content }}</p>
+              <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
+                ❤️ <span class="like-count">{{ post.likes|length }}</span>
+              </button>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p style="text-align:center; color:var(--muted);">Aucune recommandation pour le moment.</p>
+        {% endif %}
+      </div>
+    {% endif %}
   </div>
 
   <p style="text-align:center; margin-top:24px;">
@@ -213,5 +170,32 @@ a:hover { text-decoration:underline; }
   </p>
 
 </div>
+
+<!-- JS pour update likes sans reload -->
+<script>
+document.querySelectorAll('.like-btn').forEach(button => {
+    button.addEventListener('click', function(event){
+        event.stopPropagation(); // pour ne pas déclencher le clic sur le post
+        const tweetId = this.dataset.tweetId;
+        fetch(`/like/${tweetId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            if(data.success){
+                this.querySelector('.like-count').textContent = data.like_count;
+                if(data.liked){
+                    this.classList.add('liked');
+                } else {
+                    this.classList.remove('liked');
+                }
+            }
+        })
+        .catch(err => console.error(err));
+    });
+});
+</script>
+
 </body>
 </html>

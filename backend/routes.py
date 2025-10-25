@@ -87,6 +87,8 @@ def feed():
 
     tweets = read_tweets()
     users = read_users()
+    current_user_id = session['user_id']
+    current_user = next((u for u in users if u['id'] == current_user_id), None)
 
     # Publier un tweet
     if request.method == 'POST':
@@ -94,7 +96,7 @@ def feed():
         if content:
             new_tweet = {
                 'id': len(tweets) + 1,
-                'user_id': session['user_id'],
+                'user_id': current_user_id,
                 'username': session['username'],
                 'content': content,
                 'likes': [],
@@ -113,17 +115,18 @@ def feed():
     for post in tweets:
         post.setdefault('likes', [])
         post.setdefault('reactions', {})
-        post['liked'] = session['user_id'] in post['likes']
+        post['liked'] = current_user_id in post['likes']
 
-    # Gestion des catégories
-    current_user_id = session['user_id']
-    current_user = next((u for u in users if u['id'] == current_user_id), None)
-    followed_user_ids = current_user.get('following', []) if current_user else []
+    # --- Gestion des catégories ---
+    followed_ids = current_user.get('following', [])
 
-    followed_tweets = [t for t in tweets if t['user_id'] in followed_user_ids]
-    recommended_tweets = [t for t in tweets if t['user_id'] not in followed_user_ids and t['user_id'] != current_user_id]
+    # Tweets des abonnements + les siens
+    followed_tweets = [t for t in tweets if t['user_id'] in followed_ids or t['user_id'] == current_user_id]
 
-    # Vue active
+    # Tweets recommandés (non suivis et non soi-même)
+    recommended_tweets = [t for t in tweets if t['user_id'] not in followed_ids and t['user_id'] != current_user_id]
+
+    # Vue active : abonnements ou recommandations
     view = request.args.get('view', 'followed')
 
     return render_template(
@@ -133,6 +136,7 @@ def feed():
         followed_tweets=followed_tweets,
         recommended_tweets=recommended_tweets
     )
+
 
 
 # ------------------- DÉCONNEXION -------------------
@@ -151,22 +155,21 @@ def like_tweet(tweet_id):
 
     tweets = read_tweets()
     user_id = session['user_id']
-    liked = False
-    like_count = 0
 
     for tweet in tweets:
         if tweet['id'] == tweet_id:
             tweet.setdefault('likes', [])
             if user_id in tweet['likes']:
                 tweet['likes'].remove(user_id)
+                liked = False
             else:
                 tweet['likes'].append(user_id)
                 liked = True
-            like_count = len(tweet['likes'])
             write_tweets(tweets)
-            break
+            return jsonify({"success": True, "liked": liked, "like_count": len(tweet['likes'])})
 
-    return jsonify({"success": True, "liked": liked, "like_count": like_count})
+    return jsonify({"success": False, "message": "Tweet non trouvé"}), 404
+
 
 
 # ------------------- RÉACTIONS MULTIPLES -------------------
@@ -200,6 +203,7 @@ def profile(username):
 
     users = read_users()
     tweets = read_tweets()
+
     profile_user = next((u for u in users if u['username'] == username), None)
     if not profile_user:
         flash("Utilisateur introuvable.", "error")
@@ -212,17 +216,25 @@ def profile(username):
     current_user = next((u for u in users if u['id'] == session.get('user_id')), None)
     is_following = profile_user['id'] in current_user.get('following', []) if current_user else False
 
+    # Ajout systématique des champs pour le front
     for post in user_tweets:
         post.setdefault('likes', [])
         post.setdefault('reactions', {})
         post['liked'] = session['user_id'] in post['likes']
 
-    return render_template('profile.html',
-                           profile_user=profile_user,
-                           user_tweets=user_tweets,
-                           is_current_user=is_current_user,
-                           is_following=is_following)
+    # --- Nouveaux : listes complètes d'objets utilisateurs pour abonnés / abonnements ---
+    followers_list = [u for u in users if u['id'] in profile_user.get('followers', [])]
+    following_list = [u for u in users if u['id'] in profile_user.get('following', [])]
 
+    return render_template(
+        'profile.html',
+        profile_user=profile_user,
+        user_tweets=user_tweets,
+        is_current_user=is_current_user,
+        is_following=is_following,
+        followers_list=followers_list,
+        following_list=following_list
+    )
 
 # ------------------- SUIVRE / SE DÉSABONNER -------------------
 @routes.route('/toggle_follow/<username>', methods=['POST'])

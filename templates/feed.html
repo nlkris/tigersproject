@@ -133,13 +133,18 @@ a:hover { text-decoration:underline; }
         <h2>Abonnements</h2>
         {% if followed_tweets %}
           {% for post in followed_tweets %}
-            <div class="post" onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'">
-              <strong>{{ post.username }}</strong>
+            <div class="post" data-post-id="{{ post.id }}">
+              <strong onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'" style="cursor:pointer;">
+                {{ post.username }}
+              </strong>
               <p>{{ post.content }}</p>
-              <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
-                ❤️ <span class="like-count">{{ post.likes|length }}</span>
-              </button>
+              <div style="display:flex; align-items:center; margin-top:8px;">
+                <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
+                  ❤️ <span class="like-count">{{ post.likes|length }}</span>
+                </button>
+              </div>
             </div>
+
           {% endfor %}
         {% else %}
           <p style="text-align:center; color:var(--muted);">Aucun tweet de vos abonnements.</p>
@@ -173,28 +178,32 @@ a:hover { text-decoration:underline; }
 
 <!-- JS pour update likes sans reload -->
 <script>
-document.querySelectorAll('.like-btn').forEach(button => {
-    button.addEventListener('click', function(event){
-        event.stopPropagation(); // pour ne pas déclencher le clic sur le post
-        const tweetId = this.dataset.tweetId;
-        fetch(`/like/${tweetId}`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'}
-        })
-        .then(resp => resp.json())
-        .then(data => {
-            if(data.success){
-                this.querySelector('.like-count').textContent = data.like_count;
-                if(data.liked){
-                    this.classList.add('liked');
-                } else {
-                    this.classList.remove('liked');
-                }
-            }
-        })
-        .catch(err => console.error(err));
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation(); // empêche de suivre le clic du parent
+      const tweetId = btn.dataset.tweetId;
+      const countEl = btn.querySelector('.like-count');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/like/${tweetId}`, { method: 'POST' });
+        if(!res.ok) throw new Error('Erreur réseau');
+        const data = await res.json();
+        if(data.success){
+          countEl.textContent = data.like_count;
+          btn.classList.toggle('liked', data.liked);
+        }
+      } catch(err){
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+      }
     });
+  });
 });
+
+
 </script>
 
 </body>

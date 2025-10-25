@@ -60,9 +60,7 @@ h1 { color:var(--accent); margin-bottom:8px; }
   font-size:14px;
 }
 
-.stats strong {
-  color: #e6eef8;
-}
+.stats strong { color: #e6eef8; }
 
 button, .btn {
   padding:10px 16px;
@@ -99,19 +97,24 @@ h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
   margin-top:8px;
 }
 
-.like-button {
-  background:none;
-  border:none;
-  cursor:pointer;
-  font-size:18px;
-  transition:transform 0.2s;
-  color:#ffffff;
+/* --- Bouton like profil --- */
+.like-btn {
+  position:absolute; top:12px; right:12px;
+  background:none; border:none;
+  color:#ffffff; cursor:pointer; font-size:18px;
+  display:flex; align-items:center; gap:6px; transition:color 0.2s ease, transform 0.2s ease; z-index:1;
+}
+.like-btn:hover { transform: scale(1.1); }
+.like-btn.liked { color:#f87171; }
+
+/* --- Compteur de likes profil harmonisé --- */
+.like-button + .like-count {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
 }
 
-.like-button.liked { color:#f87171; }
-.like-button:hover { transform:scale(1.2); }
-
-.like-count { color:var(--muted); font-size:14px; }
 
 .follow-lists {
   display:flex;
@@ -119,8 +122,37 @@ h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
   margin-bottom:12px;
 }
 
-.follow-lists a { color:var(--accent); text-decoration:none; font-size:14px; }
+.follow-lists a { color:var(--accent); text-decoration:none; font-size:14px; cursor:pointer; }
 .follow-lists a:hover { text-decoration:underline; }
+
+.popup {
+  display:none;
+  background:var(--card);
+  padding:16px;
+  border-radius:12px;
+  max-height:400px;
+  overflow-y:auto;
+  width:300px;
+  text-align:left;
+}
+
+.popup h3 { margin-bottom:8px; color:var(--accent); }
+
+.popup ul { list-style:none; padding-left:0; }
+
+.popup li { padding:4px 0; }
+
+.popup li a { color:var(--accent); text-decoration:none; }
+.popup li a:hover { text-decoration:underline; }
+
+#overlay {
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.6);
+  z-index:1000;
+}
 
 a { color:var(--accent); text-decoration:none; }
 a:hover { text-decoration:underline; }
@@ -149,23 +181,42 @@ a:hover { text-decoration:underline; }
   </div>
 
   <div class="follow-lists">
-    <a href="#">Voir les abonnés</a>
-    <a href="#">Voir les abonnements</a>
+    <a id="show-followers">Voir les abonnés ({{ followers_list|length }})</a>
+    <a id="show-following">Voir les abonnements ({{ following_list|length }})</a>
+  </div>
+
+  <!-- Overlay et Popups -->
+  <div id="overlay"></div>
+
+  <div id="followers-popup" class="popup" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1001;">
+    <h3>Abonnés</h3>
+    <ul>
+      {% for u in followers_list %}
+        <li><a href="{{ url_for('routes.profile', username=u.username) }}">{{ u.username }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div id="following-popup" class="popup" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1001;">
+    <h3>Abonnements</h3>
+    <ul>
+      {% for u in following_list %}
+        <li><a href="{{ url_for('routes.profile', username=u.username) }}">{{ u.username }}</a></li>
+      {% endfor %}
+    </ul>
   </div>
 
   <h2>Tweets</h2>
   {% if user_tweets %}
     {% for post in user_tweets %}
       <div class="post" data-post-id="{{ post.id }}">
-        <strong onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'">{{ post.username }}</strong>
+        <strong onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'">
+          {{ post.username }}
+        </strong>
         <p>{{ post.content }}</p>
-
-        <div class="like-section">
-          <button class="like-button {% if session['user_id'] in post.likes %}liked{% endif %}" data-tweet-id="{{ post.id }}">
-            ❤️
-          </button>
-          <span class="like-count">{{ post.likes|length }}</span>
-        </div>
+        <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
+          ❤️ <span class="like-count">{{ post.likes|length }}</span>
+        </button>
       </div>
     {% endfor %}
   {% else %}
@@ -181,54 +232,67 @@ a:hover { text-decoration:underline; }
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
+  const overlay = document.getElementById('overlay');
+  const followersPopup = document.getElementById('followers-popup');
+  const followingPopup = document.getElementById('following-popup');
+
+  function openPopup(popup) {
+    overlay.style.display = 'block';
+    popup.style.display = 'block';
+  }
+
+  function closePopup() {
+    overlay.style.display = 'none';
+    followersPopup.style.display = 'none';
+    followingPopup.style.display = 'none';
+  }
+
+  document.getElementById('show-followers').addEventListener('click', (e) => {
+    e.preventDefault();
+    openPopup(followersPopup);
+  });
+
+  document.getElementById('show-following').addEventListener('click', (e) => {
+    e.preventDefault();
+    openPopup(followingPopup);
+  });
+
+  overlay.addEventListener('click', closePopup);
+
   // --- Likes AJAX ---
   document.querySelectorAll('.like-button').forEach(btn => {
     btn.addEventListener('click', async () => {
       const tweetId = btn.dataset.tweetId;
       const countEl = btn.nextElementSibling;
-      let count = parseInt(countEl.textContent) || 0;
       btn.disabled = true;
-
       try {
         const res = await fetch(`/like/${tweetId}`, { method: 'POST' });
-        if (!res.ok) throw new Error('Erreur réseau');
-        if (btn.classList.contains('liked')) {
-          btn.classList.remove('liked');
-          countEl.textContent = count - 1;
-        } else {
-          btn.classList.add('liked');
-          countEl.textContent = count + 1;
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        btn.disabled = false;
-      }
+        if(!res.ok) throw new Error('Erreur réseau');
+        const data = await res.json();
+        countEl.textContent = data.like_count;
+        if(data.liked){ btn.classList.add('liked'); } else { btn.classList.remove('liked'); }
+      } catch(err){ console.error(err); }
+      finally{ btn.disabled = false; }
     });
   });
 
   // --- Follow AJAX ---
   const followBtn = document.getElementById('follow-btn');
-  if (followBtn) {
-    followBtn.addEventListener('click', async (e) => {
+  if(followBtn){
+    followBtn.addEventListener('click', async (e)=>{
       e.preventDefault();
       followBtn.disabled = true;
-
-      try {
+      try{
         const username = "{{ profile_user.username }}";
-        const res = await fetch(`/toggle_follow/${username}`, { method: 'POST' });
-        if (!res.ok) throw new Error('Erreur réseau');
+        const res = await fetch(`/toggle_follow/${username}`, { method:'POST' });
+        if(!res.ok) throw new Error('Erreur réseau');
         const data = await res.json();
-
         followBtn.textContent = data.is_following ? 'Se désabonner' : 'Suivre';
         followBtn.dataset.following = data.is_following ? 'true' : 'false';
         document.getElementById('followers-count').textContent = data.followers_count;
         document.getElementById('following-count').textContent = data.following_count;
-      } catch (err) {
-        console.error('Erreur follow:', err);
-      } finally {
-        followBtn.disabled = false;
-      }
+      }catch(err){ console.error('Erreur follow:',err);}
+      finally{ followBtn.disabled = false; }
     });
   }
 

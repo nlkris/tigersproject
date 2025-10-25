@@ -56,6 +56,7 @@ def signup():
 
     return render_template('signup.html')
 
+
 # ------------------- CONNEXION -------------------
 @routes.route('/login', methods=['GET', 'POST'])
 def login():
@@ -77,6 +78,7 @@ def login():
 
     return render_template('login.html')
 
+
 # ------------------- FEED -------------------
 @routes.route('/feed', methods=['GET', 'POST'])
 def feed():
@@ -85,6 +87,8 @@ def feed():
 
     tweets = read_tweets()
     users = read_users()
+    current_user_id = session['user_id']
+    current_user = next((u for u in users if u['id'] == current_user_id), None)
 
     # Publier un tweet
     if request.method == 'POST':
@@ -92,7 +96,7 @@ def feed():
         if content:
             new_tweet = {
                 'id': len(tweets) + 1,
-                'user_id': session['user_id'],
+                'user_id': current_user_id,
                 'username': session['username'],
                 'content': content,
                 'likes': [],
@@ -111,9 +115,29 @@ def feed():
     for post in tweets:
         post.setdefault('likes', [])
         post.setdefault('reactions', {})
-        post['liked'] = session['user_id'] in post['likes']
+        post['liked'] = current_user_id in post['likes']
 
-    return render_template('feed.html', username=session['username'], tweets=tweets)
+    # --- Gestion des catégories ---
+    followed_ids = current_user.get('following', [])
+
+    # Tweets des abonnements + les siens
+    followed_tweets = [t for t in tweets if t['user_id'] in followed_ids or t['user_id'] == current_user_id]
+
+    # Tweets recommandés (non suivis et non soi-même)
+    recommended_tweets = [t for t in tweets if t['user_id'] not in followed_ids and t['user_id'] != current_user_id]
+
+    # Vue active : abonnements ou recommandations
+    view = request.args.get('view', 'followed')
+
+    return render_template(
+        'feed.html',
+        username=session['username'],
+        view=view,
+        followed_tweets=followed_tweets,
+        recommended_tweets=recommended_tweets
+    )
+
+
 
 # ------------------- DÉCONNEXION -------------------
 @routes.route('/logout')
@@ -122,12 +146,12 @@ def logout():
     flash("Vous êtes déconnecté.", "info")
     return redirect(url_for('routes.login'))
 
-# ------------------- LIKE -------------------
+
+# ------------------- LIKE JSON -------------------
 @routes.route('/like/<int:tweet_id>', methods=['POST'])
 def like_tweet(tweet_id):
     if 'user_id' not in session:
-        flash("Veuillez vous connecter pour liker un tweet.", "error")
-        return redirect(url_for('routes.login'))
+        return jsonify({"success": False, "message": "Non connecté"}), 401
 
     tweets = read_tweets()
     user_id = session['user_id']
@@ -137,12 +161,16 @@ def like_tweet(tweet_id):
             tweet.setdefault('likes', [])
             if user_id in tweet['likes']:
                 tweet['likes'].remove(user_id)
+                liked = False
             else:
                 tweet['likes'].append(user_id)
+                liked = True
             write_tweets(tweets)
-            break
+            return jsonify({"success": True, "liked": liked, "like_count": len(tweet['likes'])})
 
-    return redirect(request.referrer or url_for('routes.feed'))
+    return jsonify({"success": False, "message": "Tweet non trouvé"}), 404
+
+
 
 # ------------------- RÉACTIONS MULTIPLES -------------------
 @routes.route('/react/<int:tweet_id>/<emoji>', methods=['POST'])
@@ -157,16 +185,15 @@ def react(tweet_id, emoji):
         if tweet['id'] == tweet_id:
             tweet.setdefault('reactions', {})
             tweet['reactions'].setdefault(emoji, [])
-
             if user_id in tweet['reactions'][emoji]:
                 tweet['reactions'][emoji].remove(user_id)
             else:
                 tweet['reactions'][emoji].append(user_id)
-
             write_tweets(tweets)
             return jsonify({"success": True, "count": len(tweet['reactions'][emoji])})
 
     return jsonify({"success": False, "message": "Tweet non trouvé"}), 404
+
 
 # ------------------- PROFIL -------------------
 @routes.route('/profile/<username>')
@@ -189,18 +216,27 @@ def profile(username):
     current_user = next((u for u in users if u['id'] == session.get('user_id')), None)
     is_following = profile_user['id'] in current_user.get('following', []) if current_user else False
 
+    # Ajout systématique des champs pour le front
     for post in user_tweets:
         post.setdefault('likes', [])
         post.setdefault('reactions', {})
         post['liked'] = session['user_id'] in post['likes']
 
-    return render_template('profile.html',
-                           profile_user=profile_user,
-                           user_tweets=user_tweets,
-                           is_current_user=is_current_user,
-                           is_following=is_following)
+    # --- Nouveaux : listes complètes d'objets utilisateurs pour abonnés / abonnements ---
+    followers_list = [u for u in users if u['id'] in profile_user.get('followers', [])]
+    following_list = [u for u in users if u['id'] in profile_user.get('following', [])]
 
-# ------------------- SUIVRE / SE DÉSABONNER (corrigé AJAX) -------------------
+    return render_template(
+        'profile.html',
+        profile_user=profile_user,
+        user_tweets=user_tweets,
+        is_current_user=is_current_user,
+        is_following=is_following,
+        followers_list=followers_list,
+        following_list=following_list
+    )
+
+# ------------------- SUIVRE / SE DÉSABONNER -------------------
 @routes.route('/toggle_follow/<username>', methods=['POST'])
 def toggle_follow(username):
     if 'user_id' not in session:
@@ -209,18 +245,15 @@ def toggle_follow(username):
     users = read_users()
     current_user_id = session['user_id']
 
-    # Trouver l'utilisateur actuel et celui du profil
     current_user = next((u for u in users if u['id'] == current_user_id), None)
     target_user = next((u for u in users if u['username'] == username), None)
 
     if not current_user or not target_user:
         return jsonify({'error': 'Utilisateur introuvable'}), 404
 
-    # Initialiser les listes si manquantes
     current_user.setdefault('following', [])
     target_user.setdefault('followers', [])
 
-    # Déterminer s’il suit déjà
     if target_user['id'] in current_user['following']:
         current_user['following'].remove(target_user['id'])
         if current_user['id'] in target_user['followers']:
@@ -240,14 +273,18 @@ def toggle_follow(username):
         'following_count': len(current_user['following'])
     })
 
+
 # ------------------- RECHERCHE -------------------
-@routes.route('/search', methods=['GET'])
-def search():
+@routes.route('/search_ajax')
+def search_ajax():
     if 'user_id' not in session:
-        return redirect(url_for('routes.login'))
+        return jsonify([])
 
     query = request.args.get('q', '').strip()
     users = read_users()
-    matched_users = [u for u in users if query.lower() in u['username'].lower()]
+    matched_users = [
+        {'username': u['username'], 'followers_count': len(u.get('followers', []))}
+        for u in users if query.lower() in u['username'].lower()
+    ]
+    return jsonify(matched_users)
 
-    return render_template('search.html', query=query, matched_users=matched_users)

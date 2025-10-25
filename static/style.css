@@ -175,3 +175,32 @@ a:hover {
   h1, h2 { font-size: 22px; }
   .logo { width: 400px; margin-bottom: 12px; }  /* 4x la taille mobile originale */
 }
+
+/* --- COMPTEUR DE LIKES UNIFIÉ --- */
+.like-count {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;      
+  font-family: 'Inter', sans-serif;
+  margin-left: 6px;      
+}
+
+/* --- BOUTONS DE LIKE UNIFIÉS --- */
+.like-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  transition: transform 0.2s;
+  color: #ffffff;          /* cœur non liké blanc */
+}
+
+.like-button.liked {
+  color: #f87171;         /* cœur liké rouge */
+}
+
+.like-button:hover {
+  transform: scale(1.2);
+}
+
+

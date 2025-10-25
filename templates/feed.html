@@ -32,37 +32,11 @@ body {
   max-width:1100px;
 }
 
-.header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:16px;
-}
-
+.header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
 .header-left { text-align:center; flex:1; }
-
-.header-right a {
-  display:flex;
-  align-items:center;
-  gap:8px;
-  color:var(--accent);
-  text-decoration:none;
-  font-weight:600;
-}
-
-.header-right a img {
-  width:60px;
-  height:auto;
-  border-radius:50%;
-  cursor:pointer;
-  transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-.header-right a:hover img {
-  transform: scale(1.05);
-  filter: drop-shadow(0 0 8px var(--accent));
-}
-
+.header-right a { display:flex; align-items:center; gap:8px; color:var(--accent); text-decoration:none; font-weight:600; }
+.header-right a img { width:60px; height:auto; border-radius:50%; cursor:pointer; transition: transform 0.3s ease, filter 0.3s ease; }
+.header-right a:hover img { transform: scale(1.05); filter: drop-shadow(0 0 8px var(--accent)); }
 .header-right a:hover span { text-decoration:underline; }
 
 .logo { display:block; margin:0 auto 16px auto; width:200px; height:auto; }
@@ -70,115 +44,139 @@ body {
 
 .search-bar { margin:16px 0; display:flex; justify-content:center; }
 .search-bar input[type="text"] {
-  padding:10px 12px;
+  padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.1);
+  background:transparent; color:#e6eef8; outline:none; width:300px;
+}
+
+h1,h2 { color:var(--accent); margin-bottom:16px; }
+
+.switch-container { display:flex; justify-content:center; gap:12px; margin-bottom:24px; }
+.switch-btn {
+  padding:10px 20px;
   border-radius:8px;
-  border:1px solid rgba(255,255,255,0.1);
-  background:transparent;
-  color:#e6eef8;
-  outline:none;
-  width:300px;
+  background: rgba(255,255,255,0.05);
+  color: var(--accent);
+  text-decoration: none;
+  font-weight:600;
+  transition: all 0.2s ease;
 }
+.switch-btn:hover { background: rgba(255,255,255,0.15); }
+.switch-btn.active { background: linear-gradient(90deg,#06b6d4,#7c3aed); color: #021024; box-shadow: var(--shadow); }
 
-h1, h2 { color:var(--accent); margin-bottom:16px; }
-
-.feed-container { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
-
-.feed {
-  background:rgba(255,255,255,0.03);
-  border-radius:var(--radius);
-  padding:16px;
-  box-shadow:var(--shadow);
-  max-height:600px;
-  overflow-y:auto;
-}
-
-.post {
-  padding:12px;
-  border-bottom:1px solid rgba(255,255,255,0.1);
-  margin-bottom:12px;
-  border-radius:8px;
-  background:rgba(255,255,255,0.02);
-  cursor:pointer;
-  position:relative;
-}
-
+.feed { background:rgba(255,255,255,0.03); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); max-height:600px; overflow-y:auto; }
+.post { padding:12px; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:12px; border-radius:8px; background:rgba(255,255,255,0.02); cursor:pointer; position:relative; }
 .post strong { color: var(--accent); }
 .post p { margin:6px 0; }
 
 .like-btn {
-  position:absolute;
-  top:12px;
-  right:12px;
-  background:none;
-  border:none;
-  color:#ffffff;
-  cursor:pointer;
-  font-size:18px;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  transition:color 0.2s ease;
-  z-index:1;
+  position:absolute; top:12px; right:12px;
+  background:none; border:none;
+  color:#ffffff; cursor:pointer; font-size:18px;
+  display:flex; align-items:center; gap:6px; transition:color 0.2s ease, transform 0.2s ease; z-index:1;
 }
-
+.like-btn:hover { transform: scale(1.1); }
 .like-btn.liked { color:#f87171; }
-.like-btn:hover { color:#f87171; }
 
 form { display:flex; flex-direction:column; gap:16px; margin-bottom:32px; }
-
-textarea {
-  padding:10px 12px;
-  border-radius:8px;
-  border:1px solid rgba(255,255,255,0.1);
-  background:transparent;
-  color:#e6eef8;
-  outline:none;
-  width:100%;
-  min-height:80px;
+textarea { padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.1);
+  background:transparent; color:#e6eef8; outline:none; width:100%; min-height:80px;
 }
-
 button {
-  padding:12px;
-  background:linear-gradient(90deg,#06b6d4,#7c3aed);
-  border:none;
-  border-radius:8px;
-  color:#021024;
-  font-weight:700;
-  cursor:pointer;
-  transition:0.2s;
+  padding:12px; background:linear-gradient(90deg,#06b6d4,#7c3aed);
+  border:none; border-radius:8px; color:#021024; font-weight:700; cursor:pointer; transition:0.2s;
 }
-
 button:hover { opacity:0.9; }
-
 a { color:var(--accent); text-decoration:none; }
 a:hover { text-decoration:underline; }
 
-@media (max-width:900px) { .feed-container { grid-template-columns:1fr; } }
+.flashes {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.flashes li {
+  font-size: 14px;
+  margin-bottom: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  display: inline-block;
+  opacity: 1;                 /* Opaque dès l'affichage */
+  transition: opacity 0.5s ease;
+}
+
+.flashes li.success {
+  color: #021024;
+  background: rgba(94, 234, 212, 1);  /* <-- alpha = 1 pour opacité totale */
+}
+
+.flashes li.error {
+  color: #021024;
+  background: rgba(248, 113, 113, 1); /* <-- alpha = 1 pour opacité totale */
+}
+
+.header-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.header-center .search-bar {
+  width: 100%;
+  max-width: 400px;
+}
+
+.header-center .search-bar input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: #e6eef8;
+  outline: none;
+}
+
+
+
 </style>
 </head>
 <body>
 <div class="container">
 
-  <!-- Header -->
-  <div class="header">
-    <div class="header-left">
-      <img src="{{ url_for('static', filename='tiger.png') }}" alt="Logo TIGINSA" class="logo">
-      <h1>Bienvenue, {{ username }}</h1>
-    </div>
-    <div class="header-right">
-      <a href="{{ url_for('routes.profile', username=username) }}">
-        <img src="{{ url_for('static', filename='tiger.png') }}" alt="Profil">
-        <span>Mon profil</span>
-      </a>
-    </div>
-  </div>
+  <!-- --- FLASH MESSAGES --- -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
 
-  <!-- Barre de recherche -->
+
+  <!-- Header -->
+<div class="header-center">
+  <img src="{{ url_for('static', filename='tiger.png') }}" alt="Logo TIGINSA" class="logo">
   <div class="search-bar">
-    <form method="GET" action="{{ url_for('routes.search') }}">
-      <input type="text" name="q" placeholder="Rechercher des utilisateurs..." required>
-    </form>
+    <input type="text" placeholder="Rechercher des utilisateurs...">
   </div>
+</div>
+
+
+<!-- Search Overlay -->
+<div id="search-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); color:#e6eef8; z-index:1000; overflow-y:auto;">
+  <div style="max-width:600px; margin:80px auto; background:#0b1220; padding:32px; border-radius:12px; position:relative;">
+    <button id="close-search" style="position:absolute; top:16px; right:16px; background:none; border:none; color:#5eead4; font-size:24px; cursor:pointer;">✖</button>
+    <h2>Rechercher un utilisateur</h2>
+    <input type="text" id="search-input" placeholder="Tapez un nom..." style="width:100%; padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:#e6eef8;">
+    <div id="search-results" style="margin-top:16px;"></div>
+  </div>
+</div>
+
 
   <!-- Formulaire publier un tweet -->
   <form method="POST" action="{{ url_for('routes.feed') }}">
@@ -186,32 +184,152 @@ a:hover { text-decoration:underline; }
     <button type="submit">Publier</button>
   </form>
 
+  <!-- Boutons pour switcher -->
+  <div class="switch-container">
+    <a href="{{ url_for('routes.feed', view='followed') }}" class="switch-btn {% if view == 'followed' %}active{% endif %}">Abonnements</a>
+    <a href="{{ url_for('routes.feed', view='recommended') }}" class="switch-btn {% if view == 'recommended' %}active{% endif %}">Recommandations</a>
+  </div>
+
+  <!-- Contenu du fil -->
   <div class="feed-container">
-    <!-- Tous les tweets -->
-    <div class="feed">
-      <h2>Tous les tweets</h2>
-      {% if tweets %}
-        {% for post in tweets %}
-          <div class="post" onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'" data-post-id="{{ post.id }}">
-            <strong>{{ post.username }}</strong>
-            <p>{{ post.content }}</p>
-            <form action="{{ url_for('routes.like_tweet', tweet_id=post.id) }}" method="POST" style="display:inline;">
-              <button class="like-btn {% if session['user_id'] in post.likes %}liked{% endif %}" type="submit" onclick="event.stopPropagation();">
+    {% if view == 'followed' %}
+      <div class="feed">
+        <h2>Abonnements</h2>
+        {% if followed_tweets %}
+          {% for post in followed_tweets %}
+            <div class="post" data-post-id="{{ post.id }}">
+              <strong onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'" style="cursor:pointer;">
+                {{ post.username }}
+              </strong>
+              <p>{{ post.content }}</p>
+              <div style="display:flex; align-items:center; margin-top:8px;">
+                <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
+                  ❤️ <span class="like-count">{{ post.likes|length }}</span>
+                </button>
+              </div>
+            </div>
+
+          {% endfor %}
+        {% else %}
+          <p style="text-align:center; color:var(--muted);">Aucun tweet de vos abonnements.</p>
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="feed">
+        <h2>Recommandations</h2>
+        {% if recommended_tweets %}
+          {% for post in recommended_tweets %}
+            <div class="post" onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'">
+              <strong>{{ post.username }}</strong>
+              <p>{{ post.content }}</p>
+              <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
                 ❤️ <span class="like-count">{{ post.likes|length }}</span>
               </button>
-            </form>
-          </div>
-        {% endfor %}
-      {% else %}
-        <p style="text-align:center; color:var(--muted);">Aucun tweet à afficher.</p>
-      {% endif %}
-    </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p style="text-align:center; color:var(--muted);">Aucune recommandation pour le moment.</p>
+        {% endif %}
+      </div>
+    {% endif %}
   </div>
 
   <p style="text-align:center; margin-top:24px;">
     <a href="{{ url_for('routes.logout') }}">Déconnexion</a>
   </p>
 
+  
+
 </div>
+
+<!-- JS pour update likes sans reload -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation(); // empêche de suivre le clic du parent
+      const tweetId = btn.dataset.tweetId;
+      const countEl = btn.querySelector('.like-count');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/like/${tweetId}`, { method: 'POST' });
+        if(!res.ok) throw new Error('Erreur réseau');
+        const data = await res.json();
+        if(data.success){
+          countEl.textContent = data.like_count;
+          btn.classList.toggle('liked', data.liked);
+        }
+      } catch(err){
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const flashes = document.querySelectorAll('.flashes li');
+  flashes.forEach(flash => {
+    setTimeout(() => {
+      flash.style.opacity = '0';
+      setTimeout(() => flash.remove(), 500); // supprime après la transition
+    }, 3000); // disparait après 3 secondes
+  });
+});
+
+
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  const searchModal = document.getElementById('search-modal');
+  const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+  const searchBtn = document.querySelector('.search-bar input'); // input in the feed
+
+  // Show modal when input is focused
+  searchBtn.addEventListener('focus', () => {
+    searchModal.style.display = 'block';
+    searchInput.focus();
+  });
+
+  // Close modal
+  document.getElementById('close-search').addEventListener('click', () => {
+    searchModal.style.display = 'none';
+    searchResults.innerHTML = '';
+    searchInput.value = '';
+  });
+
+  // AJAX search
+  let timeout = null;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(timeout);
+    const query = searchInput.value.trim();
+    if (!query) {
+      searchResults.innerHTML = '';
+      return;
+    }
+
+    timeout = setTimeout(async () => {
+      try {
+        const res = await fetch(`/search_ajax?q=${encodeURIComponent(query)}`);
+        if (!res.ok) throw new Error('Network error');
+        const users = await res.json();
+
+        searchResults.innerHTML = users.length
+          ? users.map(u => `<div class="user" style="padding:8px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.1);" onclick="window.location.href='/profile/${u.username}'">${u.username} (${u.followers_count} abonnés)</div>`).join('')
+          : '<p style="color:#9aa8bf;">Aucun utilisateur trouvé.</p>';
+      } catch (err) {
+        console.error(err);
+      }
+    }, 300); // debounce 300ms
+  });
+});
+</script>
+
 </body>
 </html>

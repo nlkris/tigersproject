@@ -56,7 +56,9 @@
         "user_id": 3,
         "username": "nlkris",
         "content": "test 1",
-        "likes": []
+        "likes": [
+            3
+        ]
     },
     {
         "id": 7,
@@ -128,9 +130,32 @@
         "username": "jeeaaannnne",
         "content": "\u00e7a fct ?",
         "likes": [
-            2
+            2,
+            3
         ],
         "reactions": {},
         "created_at": "2025-10-23T10:03:35.104324"
+    },
+    {
+        "id": 14,
+        "user_id": 3,
+        "username": "nlkris",
+        "content": "\u00e7a marche !",
+        "likes": [
+            3
+        ],
+        "reactions": {},
+        "created_at": "2025-10-25T16:32:39.453113"
+    },
+    {
+        "id": 15,
+        "user_id": 3,
+        "username": "nlkris",
+        "content": "test message de tweet publi\u00e9",
+        "likes": [
+            3
+        ],
+        "reactions": {},
+        "created_at": "2025-10-25T17:29:41.969099"
     }
 ]

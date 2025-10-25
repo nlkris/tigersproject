@@ -275,13 +275,16 @@ def toggle_follow(username):
 
 
 # ------------------- RECHERCHE -------------------
-@routes.route('/search', methods=['GET'])
-def search():
+@routes.route('/search_ajax')
+def search_ajax():
     if 'user_id' not in session:
-        return redirect(url_for('routes.login'))
+        return jsonify([])
 
     query = request.args.get('q', '').strip()
     users = read_users()
-    matched_users = [u for u in users if query.lower() in u['username'].lower()]
+    matched_users = [
+        {'username': u['username'], 'followers_count': len(u.get('followers', []))}
+        for u in users if query.lower() in u['username'].lower()
+    ]
+    return jsonify(matched_users)
 
-    return render_template('search.html', query=query, matched_users=matched_users)

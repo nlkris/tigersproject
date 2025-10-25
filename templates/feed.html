@@ -148,12 +148,20 @@ a:hover { text-decoration:underline; }
     </div>
   </div>
 
-  <!-- Barre de recherche -->
-  <div class="search-bar">
-    <form method="GET" action="{{ url_for('routes.search') }}">
-      <input type="text" name="q" placeholder="Rechercher des utilisateurs..." required>
-    </form>
+<div class="search-bar">
+  <input type="text" placeholder="Rechercher des utilisateurs...">
+</div>
+
+<!-- Search Overlay -->
+<div id="search-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); color:#e6eef8; z-index:1000; overflow-y:auto;">
+  <div style="max-width:600px; margin:80px auto; background:#0b1220; padding:32px; border-radius:12px; position:relative;">
+    <button id="close-search" style="position:absolute; top:16px; right:16px; background:none; border:none; color:#5eead4; font-size:24px; cursor:pointer;">✖</button>
+    <h2>Rechercher un utilisateur</h2>
+    <input type="text" id="search-input" placeholder="Tapez un nom..." style="width:100%; padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:#e6eef8;">
+    <div id="search-results" style="margin-top:16px;"></div>
   </div>
+</div>
+
 
   <!-- Formulaire publier un tweet -->
   <form method="POST" action="{{ url_for('routes.feed') }}">
@@ -215,6 +223,8 @@ a:hover { text-decoration:underline; }
     <a href="{{ url_for('routes.logout') }}">Déconnexion</a>
   </p>
 
+  
+
 </div>
 
 <!-- JS pour update likes sans reload -->
@@ -256,6 +266,54 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  const searchModal = document.getElementById('search-modal');
+  const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+  const searchBtn = document.querySelector('.search-bar input'); // input in the feed
+
+  // Show modal when input is focused
+  searchBtn.addEventListener('focus', () => {
+    searchModal.style.display = 'block';
+    searchInput.focus();
+  });
+
+  // Close modal
+  document.getElementById('close-search').addEventListener('click', () => {
+    searchModal.style.display = 'none';
+    searchResults.innerHTML = '';
+    searchInput.value = '';
+  });
+
+  // AJAX search
+  let timeout = null;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(timeout);
+    const query = searchInput.value.trim();
+    if (!query) {
+      searchResults.innerHTML = '';
+      return;
+    }
+
+    timeout = setTimeout(async () => {
+      try {
+        const res = await fetch(`/search_ajax?q=${encodeURIComponent(query)}`);
+        if (!res.ok) throw new Error('Network error');
+        const users = await res.json();
+
+        searchResults.innerHTML = users.length
+          ? users.map(u => `<div class="user" style="padding:8px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.1);" onclick="window.location.href='/profile/${u.username}'">${u.username} (${u.followers_count} abonnés)</div>`).join('')
+          : '<p style="color:#9aa8bf;">Aucun utilisateur trouvé.</p>';
+      } catch (err) {
+        console.error(err);
+      }
+    }, 300); // debounce 300ms
+  });
+});
 </script>
 
 </body>

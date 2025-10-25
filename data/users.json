@@ -16,7 +16,9 @@
             5,
             3
         ],
-        "following": []
+        "following": [
+            5
+        ]
     },
     {
         "id": 3,
@@ -44,6 +46,8 @@
         "following": [
             2
         ],
-        "followers": []
+        "followers": [
+            2
+        ]
     }
 ]

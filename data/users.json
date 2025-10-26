@@ -49,5 +49,14 @@
         "followers": [
             2
         ]
+    },
+    {
+        "id": 6,
+        "username": "testuser",
+        "email": "test@example.com",
+        "password": "scrypt:32768:8:1$jmQirjBn4ZDhAvyo$ecbd0aa6185ac92c1d42a069f8d895860debe2e9af809534700149622ff67a4a4534f2354f2ef69dd6d9517f8f497ae23b0f50c6bdc16470749a149683053a8c",
+        "following": [],
+        "followers": [],
+        "profile_pic_url": null
     }
 ]

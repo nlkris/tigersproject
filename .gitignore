@@ -1,2 +1,35 @@
+# Environnements virtuels
+venv/
+env/
+.venv/
+
+# Fichiers de cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Fichiers de configuration IDE/éditeur
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Fichiers de dépendances et logs
+*.log
+*.pot
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Fichiers de base de données locales (si applicable)
+*.db
+*.sqlite3
+
+# Fichiers d'environnement
+.env
+.env.local
+
+# Fichiers de cache système
 .DS_Store
-.DS_Store
+Thumbs.db

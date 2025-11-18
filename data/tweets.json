@@ -37,14 +37,14 @@
     {
         "id": 4,
         "user_id": 5,
-        "username": "claire",
+        "username": "clairoew",
         "content": "coucou",
         "likes": []
     },
     {
         "id": 5,
         "user_id": 5,
-        "username": "claire",
+        "username": "clairoew",
         "content": "coucou",
         "likes": [
             3,
@@ -63,14 +63,14 @@
     {
         "id": 7,
         "user_id": 5,
-        "username": "claire",
+        "username": "clairoew",
         "content": "coucou cela fonctionne !",
         "likes": []
     },
     {
         "id": 8,
         "user_id": 5,
-        "username": "claire",
+        "username": "clairoew",
         "content": "test",
         "likes": [],
         "created_at": "2025-10-14T14:44:27.676306",
@@ -84,7 +84,7 @@
     {
         "id": 9,
         "user_id": 5,
-        "username": "claire",
+        "username": "clairoew",
         "content": "coucou",
         "likes": [],
         "reactions": {
@@ -97,7 +97,7 @@
     {
         "id": 10,
         "user_id": 5,
-        "username": "claire",
+        "username": "clairoew",
         "content": "tweet",
         "likes": [],
         "created_at": "2025-10-14T14:57:57.782891"
@@ -105,7 +105,7 @@
     {
         "id": 11,
         "user_id": 5,
-        "username": "claire",
+        "username": "clairoew",
         "content": "test mess",
         "likes": [
             5
@@ -116,7 +116,7 @@
     {
         "id": 12,
         "user_id": 5,
-        "username": "claire",
+        "username": "clairoew",
         "content": "ok ok",
         "likes": [
             2

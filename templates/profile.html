@@ -11,7 +11,6 @@
   font-family: Inter, sans-serif;
 }
 * { box-sizing:border-box; margin:0; padding:0; }
-
 body {
   min-height:100vh;
   display:flex;
@@ -22,7 +21,6 @@ body {
   font-size:16px;
   padding:20px;
 }
-
 .container {
   background:var(--card);
   padding:32px;
@@ -32,14 +30,12 @@ body {
   max-width:600px;
   text-align:center;
 }
-
 .profile-header {
   display:flex;
   flex-direction:column;
   align-items:center;
   margin-bottom:24px;
 }
-
 .profile-picture {
   width:120px;
   height:120px;
@@ -48,9 +44,7 @@ body {
   border:3px solid var(--accent);
   margin-bottom:12px;
 }
-
 h1 { color:var(--accent); margin-bottom:8px; }
-
 .stats {
   display:flex;
   gap:16px;
@@ -59,9 +53,7 @@ h1 { color:var(--accent); margin-bottom:8px; }
   color:var(--muted);
   font-size:14px;
 }
-
 .stats strong { color: #e6eef8; }
-
 button, .btn {
   padding:10px 16px;
   background:linear-gradient(90deg,#06b6d4,#7c3aed);
@@ -73,11 +65,8 @@ button, .btn {
   transition:0.2s;
   text-decoration:none;
 }
-
 button:hover, .btn:hover { opacity:0.9; }
-
 h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
-
 .post {
   padding:12px;
   border-bottom:1px solid rgba(255,255,255,0.1);
@@ -87,44 +76,23 @@ h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
   text-align:left;
   position:relative;
 }
-
 .post strong { color:var(--accent); cursor:pointer; }
-
-.like-section {
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-top:8px;
-}
-
-/* --- Bouton like profil --- */
 .like-btn {
   position:absolute; top:12px; right:12px;
   background:none; border:none;
   color:#ffffff; cursor:pointer; font-size:18px;
-  display:flex; align-items:center; gap:6px; transition:color 0.2s ease, transform 0.2s ease; z-index:1;
+  display:flex; align-items:center; gap:6px;
+  transition:0.2s;
 }
 .like-btn:hover { transform: scale(1.1); }
 .like-btn.liked { color:#f87171; }
-
-/* --- Compteur de likes profil harmonisé --- */
-.like-button + .like-count {
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 500;
-  font-family: 'Inter', sans-serif;
-}
-
-
 .follow-lists {
   display:flex;
   justify-content:space-around;
   margin-bottom:12px;
 }
-
-.follow-lists a { color:var(--accent); text-decoration:none; font-size:14px; cursor:pointer; }
+.follow-lists a { color:var(--accent); font-size:14px; cursor:pointer; }
 .follow-lists a:hover { text-decoration:underline; }
-
 .popup {
   display:none;
   background:var(--card);
@@ -135,16 +103,8 @@ h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
   width:300px;
   text-align:left;
 }
-
 .popup h3 { margin-bottom:8px; color:var(--accent); }
-
 .popup ul { list-style:none; padding-left:0; }
-
-.popup li { padding:4px 0; }
-
-.popup li a { color:var(--accent); text-decoration:none; }
-.popup li a:hover { text-decoration:underline; }
-
 #overlay {
   display:none;
   position:fixed;
@@ -153,17 +113,51 @@ h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
   background:rgba(0,0,0,0.6);
   z-index:1000;
 }
-
 a { color:var(--accent); text-decoration:none; }
 a:hover { text-decoration:underline; }
+.modal-content img {
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  object-fit:cover;
+  margin-bottom:8px;
+  border:2px solid var(--accent);
+}
+input, textarea {
+  background:#2e2e2e; color:white; padding:8px; border-radius:6px; border:1px solid #555; width:100%;
+}
 </style>
 </head>
 <body>
+
 <div class="container">
 
-  <div class="profile-header">
-    <img src="{{ profile_user.profile_pic_url or url_for('static', filename='default-avatar.png') }}" alt="Photo de profil" class="profile-picture">
-    <h1>{{ profile_user.username }}</h1>
+{% if is_current_user %}
+<!-- MODAL EDIT PROFILE -->
+<div id="edit-profile-modal" class="popup" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:2000; width:340px;">
+    <h3>Modifier le profil</h3>
+    <form id="edit-profile-form" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:12px;">
+      <label>Photo de profil :</label>
+      <img id="previewImg" src="{{ profile_user.profile_pic_url or url_for('static', filename='default-avatar.png') }}" class="modal-content">
+      <input type="file" name="profile_pic" accept="image/*" onchange="previewPicture(event)">
+
+      <label>Nom d'utilisateur :</label>
+      <input type="text" name="username" value="{{ profile_user.username }}" required>
+
+      <label>Biographie :</label>
+      <textarea name="bio" rows="3">{{ profile_user.bio }}</textarea>
+
+      <button type="submit">💾 Enregistrer</button>
+      <button type="button" id="close-edit" style="background:#333;">Annuler</button>
+    </form>
+</div>
+{% endif %}
+
+<!-- HEADER DU PROFIL -->
+<div class="profile-header">
+    <img id="profilePictureDisplay" src="{{ profile_user.profile_pic_url or url_for('static', filename='default-avatar.png') }}"
+         alt="Photo de profil" class="profile-picture">
+    <h1 id="usernameDisplay">{{ profile_user.username }}</h1>
 
     <div class="stats">
       <span><strong id="followers-count">{{ profile_user.followers|length }}</strong> abonnés</span>
@@ -171,61 +165,68 @@ a:hover { text-decoration:underline; }
       <span><strong>{{ user_tweets|length }}</strong> publications</span>
     </div>
 
+    {% if profile_user.bio %}
+      <p style="color:var(--muted); white-space:pre-wrap; margin-bottom:14px;">{{ profile_user.bio }}</p>
+    {% endif %}
+
     {% if is_current_user %}
-      <a href="#" class="btn">✏️ Modifier le profil</a>
+      <a href="#" class="btn" id="open-edit-profile">✏️ Modifier le profil</a>
     {% else %}
       <button id="follow-btn" type="button" data-following="{{ is_following|tojson }}">
         {% if is_following %}Se désabonner{% else %}Suivre{% endif %}
       </button>
     {% endif %}
-  </div>
+</div>
 
-  <div class="follow-lists">
-    <a id="show-followers">Voir les abonnés ({{ followers_list|length }})</a>
-    <a id="show-following">Voir les abonnements ({{ following_list|length }})</a>
-  </div>
+<div class="follow-lists">
+  <a id="show-followers">Voir les abonnés ({{ followers_list|length }})</a>
+  <a id="show-following">Voir les abonnements ({{ following_list|length }})</a>
+</div>
 
-  <!-- Overlay et Popups -->
-  <div id="overlay"></div>
+<!-- Overlay -->
+<div id="overlay"></div>
 
-  <div id="followers-popup" class="popup" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1001;">
-    <h3>Abonnés</h3>
-    <ul>
-      {% for u in followers_list %}
-        <li><a href="{{ url_for('routes.profile', username=u.username) }}">{{ u.username }}</a></li>
-      {% endfor %}
-    </ul>
-  </div>
-
-  <div id="following-popup" class="popup" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1001;">
-    <h3>Abonnements</h3>
-    <ul>
-      {% for u in following_list %}
-        <li><a href="{{ url_for('routes.profile', username=u.username) }}">{{ u.username }}</a></li>
-      {% endfor %}
-    </ul>
-  </div>
-
-  <h2>Tweets</h2>
-  {% if user_tweets %}
-    {% for post in user_tweets %}
-      <div class="post" data-post-id="{{ post.id }}">
-        <strong onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'">
-          {{ post.username }}
-        </strong>
-        <p>{{ post.content }}</p>
-        <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
-          ❤️ <span class="like-count">{{ post.likes|length }}</span>
-        </button>
-      </div>
+<!-- POPUP FOLLOWERS -->
+<div id="followers-popup" class="popup" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1001;">
+  <h3>Abonnés</h3>
+  <ul>
+    {% for u in followers_list %}
+      <li><a href="{{ url_for('routes.profile', username=u.username) }}">{{ u.username }}</a></li>
     {% endfor %}
-  {% else %}
-    <p style="color:var(--muted);">Aucun tweet pour le moment.</p>
-  {% endif %}
+  </ul>
+</div>
 
-  <p style="text-align:center; margin-top:16px;">
-    <a href="{{ url_for('routes.feed') }}">⬅ Retour au fil</a>
-  </p>
+<!-- POPUP FOLLOWING -->
+<div id="following-popup" class="popup" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1001;">
+  <h3>Abonnements</h3>
+  <ul>
+    {% for u in following_list %}
+      <li><a href="{{ url_for('routes.profile', username=u.username) }}">{{ u.username }}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+
+<h2>Tweets</h2>
+
+{% if user_tweets %}
+  {% for post in user_tweets %}
+    <div class="post" data-post-id="{{ post.id }}">
+      <strong onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'">
+        {{ post.username }}
+      </strong>
+      <p>{{ post.content }}</p>
+      <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
+        ❤️ <span class="like-count">{{ post.likes|length }}</span>
+      </button>
+    </div>
+  {% endfor %}
+{% else %}
+  <p style="color:var(--muted);">Aucun tweet pour le moment.</p>
+{% endif %}
+
+<p style="text-align:center; margin-top:16px;">
+  <a href="{{ url_for('routes.feed') }}">⬅ Retour au fil</a>
+</p>
 
 </div>
 
@@ -235,6 +236,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const overlay = document.getElementById('overlay');
   const followersPopup = document.getElementById('followers-popup');
   const followingPopup = document.getElementById('following-popup');
+  const editBtn = document.getElementById('open-edit-profile');
+  const editModal = document.getElementById('edit-profile-modal');
+  const closeEdit = document.getElementById('close-edit');
+  const editForm = document.getElementById('edit-profile-form');
+  const profileImg = document.getElementById('profilePictureDisplay');
+  const usernameDisplay = document.getElementById('usernameDisplay');
 
   function openPopup(popup) {
     overlay.style.display = 'block';
@@ -245,58 +252,110 @@ document.addEventListener('DOMContentLoaded', () => {
     overlay.style.display = 'none';
     followersPopup.style.display = 'none';
     followingPopup.style.display = 'none';
+    if(editModal) editModal.style.display = 'none';
   }
 
-  document.getElementById('show-followers').addEventListener('click', (e) => {
-    e.preventDefault();
-    openPopup(followersPopup);
+  document.getElementById('show-followers').addEventListener('click', e => {
+    e.preventDefault(); openPopup(followersPopup);
   });
 
-  document.getElementById('show-following').addEventListener('click', (e) => {
-    e.preventDefault();
-    openPopup(followingPopup);
+  document.getElementById('show-following').addEventListener('click', e => {
+    e.preventDefault(); openPopup(followingPopup);
   });
 
   overlay.addEventListener('click', closePopup);
 
-  // --- Likes AJAX ---
-  document.querySelectorAll('.like-button').forEach(btn => {
+  // LIKE AJAX
+  document.querySelectorAll('.like-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       const tweetId = btn.dataset.tweetId;
-      const countEl = btn.nextElementSibling;
+      const countEl = btn.querySelector('.like-count');
       btn.disabled = true;
       try {
         const res = await fetch(`/like/${tweetId}`, { method: 'POST' });
-        if(!res.ok) throw new Error('Erreur réseau');
         const data = await res.json();
         countEl.textContent = data.like_count;
-        if(data.liked){ btn.classList.add('liked'); } else { btn.classList.remove('liked'); }
-      } catch(err){ console.error(err); }
-      finally{ btn.disabled = false; }
+        btn.classList.toggle('liked', data.liked);
+      } finally { btn.disabled = false; }
     });
   });
 
-  // --- Follow AJAX ---
+  // EDIT PROFILE POPUP
+  if(editBtn && editModal){
+    editBtn.addEventListener('click', e => {
+      e.preventDefault();
+      overlay.style.display = 'block';
+      editModal.style.display = 'block';
+      return false;
+    });
+  }
+
+  if(closeEdit){
+    closeEdit.addEventListener('click', closePopup);
+  }
+
+  // Submit du formulaire de modification
+  if(editForm){
+    editForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const formData = new FormData(editForm);
+      const res = await fetch('/profile/edit', {
+        method: 'POST',
+        body: formData
+      });
+      if(res.redirected){
+        window.location.href = res.url;
+      } else {
+        const data = await res.json().catch(()=>{});
+        alert(data?.error || "Erreur lors de la modification.");
+      }
+    });
+  }
+
+  // FOLLOW / UNFOLLOW AJAX
   const followBtn = document.getElementById('follow-btn');
   if(followBtn){
-    followBtn.addEventListener('click', async (e)=>{
-      e.preventDefault();
+    followBtn.addEventListener('click', async () => {
+      const username = "{{ profile_user.username }}";
+      let isFollowing = followBtn.dataset.following === 'true';
       followBtn.disabled = true;
-      try{
-        const username = "{{ profile_user.username }}";
-        const res = await fetch(`/toggle_follow/${username}`, { method:'POST' });
+      try {
+        const res = await fetch(`/toggle_follow/${username}`, { method: 'POST' });
         if(!res.ok) throw new Error('Erreur réseau');
         const data = await res.json();
-        followBtn.textContent = data.is_following ? 'Se désabonner' : 'Suivre';
-        followBtn.dataset.following = data.is_following ? 'true' : 'false';
-        document.getElementById('followers-count').textContent = data.followers_count;
-        document.getElementById('following-count').textContent = data.following_count;
-      }catch(err){ console.error('Erreur follow:',err);}
-      finally{ followBtn.disabled = false; }
+        if(data.is_following){
+          followBtn.textContent = "Se désabonner";
+          followBtn.dataset.following = 'true';
+        } else {
+          followBtn.textContent = "Suivre";
+          followBtn.dataset.following = 'false';
+        }
+        // Met à jour le compteur d'abonnés
+        const followersCountEl = document.getElementById('followers-count');
+        if(followersCountEl){
+          followersCountEl.textContent = data.followers_count;
+        }
+      } catch(err){
+        console.error(err);
+        alert('Erreur : ' + err.message);
+      } finally {
+        followBtn.disabled = false;
+      }
     });
   }
 
 });
+
+// Prévisualisation photo
+function previewPicture(event) {
+  const output = document.getElementById('previewImg');
+  const headerImg = document.getElementById('profilePictureDisplay');
+  const file = event.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  output.src = url;
+  headerImg.src = url;
+}
 </script>
 
 </body>

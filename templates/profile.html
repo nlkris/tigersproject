@@ -67,6 +67,23 @@ button, .btn {
 }
 button:hover, .btn:hover { opacity:0.9; }
 h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
+
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.tweet-profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent);
+  flex-shrink: 0;
+}
+
 .post {
   padding:12px;
   border-bottom:1px solid rgba(255,255,255,0.1);
@@ -86,6 +103,59 @@ h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
 }
 .like-btn:hover { transform: scale(1.1); }
 .like-btn.liked { color:#f87171; }
+
+.tweet-gallery {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.tweet-img {
+  width: 100% !important;
+  height: auto !important;
+  object-fit: cover !important;
+  border-radius: 8px !important;      /* rounded corners */
+  border: 2px solid var(--accent);    /* subtle border like feed */
+  display: block !important;
+  cursor: pointer;
+}
+
+
+/* Grid layout based on number of images */
+.tweet-gallery:has(img:nth-child(1)):not(:has(img:nth-child(2))) {
+  grid-template-columns: 1fr;
+}
+.tweet-gallery:has(img:nth-child(2)):not(:has(img:nth-child(3))) {
+  grid-template-columns: 1fr 1fr;
+}
+.tweet-gallery:has(img:nth-child(3)) {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Make cells square */
+.tweet-gallery .tweet-img {
+  aspect-ratio: 1/1!important;
+}
+
+.img-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  cursor: pointer; /* clicking anywhere closes modal */
+}
+
+.img-modal img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+}
+
 .follow-lists {
   display:flex;
   justify-content:space-around;
@@ -211,18 +281,50 @@ input, textarea {
 {% if user_tweets %}
   {% for post in user_tweets %}
     <div class="post" data-post-id="{{ post.id }}">
-      <strong onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'">
-        {{ post.username }}
-      </strong>
-      <p>{{ post.content }}</p>
-      <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
-        ❤️ <span class="like-count">{{ post.likes|length }}</span>
-      </button>
+      <div style="display:flex; align-items:flex-start; gap:12px;">
+
+        <!-- Profile pic -->
+        <img src="{{ post.profile_pic_url or url_for('static', filename='default-avatar.png') }}"
+            alt="Profil"
+            class="tweet-profile-pic"
+            onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'"
+            style="cursor:pointer;">
+
+        <div style="flex:1;">
+
+          <!-- Username -->
+          <strong style="cursor:pointer;" 
+                  onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'">
+            {{ post.username }}
+          </strong>
+
+          <!-- Text content -->
+          <p>{{ post.content or '&nbsp;' | safe }}</p>
+
+
+          <!-- Tweet images -->
+          {% if post.image_urls %}
+            <div class="tweet-gallery">
+              {% for img in post.image_urls %}
+                <img src="{{ img }}" class="tweet-img" onclick="openImageModal('{{ img }}')">
+              {% endfor %}
+            </div>
+          {% endif %}
+
+        </div>
+
+        <!-- Like button -->
+        <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
+          ❤️ <span class="like-count">{{ post.likes|length }}</span>
+        </button>
+      </div>
     </div>
-  {% endfor %}
+{% endfor %}
+
 {% else %}
   <p style="color:var(--muted);">Aucun tweet pour le moment.</p>
 {% endif %}
+
 
 <p style="text-align:center; margin-top:16px;">
   <a href="{{ url_for('routes.feed') }}">⬅ Retour au fil</a>
@@ -357,6 +459,24 @@ function previewPicture(event) {
   headerImg.src = url;
 }
 </script>
+<!-- Image modal -->
+<div id="imgModal" class="img-modal" onclick="closeImageModal()">
+  <img id="modalImage">
+</div>
+
+<script>
+function openImageModal(src) {
+  const modal = document.getElementById("imgModal");
+  const modalImg = document.getElementById("modalImage");
+  modalImg.src = src;
+  modal.style.display = "flex";
+}
+
+function closeImageModal() {
+  document.getElementById("imgModal").style.display = "none";
+}
+</script>
+
 
 </body>
 </html>

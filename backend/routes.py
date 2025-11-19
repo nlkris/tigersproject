@@ -8,6 +8,9 @@ import os
 routes = Blueprint('routes', __name__)
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "backend", "uploads", "profile_pics")
+TWEET_UPLOAD_FOLDER = os.path.join(os.getcwd(), "backend", "uploads", "tweet_images")
+os.makedirs(TWEET_UPLOAD_FOLDER, exist_ok=True)
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -123,19 +126,37 @@ def feed():
     # POST d'un nouveau tweet
     if request.method == 'POST':
         content = request.form.get('content', '').strip()
-        if content:
+        images = request.files.getlist('images')
+
+        image_urls = []
+
+        # Handle multiple image uploads
+        for img in images:
+            if img and allowed_file(img.filename):
+                filename = secure_filename(f"{current_user_id}_{datetime.now().timestamp()}_{img.filename}")
+                img.save(os.path.join(TWEET_UPLOAD_FOLDER, filename))
+                image_urls.append(f"/uploads/tweet_images/{filename}")
+
+        # Require at least text or images
+        if content or image_urls:
             new_tweet = {
                 'id': len(tweets) + 1,
                 'user_id': current_user_id,
                 'username': session['username'],
                 'content': content,
+                'image_urls': image_urls,   # <--- HERE: A LIST
                 'likes': [],
                 'created_at': datetime.now().isoformat()
             }
             tweets.append(new_tweet)
             write_tweets(tweets)
+
             flash("Votre tweet a été publié !", "success")
             return redirect(url_for('routes.feed'))
+
+        flash("Votre tweet doit contenir un texte ou une image.", "error")
+        return redirect(url_for('routes.feed'))
+
 
     # Tri et ajout du champ liked
     tweets.sort(key=lambda t: t.get('created_at', ''), reverse=True)
@@ -158,6 +179,7 @@ def feed():
         users=users,
         current_user=current_user
     )
+
 
 # ------------------- LOGOUT -------------------
 @routes.route('/logout')
@@ -224,7 +246,6 @@ def toggle_follow(username):
         'following_count': len(current_user['following'])
     })
 
-# ------------------- PROFIL -------------------
 @routes.route('/profile/<username>')
 def profile(username):
     if 'user_id' not in session:
@@ -249,6 +270,19 @@ def profile(username):
         post.setdefault('likes', [])
         post['liked'] = session['user_id'] in post['likes']
 
+        # --- ENSURE username AND profile_pic_url ARE PRESENT ---
+        tweet_user = next((u for u in users if u['id'] == post['user_id']), None)
+        if tweet_user:
+            post['username'] = tweet_user['username']
+            # Use uploaded file if exists, else fallback to default
+            if tweet_user.get('profile_pic_url'):
+                post['profile_pic_url'] = tweet_user['profile_pic_url']
+            else:
+                post['profile_pic_url'] = url_for('static', filename='default-avatar.png')
+        else:
+            post['username'] = 'Utilisateur'
+            post['profile_pic_url'] = url_for('static', filename='default-avatar.png')
+
     followers_list = [u for u in users if u['id'] in profile_user.get('followers', [])]
     following_list = [u for u in users if u['id'] in profile_user.get('following', [])]
 
@@ -261,6 +295,9 @@ def profile(username):
         followers_list=followers_list,
         following_list=following_list
     )
+
+
+    
 
 # ------------------- EDIT PROFILE -------------------
 @routes.route('/profile/edit', methods=['POST'])
@@ -288,13 +325,9 @@ def edit_profile():
     if 'profile_pic' in request.files:
         file = request.files['profile_pic']
         if file and allowed_file(file.filename):
-            if user.get('profile_pic_url'):
-                old_pic = os.path.join(UPLOAD_FOLDER, os.path.basename(user['profile_pic_url']))
-                if os.path.exists(old_pic):
-                    os.remove(old_pic)
             filename = secure_filename(f"{current_user_id}_{file.filename}")
             file.save(os.path.join(UPLOAD_FOLDER, filename))
-            user['profile_pic_url'] = f"/uploads/profile_pics/{filename}"
+            user['profile_pic_url'] = url_for('routes.uploaded_file', filename=filename)
 
     if new_username != user['username']:
         for t in tweets:
@@ -314,3 +347,8 @@ def edit_profile():
 @routes.route('/uploads/profile_pics/<filename>')
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
+
+@routes.route('/uploads/tweet_images/<filename>')
+def uploaded_tweet_image(filename):
+    return send_from_directory(TWEET_UPLOAD_FOLDER, filename)
+

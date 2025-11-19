@@ -87,6 +87,28 @@ def login():
 
     return render_template('login.html')
 
+# ------------------- ✨ RECHERCHE D'UTILISATEURS -------------------
+@routes.route('/search', methods=['GET'])
+def search():
+    if 'user_id' not in session:
+        return redirect(url_for('routes.login'))
+
+    users = read_users()
+    query = request.args.get("q", "").strip()
+
+    matched_users = []
+    if query:
+        matched_users = [
+            u for u in users
+            if query.lower() in u['username'].lower()
+        ]
+
+    return render_template(
+        'search.html',
+        query=query,
+        matched_users=matched_users
+    )
+
 # ------------------- FEED -------------------
 @routes.route('/feed', methods=['GET', 'POST'])
 def feed():

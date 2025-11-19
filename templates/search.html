@@ -11,6 +11,7 @@
   font-family: Inter, sans-serif;
 }
 * { box-sizing:border-box; margin:0; padding:0; }
+
 body {
   min-height:100vh;
   display:flex;
@@ -21,6 +22,7 @@ body {
   font-size:16px;
   padding:20px;
 }
+
 .container {
   background:var(--card);
   padding:32px;
@@ -29,51 +31,76 @@ body {
   width:100%;
   max-width:1100px;
 }
-.header {
+
+/* Header top avec profil */
+.header-top {
   display:flex;
-  justify-content:space-between;
+  justify-content:flex-end;
   align-items:center;
-  margin-bottom:16px;
+  margin-bottom:12px;
 }
-.header-left { text-align:center; flex:1; }
-.header-right a {
+
+.profile-shortcut {
   display:flex;
   align-items:center;
-  gap:8px;
-  color:var(--accent);
+  gap:10px;
   text-decoration:none;
+  color:var(--accent);
   font-weight:600;
+  transition:0.2s;
 }
-.header-right a img {
-  width:60px;
-  height:auto;
-  border-radius:50%;
+.profile-shortcut svg {
+  width:70px;
+  height:70px;
   cursor:pointer;
   transition: transform 0.3s ease, filter 0.3s ease;
 }
-.header-right a:hover img {
+.profile-shortcut:hover svg {
   transform: scale(1.05);
-  filter: drop-shadow(0 0 8px var(--accent));
+  filter: drop-shadow(0 0 12px var(--accent));
 }
-.header-right a:hover span { text-decoration:underline; }
-.logo { display:block; margin:0 auto 16px auto; width:200px; height:auto; }
-.logo:hover { transform: scale(1.05); filter: drop-shadow(0 0 12px var(--accent)); }
-.search-bar { margin:16px 0; display:flex; justify-content:center; }
-.search-bar input[type="text"] {
-  padding:10px 12px;
+
+/* Header central */
+.header-center {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:16px;
+  margin-bottom:24px;
+}
+
+.logo {
+  width:200px;
+  margin-bottom:4px;
+  transition:0.3s;
+}
+.logo:hover {
+  transform:scale(1.05);
+  filter: drop-shadow(0 0 12px var(--accent));
+}
+
+/* Barre de recherche */
+.search-bar {
+  width:100%;
+  max-width:420px;
+  position:relative;
+}
+.search-bar input {
+  width:100%;
+  padding:12px;
   border-radius:8px;
   border:1px solid rgba(255,255,255,0.1);
-  background:transparent;
+  background:rgba(255,255,255,0.05);
   color:#e6eef8;
   outline:none;
-  width:300px;
 }
-h1, h2 { color:var(--accent); margin-bottom:16px; }
+
+/* Résultats */
 .user-list {
   display:flex;
   flex-direction:column;
   gap:12px;
-  margin-top:24px;
+  margin-top:8px;
 }
 .user-card {
   background:rgba(255,255,255,0.03);
@@ -81,41 +108,34 @@ h1, h2 { color:var(--accent); margin-bottom:16px; }
   padding:16px;
   box-shadow:var(--shadow);
   transition:transform 0.2s ease, box-shadow 0.2s ease;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  gap:16px;
 }
 .user-card:hover {
   transform:translateY(-4px);
   box-shadow:0 8px 24px rgba(2,6,23,0.8);
 }
 .user-card a {
-  text-decoration:none;
-  color:#e6eef8;
   display:flex;
   align-items:center;
-  gap:12px;
-  width:100%;
+  gap:16px;
+  text-decoration:none;
+  color:#e6eef8;
 }
 .user-card img {
   width:50px;
   height:50px;
   border-radius:50%;
-  object-fit:cover;
   border:2px solid var(--accent);
+  object-fit:cover;
 }
-.user-card .username {
+.username {
   font-weight:600;
   color:var(--accent);
-  flex:1;
 }
 .user-id {
   color:var(--muted);
   font-size:14px;
 }
-a { color:var(--accent); text-decoration:none; }
-a:hover { text-decoration:underline; }
+
 .back-link {
   text-align:center;
   margin-top:32px;
@@ -125,50 +145,54 @@ a:hover { text-decoration:underline; }
   background:rgba(94,234,212,0.1);
   border-radius:8px;
   transition:background 0.2s ease;
+  text-decoration:none;
+  color:var(--accent);
 }
 .back-link a:hover {
   background:rgba(94,234,212,0.2);
 }
-@media (max-width:900px) { .user-list { width:100%; } }
 </style>
 </head>
 <body>
+
 <div class="container">
-  <!-- Header -->
-  <div class="header">
-    <div class="header-left">
-      <img src="{{ url_for('static', filename='tiger.png') }}" alt="Logo TIGINSA" class="logo">
-      <h1>Rechercher des utilisateurs</h1>
-    </div>
-    <div class="header-right">
-      <!-- Lien corrigé vers ton profil -->
-      <a href="{{ url_for('routes.profile', username=session['username']) }}">
-        <img src="{{ url_for('static', filename='tiger.png') }}" alt="Profil">
-        <span>Mon profil</span>
-      </a>
+
+  <!-- Profil en haut à droite -->
+  <div class="header-top">
+    <a href="{{ url_for('routes.profile', username=session['username']) }}" class="profile-shortcut">
+      <svg viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 10px #5eead4);">
+        <circle cx="12" cy="12" r="10" stroke="#5eead4" stroke-width="0.8" style="filter: blur(3px); opacity:0.55;"></circle>
+        <circle cx="12" cy="12" r="9" stroke="#5eead4" stroke-width="1.5"/>
+        <circle cx="12" cy="8" r="3.2" stroke="#5eead4" stroke-width="1.6"/>
+        <path d="M5.5 19.5c1.4-3.5 4.3-5.5 6.5-5.5s5.1 2 6.5 5.5" stroke="#5eead4" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </a>
+  </div>
+
+  <!-- Logo + barre -->
+  <div class="header-center">
+    <img src="{{ url_for('static', filename='tiger.png') }}" alt="TIGINSA" class="logo">
+
+    <div class="search-bar">
+      <form method="GET" action="{{ url_for('routes.search') }}">
+        <input
+          type="text"
+          name="q"
+          placeholder="Rechercher un utilisateur..."
+          value="{{ query if query else '' }}"
+          required
+        >
+      </form>
     </div>
   </div>
 
-  <!-- Barre de recherche -->
-  <div class="search-bar">
-    <form method="GET" action="{{ url_for('routes.search') }}">
-      <input
-        type="text"
-        name="q"
-        placeholder="Rechercher un utilisateur..."
-        value="{{ query if query else '' }}"
-        required
-      >
-    </form>
-  </div>
+  <h2 style="text-align:center; margin-bottom:16px;">Résultats</h2>
 
-  <!-- Résultats de la recherche -->
+  <!-- Résultats -->
   <div class="user-list">
     {% if matched_users %}
-      <h2>Résultats</h2>
       {% for user in matched_users %}
       <div class="user-card">
-        <!-- Lien corrigé vers le profil de chaque utilisateur -->
         <a href="{{ url_for('routes.profile', username=user.username) }}">
           <img src="{{ url_for('static', filename='tiger.png') }}" alt="{{ user.username }}">
           <div>
@@ -179,20 +203,22 @@ a:hover { text-decoration:underline; }
       </div>
       {% endfor %}
     {% else %}
-      <p style="text-align:center; color:var(--muted);">
+      <p style="text-align:center; color:var(--muted); margin-top:24px;">
         {% if query %}
           Aucun utilisateur trouvé pour "{{ query }}".
         {% else %}
-          Effectuez une recherche pour trouver des utilisateurs.
+          Saisissez un nom pour commencer la recherche.
         {% endif %}
       </p>
     {% endif %}
   </div>
 
-  <!-- Lien de retour -->
+  <!-- Retour -->
   <div class="back-link">
     <a href="{{ url_for('routes.feed') }}">← Retour au fil d'actualité</a>
   </div>
+
 </div>
+
 </body>
 </html>

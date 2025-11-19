@@ -32,55 +32,214 @@ body {
   max-width:1100px;
 }
 
-.header-top { display:flex; justify-content:flex-end; margin-bottom:12px; }
-.profile-shortcut { display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--accent); font-weight:600; transition:0.2s; }
-.profile-shortcut svg { width:70px; height:70px; cursor:pointer; transition: transform 0.3s ease, filter 0.3s ease; }
-.profile-shortcut:hover svg { transform: scale(1.05); filter: drop-shadow(0 0 12px var(--accent)); }
-
-.header-center { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 24px; }
-.header-center .search-bar { width: 100%; max-width: 400px; }
-.header-center .search-bar input {
-  width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
-  background: rgba(255,255,255,0.05); color: #e6eef8; outline:none;
+/* en-tête */
+.header-top {
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:16px;
+  margin-bottom:12px;
 }
 
-.logo { display:block; margin:0 auto 16px auto; width:200px; height:auto; }
-.logo:hover { transform: scale(1.05); filter: drop-shadow(0 0 12px var(--accent)); }
+.profile-shortcut {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:600;
+  transition:0.2s;
+}
+.profile-shortcut svg {
+  width:70px;
+  height:70px;
+  cursor:pointer;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+.profile-shortcut:hover svg {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 12px var(--accent));
+}
 
-.switch-container { display:flex; justify-content:center; gap:24px; margin-bottom:24px; }
-.switch-btn { display:flex; align-items:center; justify-content:center; width:60px; height:60px; border-radius:50%; background: rgba(255,255,255,0.05); color: var(--accent); text-decoration:none; transition: all 0.3s ease; font-size:24px; }
-.switch-btn:hover { background: rgba(94,234,212,0.25); filter: drop-shadow(0 0 10px #5eead4); }
-.switch-btn.active { background: linear-gradient(90deg,#06b6d4,#7c3aed); color: #021024; box-shadow: var(--shadow); }
+/* logo + barre */
+.header-center {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:16px;
+  margin-bottom:24px;
+}
+
+.logo {
+  display:block;
+  margin:0 auto 4px auto;
+  width:200px;
+  height:auto;
+}
+.logo:hover {
+  transform:scale(1.05);
+  filter: drop-shadow(0 0 12px var(--accent));
+}
+
+/* nouvelle barre sous logo */
+.search-bar {
+  width:100%;
+  max-width:420px;
+  position:relative;
+}
+.search-bar input {
+  width:100%;
+  padding:12px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.05);
+  color:#e6eef8;
+  outline:none;
+}
+
+/* suggestions */
+#search-suggestions {
+  background:rgba(11,18,32,0.95);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px;
+  margin-top:6px;
+  padding:0;
+  list-style:none;
+  display:none;
+  position:absolute;
+  width:100%;
+  z-index:100;
+}
+#search-suggestions li {
+  padding:10px;
+  cursor:pointer;
+  color:var(--accent);
+}
+#search-suggestions li:hover {
+  background:rgba(94,234,212,0.15);
+}
+
+.switch-container {
+  display:flex;
+  justify-content:center;
+  gap:24px;
+  margin-bottom:24px;
+}
+.switch-btn {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  background: rgba(255,255,255,0.05);
+  color: var(--accent);
+  text-decoration:none;
+  transition: all 0.3s ease;
+  font-size:24px;
+}
+.switch-btn:hover {
+  background: rgba(94,234,212,0.25);
+  filter: drop-shadow(0 0 10px #5eead4);
+}
+.switch-btn.active {
+  background: linear-gradient(90deg,#06b6d4,#7c3aed);
+  color: #021024;
+  box-shadow: var(--shadow);
+}
 
 .feed-container { display:flex; flex-direction:column; gap:16px; }
-.feed { background:rgba(255,255,255,0.03); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); max-height:600px; overflow-y:auto; }
-.post { padding:12px; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:12px; border-radius:8px; background:rgba(255,255,255,0.02); position:relative; }
+.feed {
+  background:rgba(255,255,255,0.03);
+  border-radius:var(--radius);
+  padding:16px;
+  box-shadow:var(--shadow);
+  max-height:600px;
+  overflow-y:auto;
+}
+.post {
+  padding:12px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  margin-bottom:12px;
+  border-radius:8px;
+  background:rgba(255,255,255,0.02);
+  position:relative;
+}
 .post strong { color: var(--accent); }
 .post p { margin:6px 0; }
-.post img { width:50px; height:50px; border-radius:50%; object-fit:cover; flex-shrink:0; border:2px solid var(--accent); cursor:pointer; }
+.post img {
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  object-fit:cover;
+  flex-shrink:0;
+  border:2px solid var(--accent);
+  cursor:pointer;
+}
 
-.like-btn { background:none; border:none; color:#ffffff; cursor:pointer; font-size:18px; display:flex; align-items:center; gap:6px; transition:color 0.2s ease, transform 0.2s ease; z-index:1; }
+.like-btn {
+  background:none;
+  border:none;
+  color:#ffffff;
+  cursor:pointer;
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  transition:color 0.2s ease, transform 0.2s ease;
+  z-index:1;
+}
 .like-btn:hover { transform: scale(1.1); }
 .like-btn.liked { color:#f87171; }
 
 form { display:flex; flex-direction:column; gap:16px; margin-bottom:32px; }
-textarea { padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:transparent; color:#e6eef8; outline:none; width:100%; min-height:80px; }
-button { padding:12px; background:linear-gradient(90deg,#06b6d4,#7c3aed); border:none; border-radius:8px; color:#021024; font-weight:700; cursor:pointer; transition:0.2s; }
+textarea {
+  padding:10px 12px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.1);
+  background:transparent;
+  color:#e6eef8;
+  outline:none;
+  width:100%;
+  min-height:80px;
+}
+button {
+  padding:12px;
+  background:linear-gradient(90deg,#06b6d4,#7c3aed);
+  border:none;
+  border-radius:8px;
+  color:#021024;
+  font-weight:700;
+  cursor:pointer;
+  transition:0.2s;
+}
 button:hover { opacity:0.9; }
+
 a { color:var(--accent); text-decoration:none; }
 a:hover { text-decoration:underline; }
 
-.flashes { list-style: none; padding: 0; margin-bottom: 16px; text-align: center; }
-.flashes li { font-size: 14px; margin-bottom: 8px; padding: 8px 16px; border-radius: 8px; display: inline-block; opacity: 1; transition: opacity 0.5s ease; }
-.flashes li.success { color: #021024; background: rgba(94, 234, 212, 1); }
-.flashes li.error { color: #021024; background: rgba(248, 113, 113, 1); }
-.flashes li.info { color:#021024; background: rgba(94, 165, 255,1); }
+.flashes {
+  list-style:none;
+  padding:0;
+  margin-bottom:16px;
+  text-align:center;
+}
+.flashes li {
+  font-size:14px;
+  margin-bottom:8px;
+  padding:8px 16px;
+  border-radius:8px;
+  display:inline-block;
+}
+.flashes li.success { color:#021024; background:rgba(94,234,212,1); }
+.flashes li.error   { color:#021024; background:rgba(248,113,113,1); }
+.flashes li.info    { color:#021024; background:rgba(94,165,255,1); }
 </style>
 </head>
 <body>
 <div class="container">
 
-  <!-- RACCOURCI PROFIL -->
+  <!-- HEADER TOP : Profil UNIQUEMENT -->
   <div class="header-top">
     <a href="{{ url_for('routes.profile', username=current_user.username) }}" class="profile-shortcut">
       <svg viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 10px #5eead4);">
@@ -92,7 +251,7 @@ a:hover { text-decoration:underline; }
     </a>
   </div>
 
-  <!-- FLASH MESSAGES -->
+  <!-- FLASH -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <ul class="flashes">
@@ -103,11 +262,15 @@ a:hover { text-decoration:underline; }
     {% endif %}
   {% endwith %}
 
-  <!-- HEADER CENTRAL -->
+  <!-- LOGO + NOUVELLE BARRE -->
   <div class="header-center">
     <img src="{{ url_for('static', filename='tiger.png') }}" alt="Logo TIGINSA" class="logo">
+
     <div class="search-bar">
-      <input type="text" placeholder="Rechercher des utilisateurs...">
+      <form method="GET" action="{{ url_for('routes.search') }}">
+        <input type="text" name="q" id="live-search" placeholder="Rechercher des utilisateurs..." required>
+      </form>
+      <ul id="search-suggestions"></ul>
     </div>
   </div>
 
@@ -117,13 +280,13 @@ a:hover { text-decoration:underline; }
     <button type="submit">Publier</button>
   </form>
 
-  <!-- SWITCH VUES -->
+  <!-- CHANGE VUE -->
   <div class="switch-container">
     <a href="{{ url_for('routes.feed', view='followed') }}" class="switch-btn {% if view == 'followed' %}active{% endif %}">&#10148;</a>
     <a href="{{ url_for('routes.feed', view='recommended') }}" class="switch-btn {% if view == 'recommended' %}active{% endif %}">&#9733;</a>
   </div>
 
-  <!-- FIL -->
+  <!-- FEED -->
   <div class="feed-container">
     {% set tweet_lists = {'followed': followed_tweets, 'recommended': recommended_tweets} %}
     <div class="feed">
@@ -142,8 +305,6 @@ a:hover { text-decoration:underline; }
                 </strong>
                 <p>{{ post.content }}</p>
               </div>
-
-              <!-- Suppression du bouton follow/unfollow -->
 
               <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
                 ❤️ <span class="like-count">{{ post.likes|length }}</span>
@@ -165,9 +326,8 @@ a:hover { text-decoration:underline; }
 </div>
 
 <script>
+/* LIKE AJAX */
 document.addEventListener('DOMContentLoaded', () => {
-
-  // Likes
   document.querySelectorAll('.like-btn').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
@@ -175,23 +335,53 @@ document.addEventListener('DOMContentLoaded', () => {
       const countEl = btn.querySelector('.like-count');
       btn.disabled = true;
       try {
-        const res = await fetch(`/like/${tweetId}`, { method: 'POST' });
-        if(!res.ok) throw new Error('Erreur réseau');
+        const res = await fetch(`/like/${tweetId}`, { method:'POST' });
         const data = await res.json();
         if(data.success){
           countEl.textContent = data.like_count;
           btn.classList.toggle('liked', data.liked);
         }
-      } catch(err){
-        console.error(err);
       } finally {
         btn.disabled = false;
       }
     });
   });
+});
 
+/* LIVE SEARCH AJAX */
+document.getElementById("live-search").addEventListener("input", async function () {
+  const q = this.value.trim();
+  const box = document.getElementById("search-suggestions");
+
+  if (!q) {
+    box.style.display = "none";
+    box.innerHTML = "";
+    return;
+  }
+
+  const res = await fetch(`/search_live?q=${encodeURIComponent(q)}`);
+  const data = await res.json();
+
+  if (!data.length) {
+    box.style.display = "none";
+    box.innerHTML = "";
+    return;
+  }
+
+  box.innerHTML = data
+    .map(user => `<li onclick="window.location.href='/profile/${user.username}'">@${user.username}</li>`)
+    .join("");
+
+  box.style.display = "block";
+});
+
+document.addEventListener("click", (e) => {
+  const box = document.getElementById("search-suggestions");
+  if (!box.contains(e.target) && e.target.id !== "live-search") {
+    box.style.display = "none";
+  }
 });
 </script>
+
 </body>
 </html>
-

@@ -194,7 +194,9 @@ body {
       {% for user in matched_users %}
       <div class="user-card">
         <a href="{{ url_for('routes.profile', username=user.username) }}">
-          <img src="{{ url_for('static', filename='tiger.png') }}" alt="{{ user.username }}">
+          <!-- Affiche la photo de profil réelle -->
+          <img src="{{ user.profile_pic_url if user.profile_pic_url else url_for('static', filename='default-avatar.png') }}"
+               alt="{{ user.username }}">
           <div>
             <div class="username">{{ user.username }}</div>
             <div class="user-id">ID: {{ user.id }}</div>

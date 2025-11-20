@@ -21,6 +21,7 @@ def allowed_file(filename):
 init_files()
 ensure_likes_field()
 ensure_follow_fields()
+ensure_comments_field() 
 
 # ------------------- ACCUEIL -------------------
 @routes.route('/')
@@ -352,3 +353,42 @@ def uploaded_file(filename):
 def uploaded_tweet_image(filename):
     return send_from_directory(TWEET_UPLOAD_FOLDER, filename)
 
+#-------------------comments ---------------------
+@routes.route('/comment/<int:tweet_id>', methods=['POST'])
+def comment_tweet(tweet_id):
+    if 'user_id' not in session:
+        return jsonify({"success": False, "message": "Non connecté"}), 401
+    tweets = read_tweets()
+    users = read_users()
+    current_user_id = session['user_id']
+    current_user = next((u for u in users if u['id'] == current_user_id), None)
+    if not current_user:
+        return jsonify({"success": False, "message": "Utilisateur introuvable"}), 404
+    content = request.form.get('content', '').strip()
+    if not content:
+        return jsonify({"success": False, "message": "Le commentaire ne peut pas être vide"}), 400
+    for tweet in tweets:
+        if tweet['id'] == tweet_id:
+            tweet.setdefault('comments', [])
+            new_comment = {
+                'user_id': current_user_id,
+                'username': current_user['username'],
+                'content': content,
+                'created_at': datetime.now().isoformat()
+            }
+            tweet['comments'].append(new_comment)
+            write_tweets(tweets)
+            return jsonify({
+                "success": True,
+                "comment": new_comment,
+                "comment_count": len(tweet['comments'])
+            })
+    return jsonify({"success": False, "message": "Tweet introuvable"}), 404
+
+@routes.route('/comments/<int:tweet_id>', methods=['GET'])
+def get_comments(tweet_id):
+    tweets = read_tweets()
+    tweet = next((t for t in tweets if t['id'] == tweet_id), None)
+    if not tweet or 'comments' not in tweet:
+        return jsonify({"success": False, "message": "Tweet ou commentaires introuvables"}), 404
+    return jsonify({"success": True, "comments": tweet['comments']})

@@ -493,8 +493,25 @@ function openImageModal(src) {
 function closeImageModal() {
   document.getElementById("imgModal").style.display = "none";
 }
-</script>
 
+
+
+</script>
+<!-- Formulaire pour ajouter un commentaire -->
+<form action="{{ url_for('routes.comment_tweet', tweet_id=tweet.id) }}" method="POST" class="comment-form">
+    <textarea name="content" placeholder="Ajouter un commentaire..." required></textarea>
+    <button type="submit">Commenter</button>
+</form>
+
+<!-- Section pour afficher les commentaires -->
+<div class="comments-section">
+    {% for comment in tweet.get('comments', []) %}
+    <div class="comment">
+        <p><strong>{{ comment.username }}</strong>: {{ comment.content }}</p>
+        <small>{{ comment.created_at }}</small>
+    </div>
+    {% endfor %}
+</div>
 </body>
 </html>
 

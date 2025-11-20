@@ -115,4 +115,10 @@ def unfollow_user(follower_id, followed_id):
     write_users(users, USER_JSON_PATH)
     return True
 
+def ensure_comments_field():
+    tweets = read_tweets()
+    for tweet in tweets:
+        if 'comments' not in tweet:
+            tweet['comments'] = []
+    write_tweets(tweets)
 

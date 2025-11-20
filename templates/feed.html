@@ -401,8 +401,30 @@ a:hover { text-decoration:underline; }
               ❤️ <span class="like-count">{{ post.likes|length }}</span>
             </button>
           </div>
-        </div>
+           <!-- Formulaire pour ajouter un commentaire -->
+          <form action="{{ url_for('routes.comment_tweet', tweet_id=post.id) }}" method="POST" class="comment-form">
+              <textarea name="content" placeholder="Ajouter un commentaire..." required></textarea>
+              <button type="submit">Commenter</button>
+          </form>
 
+          <!-- Section pour afficher les commentaires -->
+          <div class="comments-section">
+              {% for comment in post.get('comments', []) %}
+              <div class="comment">
+                  <p><strong>{{ comment.username }}</strong>: {{ comment.content }}</p>
+                  <!-- Bouton Like pour le commentaire -->
+            <button class="like-comment-btn {% if session['user_id'] in comment.get('likes', []) %}liked{% endif %}"
+                    data-tweet-id="{{ post.id }}"
+                    data-comment-index="{{ loop.index0 }}">
+                ❤️ <span class="like-count">{{ comment.get('likes', [])|length }}</span>
+            </button>
+        </p>
+        <small>{{ comment.created_at }}</small>
+                  <small>{{ comment.created_at }}</small>
+              </div>
+              {% endfor %}
+          </div>
+        </div>
       {% endfor %}
     {% else %}
       <p style="text-align:center; color:var(--muted);">
@@ -497,21 +519,76 @@ function closeImageModal() {
 
 
 </script>
-<!-- Formulaire pour ajouter un commentaire -->
-<form action="{{ url_for('routes.comment_tweet', tweet_id=tweet.id) }}" method="POST" class="comment-form">
-    <textarea name="content" placeholder="Ajouter un commentaire..." required></textarea>
-    <button type="submit">Commenter</button>
-</form>
+/* AJAX COMMENT SUBMISSION */
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.comment-form').forEach(form => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: formData
+      });
+      const result = await response.json();
+      if (result.success) {
+        // Recharge la page pour afficher le nouveau commentaire
+        window.location.reload();
+      } else {
+        alert(result.message);
+      }
+    });
+  });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Gestion des likes sur les commentaires
+    document.querySelectorAll('.like-comment-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const tweetId = btn.dataset.tweetId;
+            const commentIndex = btn.dataset.commentIndex;
+            const countEl = btn.querySelector('.like-count');
 
-<!-- Section pour afficher les commentaires -->
-<div class="comments-section">
-    {% for comment in tweet.get('comments', []) %}
-    <div class="comment">
-        <p><strong>{{ comment.username }}</strong>: {{ comment.content }}</p>
-        <small>{{ comment.created_at }}</small>
-    </div>
-    {% endfor %}
-</div>
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`/like_comment/${tweetId}/${commentIndex}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la requête');
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Met à jour le nombre de likes
+                    countEl.textContent = data.like_count;
+                    // Met à jour l'état visuel du bouton
+                    btn.classList.toggle('liked', data.liked);
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Une erreur est survenue');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    });
+});
+</script>
+
+
+
+
 </body>
 </html>
 

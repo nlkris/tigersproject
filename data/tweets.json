@@ -6,7 +6,8 @@
         "content": "hjkhhjk\r\nkjhjkh",
         "likes": [
             5
-        ]
+        ],
+        "comments": []
     },
     {
         "id": 2,
@@ -20,7 +21,8 @@
             "\ud83d\ude2e": [
                 5
             ]
-        }
+        },
+        "comments": []
     },
     {
         "id": 3,
@@ -32,14 +34,16 @@
             "\ud83d\udd25": [
                 5
             ]
-        }
+        },
+        "comments": []
     },
     {
         "id": 4,
         "user_id": 5,
         "username": "clairoew",
         "content": "coucou",
-        "likes": []
+        "likes": [],
+        "comments": []
     },
     {
         "id": 5,
@@ -49,7 +53,8 @@
         "likes": [
             3,
             5
-        ]
+        ],
+        "comments": []
     },
     {
         "id": 6,
@@ -58,14 +63,16 @@
         "content": "test 1",
         "likes": [
             3
-        ]
+        ],
+        "comments": []
     },
     {
         "id": 7,
         "user_id": 5,
         "username": "clairoew",
         "content": "coucou cela fonctionne !",
-        "likes": []
+        "likes": [],
+        "comments": []
     },
     {
         "id": 8,
@@ -79,7 +86,8 @@
             "\ud83d\udd25": [],
             "\ud83d\ude2e": [],
             "\ud83d\ude02": []
-        }
+        },
+        "comments": []
     },
     {
         "id": 9,
@@ -92,7 +100,8 @@
                 5
             ]
         },
-        "created_at": "2025-10-14T14:49:20.209048"
+        "created_at": "2025-10-14T14:49:20.209048",
+        "comments": []
     },
     {
         "id": 10,
@@ -100,7 +109,8 @@
         "username": "clairoew",
         "content": "tweet",
         "likes": [],
-        "created_at": "2025-10-14T14:57:57.782891"
+        "created_at": "2025-10-14T14:57:57.782891",
+        "comments": []
     },
     {
         "id": 11,
@@ -111,7 +121,8 @@
             5
         ],
         "reactions": {},
-        "created_at": "2025-10-14T15:01:44.166193"
+        "created_at": "2025-10-14T15:01:44.166193",
+        "comments": []
     },
     {
         "id": 12,
@@ -122,7 +133,8 @@
             2
         ],
         "reactions": {},
-        "created_at": "2025-10-14T15:02:28.813005"
+        "created_at": "2025-10-14T15:02:28.813005",
+        "comments": []
     },
     {
         "id": 13,
@@ -134,7 +146,15 @@
             3
         ],
         "reactions": {},
-        "created_at": "2025-10-23T10:03:35.104324"
+        "created_at": "2025-10-23T10:03:35.104324",
+        "comments": [
+            {
+                "user_id": 2,
+                "username": "jeeaaannnne",
+                "content": "oui",
+                "created_at": "2025-11-20T15:22:41.139363"
+            }
+        ]
     },
     {
         "id": 14,
@@ -145,7 +165,8 @@
             3
         ],
         "reactions": {},
-        "created_at": "2025-10-25T16:32:39.453113"
+        "created_at": "2025-10-25T16:32:39.453113",
+        "comments": []
     },
     {
         "id": 15,
@@ -156,7 +177,8 @@
             3
         ],
         "reactions": {},
-        "created_at": "2025-10-25T17:29:41.969099"
+        "created_at": "2025-10-25T17:29:41.969099",
+        "comments": []
     },
     {
         "id": 16,
@@ -164,7 +186,8 @@
         "username": "nlkris",
         "content": "beurre sur le front",
         "likes": [],
-        "created_at": "2025-11-19T16:07:03.441946"
+        "created_at": "2025-11-19T16:07:03.441946",
+        "comments": []
     },
     {
         "id": 17,
@@ -173,7 +196,8 @@
         "content": "beurre sur le front 2.0 stp met l'image",
         "image_url": "/uploads/tweet_images/3_1763564926.875752___1.jpeg",
         "likes": [],
-        "created_at": "2025-11-19T16:08:46.877943"
+        "created_at": "2025-11-19T16:08:46.877943",
+        "comments": []
     },
     {
         "id": 18,
@@ -185,7 +209,8 @@
             "/uploads/tweet_images/3_1763565334.905828_slay_monkey.jpeg"
         ],
         "likes": [],
-        "created_at": "2025-11-19T16:15:34.906246"
+        "created_at": "2025-11-19T16:15:34.906246",
+        "comments": []
     },
     {
         "id": 19,
@@ -196,7 +221,8 @@
             "/uploads/tweet_images/3_1763566137.564582___1.jpeg"
         ],
         "likes": [],
-        "created_at": "2025-11-19T16:28:57.565762"
+        "created_at": "2025-11-19T16:28:57.565762",
+        "comments": []
     },
     {
         "id": 20,
@@ -207,7 +233,8 @@
             "/uploads/tweet_images/3_1763566260.937092_bread.jpeg"
         ],
         "likes": [],
-        "created_at": "2025-11-19T16:31:00.937909"
+        "created_at": "2025-11-19T16:31:00.937909",
+        "comments": []
     },
     {
         "id": 21,
@@ -220,7 +247,8 @@
             "/uploads/tweet_images/3_1763578052.332623_toro.jpeg"
         ],
         "likes": [],
-        "created_at": "2025-11-19T19:47:32.332813"
+        "created_at": "2025-11-19T19:47:32.332813",
+        "comments": []
     },
     {
         "id": 22,
@@ -238,7 +266,8 @@
             "/uploads/tweet_images/3_1763578909.561547__.jpeg"
         ],
         "likes": [],
-        "created_at": "2025-11-19T20:01:49.562197"
+        "created_at": "2025-11-19T20:01:49.562197",
+        "comments": []
     },
     {
         "id": 23,
@@ -249,6 +278,24 @@
             "/uploads/tweet_images/2_1763647243.566817_mbf2025_post-prog-carre-completev23.png"
         ],
         "likes": [],
-        "created_at": "2025-11-20T15:00:43.568828"
+        "created_at": "2025-11-20T15:00:43.568828",
+        "comments": [
+            {
+                "user_id": 2,
+                "username": "jeeaaannnne",
+                "content": "stylax",
+                "created_at": "2025-11-20T15:19:09.625715",
+                "likes": []
+            },
+            {
+                "user_id": 2,
+                "username": "jeeaaannnne",
+                "content": "stylax",
+                "created_at": "2025-11-20T15:21:47.024497",
+                "likes": [
+                    2
+                ]
+            }
+        ]
     }
 ]

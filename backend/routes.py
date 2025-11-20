@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field, ensure_follow_fields
+from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field, ensure_follow_fields, ensure_comments_field
 from datetime import datetime
 import os
 
@@ -392,3 +392,46 @@ def get_comments(tweet_id):
     if not tweet or 'comments' not in tweet:
         return jsonify({"success": False, "message": "Tweet ou commentaires introuvables"}), 404
     return jsonify({"success": True, "comments": tweet['comments']})
+
+#------------------- like com----------------------------------
+@routes.route('/like_comment/<int:tweet_id>/<int:comment_index>', methods=['POST'])
+def like_comment(tweet_id, comment_index):
+    if 'user_id' not in session:
+        return jsonify({"success": False, "message": "Non connecté"}), 401
+
+    tweets = read_tweets()
+    user_id = session['user_id']
+
+    tweet = next((t for t in tweets if t['id'] == tweet_id), None)
+    if not tweet:
+        return jsonify({"success": False, "message": "Tweet introuvable"}), 404
+
+    if 'comments' not in tweet or not tweet['comments']:
+        return jsonify({"success": False, "message": "Aucun commentaire trouvé pour ce tweet"}), 404
+
+    if comment_index < 0 or comment_index >= len(tweet['comments']):
+        return jsonify({"success": False, "message": "Index de commentaire invalide"}), 404
+
+    comment = tweet['comments'][comment_index]
+    comment.setdefault('likes', [])
+
+    if user_id in comment['likes']:
+        comment['likes'].remove(user_id)
+        liked = False
+    else:
+        comment['likes'].append(user_id)
+        liked = True
+
+    write_tweets(tweets)
+
+    return jsonify({
+        "success": True,
+        "liked": liked,
+        "like_count": len(comment['likes'])
+    })
+
+
+
+   
+
+

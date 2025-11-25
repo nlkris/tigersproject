@@ -1,13 +1,16 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field, ensure_follow_fields
+from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field, ensure_follow_fields, ensure_comments_field
 from datetime import datetime
 import os
 
 routes = Blueprint('routes', __name__)
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "backend", "uploads", "profile_pics")
+TWEET_UPLOAD_FOLDER = os.path.join(os.getcwd(), "backend", "uploads", "tweet_images")
+os.makedirs(TWEET_UPLOAD_FOLDER, exist_ok=True)
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -18,6 +21,7 @@ def allowed_file(filename):
 init_files()
 ensure_likes_field()
 ensure_follow_fields()
+ensure_comments_field() 
 
 # ------------------- ACCUEIL -------------------
 @routes.route('/')
@@ -123,19 +127,37 @@ def feed():
     # POST d'un nouveau tweet
     if request.method == 'POST':
         content = request.form.get('content', '').strip()
-        if content:
+        images = request.files.getlist('images')
+
+        image_urls = []
+
+        # Handle multiple image uploads
+        for img in images:
+            if img and allowed_file(img.filename):
+                filename = secure_filename(f"{current_user_id}_{datetime.now().timestamp()}_{img.filename}")
+                img.save(os.path.join(TWEET_UPLOAD_FOLDER, filename))
+                image_urls.append(f"/uploads/tweet_images/{filename}")
+
+        # Require at least text or images
+        if content or image_urls:
             new_tweet = {
                 'id': len(tweets) + 1,
                 'user_id': current_user_id,
                 'username': session['username'],
                 'content': content,
+                'image_urls': image_urls,   # <--- HERE: A LIST
                 'likes': [],
                 'created_at': datetime.now().isoformat()
             }
             tweets.append(new_tweet)
             write_tweets(tweets)
+
             flash("Votre tweet a été publié !", "success")
             return redirect(url_for('routes.feed'))
+
+        flash("Votre tweet doit contenir un texte ou une image.", "error")
+        return redirect(url_for('routes.feed'))
+
 
     # Tri et ajout du champ liked
     tweets.sort(key=lambda t: t.get('created_at', ''), reverse=True)
@@ -158,6 +180,7 @@ def feed():
         users=users,
         current_user=current_user
     )
+
 
 # ------------------- LOGOUT -------------------
 @routes.route('/logout')
@@ -224,7 +247,6 @@ def toggle_follow(username):
         'following_count': len(current_user['following'])
     })
 
-# ------------------- PROFIL -------------------
 @routes.route('/profile/<username>')
 def profile(username):
     if 'user_id' not in session:
@@ -249,6 +271,19 @@ def profile(username):
         post.setdefault('likes', [])
         post['liked'] = session['user_id'] in post['likes']
 
+        # --- ENSURE username AND profile_pic_url ARE PRESENT ---
+        tweet_user = next((u for u in users if u['id'] == post['user_id']), None)
+        if tweet_user:
+            post['username'] = tweet_user['username']
+            # Use uploaded file if exists, else fallback to default
+            if tweet_user.get('profile_pic_url'):
+                post['profile_pic_url'] = tweet_user['profile_pic_url']
+            else:
+                post['profile_pic_url'] = url_for('static', filename='default-avatar.png')
+        else:
+            post['username'] = 'Utilisateur'
+            post['profile_pic_url'] = url_for('static', filename='default-avatar.png')
+
     followers_list = [u for u in users if u['id'] in profile_user.get('followers', [])]
     following_list = [u for u in users if u['id'] in profile_user.get('following', [])]
 
@@ -261,6 +296,9 @@ def profile(username):
         followers_list=followers_list,
         following_list=following_list
     )
+
+
+    
 
 # ------------------- EDIT PROFILE -------------------
 @routes.route('/profile/edit', methods=['POST'])
@@ -288,13 +326,9 @@ def edit_profile():
     if 'profile_pic' in request.files:
         file = request.files['profile_pic']
         if file and allowed_file(file.filename):
-            if user.get('profile_pic_url'):
-                old_pic = os.path.join(UPLOAD_FOLDER, os.path.basename(user['profile_pic_url']))
-                if os.path.exists(old_pic):
-                    os.remove(old_pic)
             filename = secure_filename(f"{current_user_id}_{file.filename}")
             file.save(os.path.join(UPLOAD_FOLDER, filename))
-            user['profile_pic_url'] = f"/uploads/profile_pics/{filename}"
+            user['profile_pic_url'] = url_for('routes.uploaded_file', filename=filename)
 
     if new_username != user['username']:
         for t in tweets:
@@ -314,3 +348,90 @@ def edit_profile():
 @routes.route('/uploads/profile_pics/<filename>')
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
+
+@routes.route('/uploads/tweet_images/<filename>')
+def uploaded_tweet_image(filename):
+    return send_from_directory(TWEET_UPLOAD_FOLDER, filename)
+
+#-------------------comments ---------------------
+@routes.route('/comment/<int:tweet_id>', methods=['POST'])
+def comment_tweet(tweet_id):
+    if 'user_id' not in session:
+        return jsonify({"success": False, "message": "Non connecté"}), 401
+    tweets = read_tweets()
+    users = read_users()
+    current_user_id = session['user_id']
+    current_user = next((u for u in users if u['id'] == current_user_id), None)
+    if not current_user:
+        return jsonify({"success": False, "message": "Utilisateur introuvable"}), 404
+    content = request.form.get('content', '').strip()
+    if not content:
+        return jsonify({"success": False, "message": "Le commentaire ne peut pas être vide"}), 400
+    for tweet in tweets:
+        if tweet['id'] == tweet_id:
+            tweet.setdefault('comments', [])
+            new_comment = {
+                'user_id': current_user_id,
+                'username': current_user['username'],
+                'content': content,
+                'created_at': datetime.now().isoformat()
+            }
+            tweet['comments'].append(new_comment)
+            write_tweets(tweets)
+            return jsonify({
+                "success": True,
+                "comment": new_comment,
+                "comment_count": len(tweet['comments'])
+            })
+    return jsonify({"success": False, "message": "Tweet introuvable"}), 404
+
+@routes.route('/comments/<int:tweet_id>', methods=['GET'])
+def get_comments(tweet_id):
+    tweets = read_tweets()
+    tweet = next((t for t in tweets if t['id'] == tweet_id), None)
+    if not tweet or 'comments' not in tweet:
+        return jsonify({"success": False, "message": "Tweet ou commentaires introuvables"}), 404
+    return jsonify({"success": True, "comments": tweet['comments']})
+
+#------------------- like com----------------------------------
+@routes.route('/like_comment/<int:tweet_id>/<int:comment_index>', methods=['POST'])
+def like_comment(tweet_id, comment_index):
+    if 'user_id' not in session:
+        return jsonify({"success": False, "message": "Non connecté"}), 401
+
+    tweets = read_tweets()
+    user_id = session['user_id']
+
+    tweet = next((t for t in tweets if t['id'] == tweet_id), None)
+    if not tweet:
+        return jsonify({"success": False, "message": "Tweet introuvable"}), 404
+
+    if 'comments' not in tweet or not tweet['comments']:
+        return jsonify({"success": False, "message": "Aucun commentaire trouvé pour ce tweet"}), 404
+
+    if comment_index < 0 or comment_index >= len(tweet['comments']):
+        return jsonify({"success": False, "message": "Index de commentaire invalide"}), 404
+
+    comment = tweet['comments'][comment_index]
+    comment.setdefault('likes', [])
+
+    if user_id in comment['likes']:
+        comment['likes'].remove(user_id)
+        liked = False
+    else:
+        comment['likes'].append(user_id)
+        liked = True
+
+    write_tweets(tweets)
+
+    return jsonify({
+        "success": True,
+        "liked": liked,
+        "like_count": len(comment['likes'])
+    })
+
+
+
+   
+
+

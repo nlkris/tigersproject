@@ -52,4 +52,10 @@ def print_user_tweets(user_id):
             print(f"Tweet ID {tweet['id']} :")
             print(f"  Contenu : {tweet['content']}")
             print(f"  Posté le : {tweet['timestamp']}\n")
-
+            
+# gestion page de profil 
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    bio = db.Column(db.Text, default="")
+    profile_pic = db.Column(db.String(200), default="default.jpg")

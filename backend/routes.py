@@ -1,14 +1,27 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
-from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field, ensure_follow_fields
+from werkzeug.utils import secure_filename
+from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field, ensure_follow_fields, ensure_comments_field
 from datetime import datetime
+import os
 
 routes = Blueprint('routes', __name__)
 
-# Initialisation des fichiers et champs
+UPLOAD_FOLDER = os.path.join(os.getcwd(), "backend", "uploads", "profile_pics")
+TWEET_UPLOAD_FOLDER = os.path.join(os.getcwd(), "backend", "uploads", "tweet_images")
+os.makedirs(TWEET_UPLOAD_FOLDER, exist_ok=True)
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# Initialisation des fichiers
 init_files()
 ensure_likes_field()
 ensure_follow_fields()
+ensure_comments_field() 
 
 # ------------------- ACCUEIL -------------------
 @routes.route('/')
@@ -47,7 +60,8 @@ def signup():
             'password': hashed_password,
             'following': [],
             'followers': [],
-            'profile_pic_url': None
+            'profile_pic_url': None,
+            'bio': ''
         }
         users.append(new_user)
         write_users(users)
@@ -55,7 +69,6 @@ def signup():
         return redirect(url_for('routes.login'))
 
     return render_template('signup.html')
-
 
 # ------------------- CONNEXION -------------------
 @routes.route('/login', methods=['GET', 'POST'])
@@ -78,6 +91,27 @@ def login():
 
     return render_template('login.html')
 
+# ------------------- ✨ RECHERCHE D'UTILISATEURS -------------------
+@routes.route('/search', methods=['GET'])
+def search():
+    if 'user_id' not in session:
+        return redirect(url_for('routes.login'))
+
+    users = read_users()
+    query = request.args.get("q", "").strip()
+
+    matched_users = []
+    if query:
+        matched_users = [
+            u for u in users
+            if query.lower() in u['username'].lower()
+        ]
+
+    return render_template(
+        'search.html',
+        query=query,
+        matched_users=matched_users
+    )
 
 # ------------------- FEED -------------------
 @routes.route('/feed', methods=['GET', 'POST'])
@@ -90,43 +124,51 @@ def feed():
     current_user_id = session['user_id']
     current_user = next((u for u in users if u['id'] == current_user_id), None)
 
-    # Publier un tweet
+    # POST d'un nouveau tweet
     if request.method == 'POST':
         content = request.form.get('content', '').strip()
-        if content:
+        images = request.files.getlist('images')
+
+        image_urls = []
+
+        # Handle multiple image uploads
+        for img in images:
+            if img and allowed_file(img.filename):
+                filename = secure_filename(f"{current_user_id}_{datetime.now().timestamp()}_{img.filename}")
+                img.save(os.path.join(TWEET_UPLOAD_FOLDER, filename))
+                image_urls.append(f"/uploads/tweet_images/{filename}")
+
+        # Require at least text or images
+        if content or image_urls:
             new_tweet = {
                 'id': len(tweets) + 1,
                 'user_id': current_user_id,
                 'username': session['username'],
                 'content': content,
+                'image_urls': image_urls,   # <--- HERE: A LIST
                 'likes': [],
-                'reactions': {},
                 'created_at': datetime.now().isoformat()
             }
             tweets.append(new_tweet)
             write_tweets(tweets)
+
             flash("Votre tweet a été publié !", "success")
             return redirect(url_for('routes.feed'))
 
-    # Tri du plus récent au plus ancien
-    tweets.sort(key=lambda t: t.get('created_at', ''), reverse=True)
+        flash("Votre tweet doit contenir un texte ou une image.", "error")
+        return redirect(url_for('routes.feed'))
 
-    # Ajout systématique des champs pour le front
+
+    # Tri et ajout du champ liked
+    tweets.sort(key=lambda t: t.get('created_at', ''), reverse=True)
     for post in tweets:
         post.setdefault('likes', [])
-        post.setdefault('reactions', {})
         post['liked'] = current_user_id in post['likes']
 
-    # --- Gestion des catégories ---
     followed_ids = current_user.get('following', [])
-
-    # Tweets des abonnements + les siens
     followed_tweets = [t for t in tweets if t['user_id'] in followed_ids or t['user_id'] == current_user_id]
-
-    # Tweets recommandés (non suivis et non soi-même)
     recommended_tweets = [t for t in tweets if t['user_id'] not in followed_ids and t['user_id'] != current_user_id]
 
-    # Vue active : abonnements ou recommandations
     view = request.args.get('view', 'followed')
 
     return render_template(
@@ -134,20 +176,20 @@ def feed():
         username=session['username'],
         view=view,
         followed_tweets=followed_tweets,
-        recommended_tweets=recommended_tweets
+        recommended_tweets=recommended_tweets,
+        users=users,
+        current_user=current_user
     )
 
 
-
-# ------------------- DÉCONNEXION -------------------
+# ------------------- LOGOUT -------------------
 @routes.route('/logout')
 def logout():
     session.clear()
-    flash("Vous êtes déconnecté.", "info")
+    flash("Vous avez été déconnecté.", "success")
     return redirect(url_for('routes.login'))
 
-
-# ------------------- LIKE JSON -------------------
+# ------------------- LIKE -------------------
 @routes.route('/like/<int:tweet_id>', methods=['POST'])
 def like_tweet(tweet_id):
     if 'user_id' not in session:
@@ -170,73 +212,7 @@ def like_tweet(tweet_id):
 
     return jsonify({"success": False, "message": "Tweet non trouvé"}), 404
 
-
-
-# ------------------- RÉACTIONS MULTIPLES -------------------
-@routes.route('/react/<int:tweet_id>/<emoji>', methods=['POST'])
-def react(tweet_id, emoji):
-    if 'user_id' not in session:
-        return jsonify({"success": False, "message": "Non connecté"}), 401
-
-    tweets = read_tweets()
-    user_id = session['user_id']
-
-    for tweet in tweets:
-        if tweet['id'] == tweet_id:
-            tweet.setdefault('reactions', {})
-            tweet['reactions'].setdefault(emoji, [])
-            if user_id in tweet['reactions'][emoji]:
-                tweet['reactions'][emoji].remove(user_id)
-            else:
-                tweet['reactions'][emoji].append(user_id)
-            write_tweets(tweets)
-            return jsonify({"success": True, "count": len(tweet['reactions'][emoji])})
-
-    return jsonify({"success": False, "message": "Tweet non trouvé"}), 404
-
-
-# ------------------- PROFIL -------------------
-@routes.route('/profile/<username>')
-def profile(username):
-    if 'user_id' not in session:
-        return redirect(url_for('routes.login'))
-
-    users = read_users()
-    tweets = read_tweets()
-
-    profile_user = next((u for u in users if u['username'] == username), None)
-    if not profile_user:
-        flash("Utilisateur introuvable.", "error")
-        return redirect(url_for('routes.feed'))
-
-    user_tweets = [t for t in tweets if t['username'] == username]
-    user_tweets.sort(key=lambda t: t.get('created_at', ''), reverse=True)
-
-    is_current_user = session.get('user_id') == profile_user['id']
-    current_user = next((u for u in users if u['id'] == session.get('user_id')), None)
-    is_following = profile_user['id'] in current_user.get('following', []) if current_user else False
-
-    # Ajout systématique des champs pour le front
-    for post in user_tweets:
-        post.setdefault('likes', [])
-        post.setdefault('reactions', {})
-        post['liked'] = session['user_id'] in post['likes']
-
-    # --- Nouveaux : listes complètes d'objets utilisateurs pour abonnés / abonnements ---
-    followers_list = [u for u in users if u['id'] in profile_user.get('followers', [])]
-    following_list = [u for u in users if u['id'] in profile_user.get('following', [])]
-
-    return render_template(
-        'profile.html',
-        profile_user=profile_user,
-        user_tweets=user_tweets,
-        is_current_user=is_current_user,
-        is_following=is_following,
-        followers_list=followers_list,
-        following_list=following_list
-    )
-
-# ------------------- SUIVRE / SE DÉSABONNER -------------------
+# ------------------- TOGGLE FOLLOW -------------------
 @routes.route('/toggle_follow/<username>', methods=['POST'])
 def toggle_follow(username):
     if 'user_id' not in session:
@@ -244,7 +220,6 @@ def toggle_follow(username):
 
     users = read_users()
     current_user_id = session['user_id']
-
     current_user = next((u for u in users if u['id'] == current_user_id), None)
     target_user = next((u for u in users if u['username'] == username), None)
 
@@ -266,25 +241,197 @@ def toggle_follow(username):
         is_following = True
 
     write_users(users)
-
     return jsonify({
         'is_following': is_following,
         'followers_count': len(target_user['followers']),
         'following_count': len(current_user['following'])
     })
 
-
-# ------------------- RECHERCHE -------------------
-@routes.route('/search_ajax')
-def search_ajax():
+@routes.route('/profile/<username>')
+def profile(username):
     if 'user_id' not in session:
-        return jsonify([])
+        return redirect(url_for('routes.login'))
 
-    query = request.args.get('q', '').strip()
     users = read_users()
-    matched_users = [
-        {'username': u['username'], 'followers_count': len(u.get('followers', []))}
-        for u in users if query.lower() in u['username'].lower()
-    ]
-    return jsonify(matched_users)
+    tweets = read_tweets()
+
+    profile_user = next((u for u in users if u['username'] == username), None)
+    if not profile_user:
+        flash("Utilisateur introuvable.", "error")
+        return redirect(url_for('routes.feed'))
+
+    user_tweets = [t for t in tweets if t['user_id'] == profile_user['id']]
+    user_tweets.sort(key=lambda t: t.get('created_at', ''), reverse=True)
+
+    current_user = next((u for u in users if u['id'] == session.get('user_id')), None)
+    is_current_user = current_user['id'] == profile_user['id']
+    is_following = profile_user['id'] in current_user.get('following', []) if current_user else False
+
+    for post in user_tweets:
+        post.setdefault('likes', [])
+        post['liked'] = session['user_id'] in post['likes']
+
+        # --- ENSURE username AND profile_pic_url ARE PRESENT ---
+        tweet_user = next((u for u in users if u['id'] == post['user_id']), None)
+        if tweet_user:
+            post['username'] = tweet_user['username']
+            # Use uploaded file if exists, else fallback to default
+            if tweet_user.get('profile_pic_url'):
+                post['profile_pic_url'] = tweet_user['profile_pic_url']
+            else:
+                post['profile_pic_url'] = url_for('static', filename='default-avatar.png')
+        else:
+            post['username'] = 'Utilisateur'
+            post['profile_pic_url'] = url_for('static', filename='default-avatar.png')
+
+    followers_list = [u for u in users if u['id'] in profile_user.get('followers', [])]
+    following_list = [u for u in users if u['id'] in profile_user.get('following', [])]
+
+    return render_template(
+        'profile.html',
+        profile_user=profile_user,
+        user_tweets=user_tweets,
+        is_current_user=is_current_user,
+        is_following=is_following,
+        followers_list=followers_list,
+        following_list=following_list
+    )
+
+
+    
+
+# ------------------- EDIT PROFILE -------------------
+@routes.route('/profile/edit', methods=['POST'])
+def edit_profile():
+    if 'user_id' not in session:
+        flash("Vous devez être connecté pour modifier un profil.", "error")
+        return redirect(url_for('routes.login'))
+
+    users = read_users()
+    tweets = read_tweets()
+    current_user_id = session['user_id']
+    user = next((u for u in users if u['id'] == current_user_id), None)
+
+    if not user:
+        flash("Utilisateur introuvable.", "error")
+        return redirect(url_for('routes.profile', username=session.get('username')))
+
+    new_username = request.form.get('username', '').strip()
+    new_bio = request.form.get('bio', '').strip()
+
+    if new_username != user['username'] and any(u['username'].lower() == new_username.lower() for u in users):
+        flash("Ce nom d'utilisateur est déjà pris.", "error")
+        return redirect(url_for('routes.profile', username=user['username']))
+
+    if 'profile_pic' in request.files:
+        file = request.files['profile_pic']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(f"{current_user_id}_{file.filename}")
+            file.save(os.path.join(UPLOAD_FOLDER, filename))
+            user['profile_pic_url'] = url_for('routes.uploaded_file', filename=filename)
+
+    if new_username != user['username']:
+        for t in tweets:
+            if t['user_id'] == current_user_id:
+                t['username'] = new_username
+        write_tweets(tweets)
+
+    user['username'] = new_username
+    user['bio'] = new_bio
+    write_users(users)
+    session['username'] = new_username
+
+    flash("Votre profil a été mis à jour !", "success")
+    return redirect(url_for('routes.profile', username=new_username))
+
+# ------------------- UPLOADS -------------------
+@routes.route('/uploads/profile_pics/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
+
+@routes.route('/uploads/tweet_images/<filename>')
+def uploaded_tweet_image(filename):
+    return send_from_directory(TWEET_UPLOAD_FOLDER, filename)
+
+#-------------------comments ---------------------
+@routes.route('/comment/<int:tweet_id>', methods=['POST'])
+def comment_tweet(tweet_id):
+    if 'user_id' not in session:
+        return jsonify({"success": False, "message": "Non connecté"}), 401
+    tweets = read_tweets()
+    users = read_users()
+    current_user_id = session['user_id']
+    current_user = next((u for u in users if u['id'] == current_user_id), None)
+    if not current_user:
+        return jsonify({"success": False, "message": "Utilisateur introuvable"}), 404
+    content = request.form.get('content', '').strip()
+    if not content:
+        return jsonify({"success": False, "message": "Le commentaire ne peut pas être vide"}), 400
+    for tweet in tweets:
+        if tweet['id'] == tweet_id:
+            tweet.setdefault('comments', [])
+            new_comment = {
+                'user_id': current_user_id,
+                'username': current_user['username'],
+                'content': content,
+                'created_at': datetime.now().isoformat()
+            }
+            tweet['comments'].append(new_comment)
+            write_tweets(tweets)
+            return jsonify({
+                "success": True,
+                "comment": new_comment,
+                "comment_count": len(tweet['comments'])
+            })
+    return jsonify({"success": False, "message": "Tweet introuvable"}), 404
+
+@routes.route('/comments/<int:tweet_id>', methods=['GET'])
+def get_comments(tweet_id):
+    tweets = read_tweets()
+    tweet = next((t for t in tweets if t['id'] == tweet_id), None)
+    if not tweet or 'comments' not in tweet:
+        return jsonify({"success": False, "message": "Tweet ou commentaires introuvables"}), 404
+    return jsonify({"success": True, "comments": tweet['comments']})
+
+#------------------- like com----------------------------------
+@routes.route('/like_comment/<int:tweet_id>/<int:comment_index>', methods=['POST'])
+def like_comment(tweet_id, comment_index):
+    if 'user_id' not in session:
+        return jsonify({"success": False, "message": "Non connecté"}), 401
+
+    tweets = read_tweets()
+    user_id = session['user_id']
+
+    tweet = next((t for t in tweets if t['id'] == tweet_id), None)
+    if not tweet:
+        return jsonify({"success": False, "message": "Tweet introuvable"}), 404
+
+    if 'comments' not in tweet or not tweet['comments']:
+        return jsonify({"success": False, "message": "Aucun commentaire trouvé pour ce tweet"}), 404
+
+    if comment_index < 0 or comment_index >= len(tweet['comments']):
+        return jsonify({"success": False, "message": "Index de commentaire invalide"}), 404
+
+    comment = tweet['comments'][comment_index]
+    comment.setdefault('likes', [])
+
+    if user_id in comment['likes']:
+        comment['likes'].remove(user_id)
+        liked = False
+    else:
+        comment['likes'].append(user_id)
+        liked = True
+
+    write_tweets(tweets)
+
+    return jsonify({
+        "success": True,
+        "liked": liked,
+        "like_count": len(comment['likes'])
+    })
+
+
+
+   
+
 

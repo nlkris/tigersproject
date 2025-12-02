@@ -2,7 +2,7 @@ name: Deploy to GCP VM
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "features/deployment"]
   workflow_dispatch:
 
 env:

@@ -152,7 +152,8 @@
                 "user_id": 2,
                 "username": "jeeaaannnne",
                 "content": "oui",
-                "created_at": "2025-11-20T15:22:41.139363"
+                "created_at": "2025-11-20T15:22:41.139363",
+                "likes": []
             }
         ]
     },

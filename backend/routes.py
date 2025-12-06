@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field, ensure_follow_fields, ensure_comments_field
+from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field, ensure_follow_fields, ensure_comments_field, ensure_retweets_field
+
 from datetime import datetime
 import os
 
@@ -22,6 +23,7 @@ init_files()
 ensure_likes_field()
 ensure_follow_fields()
 ensure_comments_field() 
+ensure_retweets_field()
 
 # ------------------- ACCUEIL -------------------
 @routes.route('/')
@@ -260,6 +262,65 @@ def profile(username):
         flash("Utilisateur introuvable.", "error")
         return redirect(url_for('routes.feed'))
 
+    current_user = next((u for u in users if u['id'] == session.get('user_id')), None)
+    is_current_user = current_user['id'] == profile_user['id']
+    is_following = profile_user['id'] in current_user.get('following', []) if current_user else False
+
+    # ----------- Tweets normaux de l'utilisateur -----------
+    user_tweets = [t for t in tweets if t['user_id'] == profile_user['id']]
+
+    # ----------- Retweets faits par l'utilisateur -----------
+    # ----------- Retweets faits par l'utilisateur -----------
+    retweeted_tweets = []
+    for tweet in tweets:
+        if profile_user['id'] in tweet.get('retweets', []):
+            rt_copy = tweet.copy()
+            rt_copy['is_retweet'] = True
+            rt_copy['retweeted_by'] = profile_user['username']
+            retweeted_tweets.append(rt_copy)
+
+
+    # Fusion tweets + retweets
+    all_tweets = user_tweets + retweeted_tweets
+
+    # Tri par date (les retweets apparaissent aussi)
+    all_tweets.sort(key=lambda t: t.get('created_at', ''), reverse=True)
+
+    # Ajout des infos manquantes
+    for post in all_tweets:
+        post.setdefault('likes', [])
+        post['liked'] = session['user_id'] in post['likes']
+
+        # Récupération de l'auteur réel du tweet
+        tweet_user = next((u for u in users if u['id'] == post['user_id']), None)
+        if tweet_user:
+            post['username'] = tweet_user['username']
+            post['profile_pic_url'] = tweet_user.get('profile_pic_url') or url_for('static', filename='default-avatar.png')
+        else:
+            post['username'] = "Utilisateur"
+            post['profile_pic_url'] = url_for('static', filename='default-avatar.png')
+
+    followers_list = [u for u in users if u['id'] in profile_user.get('followers', [])]
+    following_list = [u for u in users if u['id'] in profile_user.get('following', [])]
+
+    return render_template(
+        'profile.html',
+        profile_user=profile_user,
+        user_tweets=all_tweets,
+        is_current_user=is_current_user,
+        is_following=is_following,
+        followers_list=followers_list,
+        following_list=following_list
+    )
+
+    users = read_users()
+    tweets = read_tweets()
+
+    profile_user = next((u for u in users if u['username'] == username), None)
+    if not profile_user:
+        flash("Utilisateur introuvable.", "error")
+        return redirect(url_for('routes.feed'))
+
     user_tweets = [t for t in tweets if t['user_id'] == profile_user['id']]
     user_tweets.sort(key=lambda t: t.get('created_at', ''), reverse=True)
 
@@ -429,6 +490,43 @@ def like_comment(tweet_id, comment_index):
         "liked": liked,
         "like_count": len(comment['likes'])
     })
+#------------------- RETWEET ---------------------
+@routes.route('/retweet/<int:tweet_id>', methods=['POST'])
+def retweet(tweet_id):
+    if 'user_id' not in session:
+        return jsonify({"success": False, "error": "Utilisateur non connecté"}), 403
+
+    user_id = session['user_id']
+    tweets = read_tweets()
+
+    # Trouver tweet
+    tweet = next((t for t in tweets if t['id'] == tweet_id), None)
+    if not tweet:
+        return jsonify({"success": False, "error": "Tweet non trouvé"}), 404
+
+    # Assurer que le champ existe
+    tweet.setdefault("retweets", [])
+
+    # Toggle retweet
+    if user_id in tweet["retweets"]:
+        tweet["retweets"].remove(user_id)
+    else:
+        tweet["retweets"].append(user_id)
+
+    # Sauvegarder
+    write_tweets(tweets)
+
+    # Réponse envoyée au front
+    return jsonify({
+        "success": True,
+        "is_retweeted": user_id in tweet["retweets"],
+        "retweet_count": len(tweet["retweets"])
+    })
+
+
+
+
+
 
 
 

@@ -277,32 +277,31 @@ input, textarea {
 </div>
 
 <h2>Tweets</h2>
-
 {% if user_tweets %}
   {% for post in user_tweets %}
     <div class="post" data-post-id="{{ post.id }}">
       <div style="display:flex; align-items:flex-start; gap:12px;">
-
-        <!-- Profile pic -->
+        <!-- Photo de profil -->
         <img src="{{ post.profile_pic_url or url_for('static', filename='default-avatar.png') }}"
-            alt="Profil"
-            class="tweet-profile-pic"
-            onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'"
-            style="cursor:pointer;">
-
+             alt="Profil"
+             class="tweet-profile-pic"
+             onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'"
+             style="cursor:pointer;">
         <div style="flex:1;">
-
-          <!-- Username -->
-          <strong style="cursor:pointer;" 
+          <!-- Mention "Retweeté par" si c'est un retweet -->
+          {% if post.is_retweet %}
+            <p style="color: var(--muted); font-size: 12px; margin-bottom: 4px;">
+              Retweeté par <strong>{{ post.retweeted_by }}</strong>
+            </p>
+          {% endif %}
+          <!-- Nom d'utilisateur -->
+          <strong style="cursor:pointer;"
                   onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'">
             {{ post.username }}
           </strong>
-
-          <!-- Text content -->
+          <!-- Contenu du tweet -->
           <p>{{ post.content or '&nbsp;' | safe }}</p>
-
-
-          <!-- Tweet images -->
+          <!-- Images du tweet -->
           {% if post.image_urls %}
             <div class="tweet-gallery">
               {% for img in post.image_urls %}
@@ -310,20 +309,19 @@ input, textarea {
               {% endfor %}
             </div>
           {% endif %}
-
         </div>
-
-        <!-- Like button -->
-        <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
-          ❤️ <span class="like-count">{{ post.likes|length }}</span>
-        </button>
       </div>
+      <!-- Bouton Like -->
+      <button class="like-btn {% if session['user_id'] in post.likes %}liked{% endif %}"
+              data-tweet-id="{{ post.id }}">
+        ❤️ <span class="like-count">{{ post.likes|length }}</span>
+      </button>
     </div>
-{% endfor %}
-
+  {% endfor %}
 {% else %}
   <p style="color:var(--muted);">Aucun tweet pour le moment.</p>
 {% endif %}
+
 
 
 <p style="text-align:center; margin-top:16px;">
@@ -448,6 +446,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
+//AJEX REtweet
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  document.querySelectorAll(".retweet-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const tweetId = btn.dataset.tweetId;
+      const countEl = btn.querySelector(".retweet-count");
+
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/retweet/${tweetId}`, { method: "POST" });
+        const data = await res.json();
+
+        if (!data.success) throw new Error(data.error || "Erreur");
+
+        // Change l'état visuel du bouton
+        btn.classList.toggle("retweeted", data.is_retweeted);
+
+        // Mets à jour le compteur
+        countEl.textContent = data.retweet_count;
+
+      } catch (err) {
+        console.error(err);
+        alert("Erreur retweet : " + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+
+});
+</script>
+<script>
 // Prévisualisation photo
 function previewPicture(event) {
   const output = document.getElementById('previewImg');

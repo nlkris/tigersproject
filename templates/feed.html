@@ -276,6 +276,26 @@ button {
   transition:0.2s;
 }
 button:hover { opacity:0.9; }
+/* Retweet button */
+.retweet-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease, transform 0.2s ease;
+  z-index: 1;
+}
+.retweet-btn:hover {
+  transform: scale(1.1);
+}
+.retweet-btn.retweeted {
+  color: #5eead4; /* Couleur accent pour indiquer qu'il est déjà retweeté */
+}
+
 
 a { color:var(--accent); text-decoration:none; }
 a:hover { text-decoration:underline; }
@@ -354,31 +374,25 @@ a:hover { text-decoration:underline; }
   {% set tweet_lists = {'followed': followed_tweets, 'recommended': recommended_tweets} %}
   <div class="feed">
     <h2>{{ 'Abonnements' if view == 'followed' else 'Recommandations' }}</h2>
-
     {% if tweet_lists[view] %}
       {% for post in tweet_lists[view] %}
         {% set user_obj = users | selectattr('username','equalto',post.username) | first %}
-        
+
         <div class="post" data-post-id="{{ post.id }}">
           <div style="display:flex; align-items:flex-start; gap:12px;">
-
             <!-- Profile pic -->
             <img src="{{ user_obj.profile_pic_url if user_obj and user_obj.profile_pic_url else url_for('static', filename='default-avatar.png') }}"
                  alt="Profil"
                  onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'"
                  style="cursor:pointer;">
-
             <div style="flex:1;">
-
               <!-- Username -->
-              <strong style="cursor:pointer;" 
+              <strong style="cursor:pointer;"
                       onclick="window.location.href='{{ url_for('routes.profile', username=post.username) }}'">
                 {{ post.username }}
               </strong>
-
               <!-- Text content -->
               <p>{{ post.content }}</p>
-
               <!-- Tweet image (NEW) -->
               {% if post.image_urls %}
                 <div class="tweet-grid">
@@ -387,42 +401,48 @@ a:hover { text-decoration:underline; }
                   {% endfor %}
                 </div>
               {% endif %}
-
-
-
-
-
-
-
             </div>
-
-            <!-- Like button -->
-            <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
-              ❤️ <span class="like-count">{{ post.likes|length }}</span>
-            </button>
           </div>
-           <!-- Formulaire pour ajouter un commentaire -->
+
+          <<div class="post-buttons">
+
+  <!-- RETWEET FIXÉ -->
+  <button class="retweet-btn {% if session['user_id'] in post.get('retweets', []) %}retweeted{% endif %}"
+          data-tweet-id="{{ post.id }}">
+    🔄 <span class="retweet-count">{{ post.get('retweets', [])|length }}</span>
+  </button>
+
+  <!-- LIKE -->
+  <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
+    ❤️ <span class="like-count">{{ post.likes|length }}</span>
+  </button>
+
+</div>
+
+
+
+          <!-- Formulaire pour ajouter un commentaire -->
           <form action="{{ url_for('routes.comment_tweet', tweet_id=post.id) }}" method="POST" class="comment-form">
-              <textarea name="content" placeholder="Ajouter un commentaire..." required></textarea>
-              <button type="submit">Commenter</button>
+            <textarea name="content" placeholder="Ajouter un commentaire..." required></textarea>
+            <button type="submit">Commenter</button>
           </form>
 
           <!-- Section pour afficher les commentaires -->
           <div class="comments-section">
-              {% for comment in post.get('comments', []) %}
+            {% for comment in post.get('comments', []) %}
               <div class="comment">
-                  <p><strong>{{ comment.username }}</strong>: {{ comment.content }}</p>
+                <p>
+                  <strong>{{ comment.username }}</strong>: {{ comment.content }}
                   <!-- Bouton Like pour le commentaire -->
-            <button class="like-comment-btn {% if session['user_id'] in comment.get('likes', []) %}liked{% endif %}"
-                    data-tweet-id="{{ post.id }}"
-                    data-comment-index="{{ loop.index0 }}">
-                ❤️ <span class="like-count">{{ comment.get('likes', [])|length }}</span>
-            </button>
-        </p>
-        <small>{{ comment.created_at }}</small>
-                  <small>{{ comment.created_at }}</small>
+                  <button class="like-comment-btn {% if session['user_id'] in comment.get('likes', []) %}liked{% endif %}"
+                          data-tweet-id="{{ post.id }}"
+                          data-comment-index="{{ loop.index0 }}">
+                    ❤️ <span class="like-count">{{ comment.get('likes', [])|length }}</span>
+                  </button>
+                </p>
+                <small>{{ comment.created_at }}</small>
               </div>
-              {% endfor %}
+            {% endfor %}
           </div>
         </div>
       {% endfor %}
@@ -438,11 +458,6 @@ a:hover { text-decoration:underline; }
   </div>
 </div>
 
-<p style="text-align:center; margin-top:24px;">
-  <a href="{{ url_for('routes.logout') }}">Déconnexion</a>
-</p>
-
-<script>
   
 /* LIKE AJAX */
 document.addEventListener('DOMContentLoaded', () => {
@@ -585,6 +600,44 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
+
+/* AJAX RETWEET SUBMISSION */
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  document.querySelectorAll(".retweet-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const tweetId = btn.dataset.tweetId;
+      const countEl = btn.querySelector(".retweet-count");
+
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/retweet/${tweetId}`, { method: "POST" });
+        const data = await res.json();
+
+        if (!data.success) throw new Error(data.error || "Erreur");
+
+        // Change l'état visuel du bouton
+        btn.classList.toggle("retweeted", data.is_retweeted);
+
+        // Mets à jour le compteur
+        countEl.textContent = data.retweet_count;
+
+      } catch (err) {
+        console.error(err);
+        alert("Erreur retweet : " + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+
+});
+</script>
+
+
+
 
 
 

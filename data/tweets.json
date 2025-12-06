@@ -7,7 +7,8 @@
         "likes": [
             5
         ],
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 2,
@@ -22,7 +23,8 @@
                 5
             ]
         },
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 3,
@@ -35,7 +37,8 @@
                 5
             ]
         },
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 4,
@@ -43,7 +46,8 @@
         "username": "clairoew",
         "content": "coucou",
         "likes": [],
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 5,
@@ -54,7 +58,8 @@
             3,
             5
         ],
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 6,
@@ -64,7 +69,8 @@
         "likes": [
             3
         ],
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 7,
@@ -72,7 +78,8 @@
         "username": "clairoew",
         "content": "coucou cela fonctionne !",
         "likes": [],
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 8,
@@ -87,7 +94,8 @@
             "\ud83d\ude2e": [],
             "\ud83d\ude02": []
         },
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 9,
@@ -101,7 +109,8 @@
             ]
         },
         "created_at": "2025-10-14T14:49:20.209048",
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 10,
@@ -110,7 +119,8 @@
         "content": "tweet",
         "likes": [],
         "created_at": "2025-10-14T14:57:57.782891",
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 11,
@@ -122,7 +132,10 @@
         ],
         "reactions": {},
         "created_at": "2025-10-14T15:01:44.166193",
-        "comments": []
+        "comments": [],
+        "retweets": [
+            2
+        ]
     },
     {
         "id": 12,
@@ -134,7 +147,10 @@
         ],
         "reactions": {},
         "created_at": "2025-10-14T15:02:28.813005",
-        "comments": []
+        "comments": [],
+        "retweets": [
+            2
+        ]
     },
     {
         "id": 13,
@@ -152,8 +168,14 @@
                 "user_id": 2,
                 "username": "jeeaaannnne",
                 "content": "oui",
-                "created_at": "2025-11-20T15:22:41.139363"
+                "created_at": "2025-11-20T15:22:41.139363",
+                "likes": [
+                    2
+                ]
             }
+        ],
+        "retweets": [
+            2
         ]
     },
     {
@@ -166,7 +188,8 @@
         ],
         "reactions": {},
         "created_at": "2025-10-25T16:32:39.453113",
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 15,
@@ -178,7 +201,8 @@
         ],
         "reactions": {},
         "created_at": "2025-10-25T17:29:41.969099",
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 16,
@@ -187,7 +211,8 @@
         "content": "beurre sur le front",
         "likes": [],
         "created_at": "2025-11-19T16:07:03.441946",
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 17,
@@ -197,7 +222,8 @@
         "image_url": "/uploads/tweet_images/3_1763564926.875752___1.jpeg",
         "likes": [],
         "created_at": "2025-11-19T16:08:46.877943",
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 18,
@@ -210,7 +236,8 @@
         ],
         "likes": [],
         "created_at": "2025-11-19T16:15:34.906246",
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 19,
@@ -222,7 +249,8 @@
         ],
         "likes": [],
         "created_at": "2025-11-19T16:28:57.565762",
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 20,
@@ -234,7 +262,8 @@
         ],
         "likes": [],
         "created_at": "2025-11-19T16:31:00.937909",
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 21,
@@ -248,7 +277,8 @@
         ],
         "likes": [],
         "created_at": "2025-11-19T19:47:32.332813",
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 22,
@@ -267,7 +297,8 @@
         ],
         "likes": [],
         "created_at": "2025-11-19T20:01:49.562197",
-        "comments": []
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 23,
@@ -285,7 +316,9 @@
                 "username": "jeeaaannnne",
                 "content": "stylax",
                 "created_at": "2025-11-20T15:19:09.625715",
-                "likes": []
+                "likes": [
+                    2
+                ]
             },
             {
                 "user_id": 2,
@@ -296,6 +329,7 @@
                     2
                 ]
             }
-        ]
+        ],
+        "retweets": []
     }
 ]

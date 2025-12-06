@@ -127,4 +127,44 @@ def ensure_comments_field():
                     comment['likes'] = []
     write_tweets(tweets)
 
+import json
+from datetime import datetime
+
+def retweet_user(tweet_id: str, user_id: str, db_path: str = "user.json"):
+    """Ajoute un retweet à la base de données."""
+    with open(db_path, "r+") as f:
+        data = json.load(f)
+        for user in data["users"]:
+            if user["id"] == user_id:
+                # Vérifie si le tweet original existe
+                original_tweet = None
+                for u in data["users"]:
+                    for tweet in u["tweets"]:
+                        if tweet["id"] == tweet_id:
+                            original_tweet = tweet
+                            break
+                if not original_tweet:
+                    raise ValueError("Tweet original introuvable.")
+
+                # Crée le retweet
+                retweet = {
+                    "id": f"retweet_{len(user['retweets'])+1}",
+                    "original_tweet_id": tweet_id,
+                    "author": original_tweet["author"],
+                    "date": datetime.now().strftime("%Y-%m-%d")
+                }
+                user["retweets"].append(retweet)
+                f.seek(0)
+                json.dump(data, f, indent=2)
+                return retweet
+    raise ValueError("Utilisateur introuvable.")
+
+def ensure_retweets_field():
+    tweets = read_tweets()
+    for tweet in tweets:
+        if 'retweets' not in tweet:
+            tweet['retweets'] = []
+    write_tweets(tweets)
+
+
 

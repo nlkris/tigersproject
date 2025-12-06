@@ -119,8 +119,18 @@
         "content": "tweet",
         "likes": [],
         "created_at": "2025-10-14T14:57:57.782891",
-        "comments": [],
-        "retweets": []
+        "comments": [
+            {
+                "user_id": 2,
+                "username": "jeeaaannnne",
+                "content": "louche",
+                "created_at": "2025-12-06T13:38:52.170106",
+                "likes": []
+            }
+        ],
+        "retweets": [
+            2
+        ]
     },
     {
         "id": 11,
@@ -172,6 +182,13 @@
                 "likes": [
                     2
                 ]
+            },
+            {
+                "user_id": 2,
+                "username": "jeeaaannnne",
+                "content": "gcd",
+                "created_at": "2025-12-06T13:49:44.542635",
+                "likes": []
             }
         ],
         "retweets": [
@@ -295,7 +312,9 @@
             "/uploads/tweet_images/3_1763578909.560783_toro.jpeg",
             "/uploads/tweet_images/3_1763578909.561547__.jpeg"
         ],
-        "likes": [],
+        "likes": [
+            2
+        ],
         "created_at": "2025-11-19T20:01:49.562197",
         "comments": [],
         "retweets": []
@@ -308,7 +327,9 @@
         "image_urls": [
             "/uploads/tweet_images/2_1763647243.566817_mbf2025_post-prog-carre-completev23.png"
         ],
-        "likes": [],
+        "likes": [
+            2
+        ],
         "created_at": "2025-11-20T15:00:43.568828",
         "comments": [
             {
@@ -328,8 +349,25 @@
                 "likes": [
                     2
                 ]
+            },
+            {
+                "user_id": 2,
+                "username": "jeeaaannnne",
+                "content": "\u00e7a fct",
+                "created_at": "2025-12-06T13:21:17.889338",
+                "likes": [],
+                "replies": [
+                    {
+                        "user_id": 2,
+                        "username": "jeeaaannnne",
+                        "content": "incroyable",
+                        "created_at": "2025-12-06T13:56:41.286491"
+                    }
+                ]
             }
         ],
-        "retweets": []
+        "retweets": [
+            2
+        ]
     }
 ]

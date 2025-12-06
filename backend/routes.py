@@ -522,6 +522,38 @@ def retweet(tweet_id):
         "is_retweeted": user_id in tweet["retweets"],
         "retweet_count": len(tweet["retweets"])
     })
+#-------------------com de comment----------------------------------
+# Répondre à un commentaire
+@routes.route('/reply_comment/<int:tweet_id>/<int:comment_index>', methods=['POST'])
+def reply_comment(tweet_id, comment_index):
+    if 'user_id' not in session:
+        return jsonify({"success": False, "message": "Non connecté"}), 401
+
+    tweets = read_tweets()
+    user_id = session['user_id']
+    user = next((u for u in read_users() if u['id'] == user_id), None)
+    if not user:
+        return jsonify({"success": False, "message": "Utilisateur introuvable"}), 404
+
+    tweet = next((t for t in tweets if t['id'] == tweet_id), None)
+    if not tweet or 'comments' not in tweet or comment_index >= len(tweet['comments']):
+        return jsonify({"success": False, "message": "Commentaire introuvable"}), 404
+
+    data = request.get_json()
+    content = data.get('content', '').strip()
+    if not content:
+        return jsonify({"success": False, "message": "Le contenu est vide"}), 400
+
+    tweet['comments'][comment_index].setdefault('replies', [])
+    tweet['comments'][comment_index]['replies'].append({
+        'user_id': user_id,
+        'username': user['username'],
+        'content': content,
+        'created_at': datetime.now().isoformat()
+    })
+
+    write_tweets(tweets)
+    return jsonify({"success": True})
 
 
 

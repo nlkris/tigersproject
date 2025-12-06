@@ -296,6 +296,27 @@ button:hover { opacity:0.9; }
   color: #5eead4; /* Couleur accent pour indiquer qu'il est déjà retweeté */
 }
 
+.comment {
+  background: rgba(255,255,255,0.05);
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.comment .reply {
+  margin-left: 20px;
+  background: rgba(94,234,212,0.05);
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.comment button.reply-btn {
+  background:none;
+  border:none;
+  color: var(--accent);
+  cursor:pointer;
+  font-size: 14px;
+  margin-top:4px;
+}
 
 a { color:var(--accent); text-decoration:none; }
 a:hover { text-decoration:underline; }
@@ -320,6 +341,8 @@ a:hover { text-decoration:underline; }
 </head>
 <body>
 <div class="container">
+
+  
 
   <!-- HEADER TOP : Profil UNIQUEMENT -->
   <div class="header-top">
@@ -404,46 +427,24 @@ a:hover { text-decoration:underline; }
             </div>
           </div>
 
-          <<div class="post-buttons">
+          <div class="post-buttons">
+            <!-- RETWEET -->
+            <button class="retweet-btn {% if session['user_id'] in post.get('retweets', []) %}retweeted{% endif %}"
+                    data-tweet-id="{{ post.id }}">
+              🔄 <span class="retweet-count">{{ post.get('retweets', [])|length }}</span>
+            </button>
 
-  <!-- RETWEET FIXÉ -->
-  <button class="retweet-btn {% if session['user_id'] in post.get('retweets', []) %}retweeted{% endif %}"
-          data-tweet-id="{{ post.id }}">
-    🔄 <span class="retweet-count">{{ post.get('retweets', [])|length }}</span>
-  </button>
+            <!-- LIKE -->
+            <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
+              ❤️ <span class="like-count">{{ post.likes|length }}</span>
+            </button>
 
-  <!-- LIKE -->
-  <button class="like-btn {% if post.liked %}liked{% endif %}" data-tweet-id="{{ post.id }}">
-    ❤️ <span class="like-count">{{ post.likes|length }}</span>
-  </button>
-
-</div>
-
-
-
-          <!-- Formulaire pour ajouter un commentaire -->
-          <form action="{{ url_for('routes.comment_tweet', tweet_id=post.id) }}" method="POST" class="comment-form">
-            <textarea name="content" placeholder="Ajouter un commentaire..." required></textarea>
-            <button type="submit">Commenter</button>
-          </form>
-
-          <!-- Section pour afficher les commentaires -->
-          <div class="comments-section">
-            {% for comment in post.get('comments', []) %}
-              <div class="comment">
-                <p>
-                  <strong>{{ comment.username }}</strong>: {{ comment.content }}
-                  <!-- Bouton Like pour le commentaire -->
-                  <button class="like-comment-btn {% if session['user_id'] in comment.get('likes', []) %}liked{% endif %}"
-                          data-tweet-id="{{ post.id }}"
-                          data-comment-index="{{ loop.index0 }}">
-                    ❤️ <span class="like-count">{{ comment.get('likes', [])|length }}</span>
-                  </button>
-                </p>
-                <small>{{ comment.created_at }}</small>
-              </div>
-            {% endfor %}
+            <!-- Ouvrir modal des commentaires -->
+            <button class="view-comments-btn" data-tweet-id="{{ post.id }}">
+              💬 Commentaires ({{ post.get('comments', [])|length }})
+            </button>
           </div>
+
         </div>
       {% endfor %}
     {% else %}
@@ -458,7 +459,21 @@ a:hover { text-decoration:underline; }
   </div>
 </div>
 
+<!-- MODAL COMMENTAIRES -->
+<div id="commentsModal" class="img-modal" style="display:none; flex-direction:column; padding:20px; background:rgba(0,0,0,0.85); overflow-y:auto; max-height:80vh;">
+  <button id="closeCommentsModal" style="align-self:flex-end; margin-bottom:10px;">❌ Fermer</button>
   
+  <div id="commentsList"></div>
+
+  <form id="newCommentForm" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
+    <textarea name="content" placeholder="Ajouter un commentaire..." required></textarea>
+    <button type="submit">Commenter</button>
+  </form>
+</div>
+
+
+
+  <script>
 /* LIKE AJAX */
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.like-btn').forEach(btn => {
@@ -635,6 +650,110 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 </script>
+
+<script>
+  /*AJAX MODAL COMMENTAIRES */
+let currentTweetId = null;
+
+// Ouvrir modal avec commentaires
+document.querySelectorAll('.view-comments-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    currentTweetId = btn.dataset.tweetId;
+    document.getElementById('commentsModal').style.display = 'flex';
+    await loadComments(currentTweetId);
+  });
+});
+
+// Fermer modal
+document.getElementById('closeCommentsModal').addEventListener('click', () => {
+  document.getElementById('commentsModal').style.display = 'none';
+  document.getElementById('commentsList').innerHTML = '';
+  currentTweetId = null;
+});
+
+// Charger les commentaires
+async function loadComments(tweetId) {
+  const res = await fetch(`/comments/${tweetId}`);
+  const data = await res.json();
+  const container = document.getElementById('commentsList');
+  container.innerHTML = '';
+
+  if (data.success) {
+    data.comments.forEach((comment, idx) => {
+      const div = document.createElement('div');
+      div.classList.add('comment');
+      div.dataset.index = idx;
+
+      let repliesHtml = '';
+      if(comment.replies && comment.replies.length) {
+        repliesHtml = comment.replies.map(r => `<div class="reply"><strong>${r.username}</strong>: ${r.content}</div>`).join('');
+      }
+
+      div.innerHTML = `
+        <strong>${comment.username}</strong>: ${comment.content}
+        <button class="reply-btn">Répondre</button>
+        ${repliesHtml}
+      `;
+
+      // Bouton réponse
+      div.querySelector('.reply-btn').addEventListener('click', () => {
+        const replyForm = document.createElement('form');
+        replyForm.style.display = 'flex';
+        replyForm.style.flexDirection = 'column';
+        replyForm.innerHTML = `
+          <textarea name="replyContent" placeholder="Répondre..." required></textarea>
+          <button type="submit">Envoyer</button>
+        `;
+        div.appendChild(replyForm);
+
+        replyForm.addEventListener('submit', async e => {
+          e.preventDefault();
+          const content = replyForm.replyContent.value.trim();
+          if(!content) return;
+
+          const res = await fetch(`/reply_comment/${tweetId}/${idx}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content })
+          });
+          const result = await res.json();
+          if(result.success){
+            await loadComments(tweetId); // recharge commentaires
+          } else {
+            alert(result.message);
+          }
+        });
+
+        // Désactiver bouton pour éviter double form
+        div.querySelector('.reply-btn').disabled = true;
+      });
+
+      container.appendChild(div);
+    });
+  }
+}
+
+// Ajouter un nouveau commentaire
+document.getElementById('newCommentForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const content = e.target.content.value.trim();
+  if(!content || !currentTweetId) return;
+
+  const formData = new FormData(e.target);
+  const res = await fetch(`/comment/${currentTweetId}`, {
+    method: 'POST',
+    body: formData
+  });
+  const data = await res.json();
+  if(data.success){
+    e.target.content.value = '';
+    await loadComments(currentTweetId);
+  } else {
+    alert(data.message);
+  }
+});
+</script>
+
 
 
 

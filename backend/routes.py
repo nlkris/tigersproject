@@ -22,7 +22,7 @@ def allowed_file(filename):
 init_files()
 ensure_likes_field()
 ensure_follow_fields()
-ensure_comments_field() 
+ensure_comments_field()
 ensure_retweets_field()
 
 # ------------------- ACCUEIL -------------------
@@ -555,6 +555,19 @@ def reply_comment(tweet_id, comment_index):
     write_tweets(tweets)
     return jsonify({"success": True})
 
+# ------------------- NOTIFICATIONS -------------------
+@routes.route('/notifications', methods=['GET'])
+def notifications():
+    if 'user_id' not in session:
+        return jsonify({"success": False, "message": "Non connecté"}), 401
+
+    # Exemple : liste statique de notifications
+    notifications_list = [
+        {"message": "Nouvelle notification 1", "type": "info"},
+        {"message": "Nouvelle notification 2", "type": "warning"},
+        # Tu peux ajouter ici des notifications dynamiques liées à l'utilisateur
+    ]
+    return jsonify({"success": True, "notifications": notifications_list})
 
 
 
@@ -563,5 +576,4 @@ def reply_comment(tweet_id, comment_index):
 
 
    
-
 

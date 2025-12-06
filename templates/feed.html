@@ -415,7 +415,8 @@ a:hover { text-decoration:underline; }
         {% for post in tweet_lists[view] %}
           {% set user_obj = users | selectattr('username','equalto',post.username) | first %}
 
-          <div class="post" data-post-id="{{ post.id }}">
+          <div class="post" id="post-{{ post.id }}" data-post-id="{{ post.id }}">
+
             <div style="display:flex; align-items:flex-start; gap:12px;">
               <!-- Profile pic -->
               <img src="{{ user_obj.profile_pic_url if user_obj and user_obj.profile_pic_url else url_for('static', filename='default-avatar.png') }}"
@@ -470,10 +471,308 @@ a:hover { text-decoration:underline; }
     </div>
   </div>
 
-<!-- MODALS et scripts existants inchangés (image modal, commentaires, AJAX likes/retweets) -->
-<script>
-// ... (tout ton code JS existant pour likes, retweets, commentaires, modal reste inchangé)
+<!-- MODAL COMMENTAIRES -->
+<div id="commentsModal" class="img-modal" style="display:none; flex-direction:column; padding:20px; background:rgba(0,0,0,0.85); overflow-y:auto; max-height:80vh;">
+  <button id="closeCommentsModal" style="align-self:flex-end; margin-bottom:10px;">❌ Fermer</button>
+  
+  <div id="commentsList"></div>
+
+  <form id="newCommentForm" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
+    <textarea name="content" placeholder="Ajouter un commentaire..." required></textarea>
+    <button type="submit">Commenter</button>
+  </form>
+</div>
+
+
+
+  <script>
+/* LIKE AJAX */
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const tweetId = btn.dataset.tweetId;
+      const countEl = btn.querySelector('.like-count');
+      btn.disabled = true;
+      try {
+        const res = await fetch(`/like/${tweetId}`, { method:'POST' });
+        const data = await res.json();
+        if(data.success){
+          countEl.textContent = data.like_count;
+          btn.classList.toggle('liked', data.liked);
+        }
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+});
+
+/* LIVE SEARCH AJAX */
+document.getElementById("live-search").addEventListener("input", async function () {
+  const q = this.value.trim();
+  const box = document.getElementById("search-suggestions");
+
+  if (!q) {
+    box.style.display = "none";
+    box.innerHTML = "";
+    return;
+  }
+
+  const res = await fetch(`/search_live?q=${encodeURIComponent(q)}`);
+  const data = await res.json();
+
+  if (!data.length) {
+    box.style.display = "none";
+    box.innerHTML = "";
+    return;
+  }
+
+  box.innerHTML = data
+    .map(user => `<li onclick="window.location.href='/profile/${user.username}'">@${user.username}</li>`)
+    .join("");
+
+  box.style.display = "block";
+});
+
+document.addEventListener("click", (e) => {
+  const box = document.getElementById("search-suggestions");
+  if (!box.contains(e.target) && e.target.id !== "live-search") {
+    box.style.display = "none";
+  }
+});
 </script>
+
+<!-- Image modal -->
+<div id="imgModal" class="img-modal" onclick="closeImageModal()">
+  <img id="modalImage">
+</div>
+
+<script>
+function openImageModal(src) {
+  document.getElementById("modalImage").src = src;
+  document.getElementById("imgModal").style.display = "flex";
+}
+
+function closeImageModal() {
+  document.getElementById("imgModal").style.display = "none";
+}
+
+
+
+</script>
+/* AJAX COMMENT SUBMISSION */
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.comment-form').forEach(form => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: formData
+      });
+      const result = await response.json();
+      if (result.success) {
+        // Recharge la page pour afficher le nouveau commentaire
+        window.location.reload();
+      } else {
+        alert(result.message);
+      }
+    });
+  });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Gestion des likes sur les commentaires
+    document.querySelectorAll('.like-comment-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const tweetId = btn.dataset.tweetId;
+            const commentIndex = btn.dataset.commentIndex;
+            const countEl = btn.querySelector('.like-count');
+
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`/like_comment/${tweetId}/${commentIndex}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la requête');
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Met à jour le nombre de likes
+                    countEl.textContent = data.like_count;
+                    // Met à jour l'état visuel du bouton
+                    btn.classList.toggle('liked', data.liked);
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Une erreur est survenue');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    });
+});
+</script>
+
+/* AJAX RETWEET SUBMISSION */
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  document.querySelectorAll(".retweet-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const tweetId = btn.dataset.tweetId;
+      const countEl = btn.querySelector(".retweet-count");
+
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/retweet/${tweetId}`, { method: "POST" });
+        const data = await res.json();
+
+        if (!data.success) throw new Error(data.error || "Erreur");
+
+        // Change l'état visuel du bouton
+        btn.classList.toggle("retweeted", data.is_retweeted);
+
+        // Mets à jour le compteur
+        countEl.textContent = data.retweet_count;
+
+      } catch (err) {
+        console.error(err);
+        alert("Erreur retweet : " + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+
+});
+</script>
+
+<script>
+  /*AJAX MODAL COMMENTAIRES */
+let currentTweetId = null;
+
+// Ouvrir modal avec commentaires
+document.querySelectorAll('.view-comments-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    currentTweetId = btn.dataset.tweetId;
+    document.getElementById('commentsModal').style.display = 'flex';
+    await loadComments(currentTweetId);
+  });
+});
+
+// Fermer modal
+document.getElementById('closeCommentsModal').addEventListener('click', () => {
+  document.getElementById('commentsModal').style.display = 'none';
+  document.getElementById('commentsList').innerHTML = '';
+  currentTweetId = null;
+});
+
+// Charger les commentaires
+async function loadComments(tweetId) {
+  const res = await fetch(`/comments/${tweetId}`);
+  const data = await res.json();
+  const container = document.getElementById('commentsList');
+  container.innerHTML = '';
+
+  if (data.success) {
+    data.comments.forEach((comment, idx) => {
+      const div = document.createElement('div');
+      div.classList.add('comment');
+      div.dataset.index = idx;
+
+      let repliesHtml = '';
+      if(comment.replies && comment.replies.length) {
+        repliesHtml = comment.replies.map(r => `<div class="reply"><strong>${r.username}</strong>: ${r.content}</div>`).join('');
+      }
+
+      div.innerHTML = `
+        <strong>${comment.username}</strong>: ${comment.content}
+        <button class="reply-btn">Répondre</button>
+        ${repliesHtml}
+      `;
+
+      // Bouton réponse
+      div.querySelector('.reply-btn').addEventListener('click', () => {
+        const replyForm = document.createElement('form');
+        replyForm.style.display = 'flex';
+        replyForm.style.flexDirection = 'column';
+        replyForm.innerHTML = `
+          <textarea name="replyContent" placeholder="Répondre..." required></textarea>
+          <button type="submit">Envoyer</button>
+        `;
+        div.appendChild(replyForm);
+
+        replyForm.addEventListener('submit', async e => {
+          e.preventDefault();
+          const content = replyForm.replyContent.value.trim();
+          if(!content) return;
+
+          const res = await fetch(`/reply_comment/${tweetId}/${idx}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content })
+          });
+          const result = await res.json();
+          if(result.success){
+            await loadComments(tweetId); // recharge commentaires
+          } else {
+            alert(result.message);
+          }
+        });
+
+        // Désactiver bouton pour éviter double form
+        div.querySelector('.reply-btn').disabled = true;
+      });
+
+      container.appendChild(div);
+    });
+  }
+}
+
+// Ajouter un nouveau commentaire
+document.getElementById('newCommentForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const content = e.target.content.value.trim();
+  if(!content || !currentTweetId) return;
+
+  const formData = new FormData(e.target);
+  const res = await fetch(`/comment/${currentTweetId}`, {
+    method: 'POST',
+    body: formData
+  });
+  const data = await res.json();
+  if(data.success){
+    e.target.content.value = '';
+    await loadComments(currentTweetId);
+  } else {
+    alert(data.message);
+  }
+});
+</script>
+
+
+
+
+
+
+
+
 
 </div>
 </body>

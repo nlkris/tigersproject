@@ -167,4 +167,33 @@ def ensure_retweets_field():
     write_tweets(tweets)
 
 
+NOTIF_FILE = os.path.join(os.getcwd(), "backend", "data", "notifications.json")
 
+def read_notifications():
+    import json
+    if not os.path.exists(NOTIF_FILE):
+        return []
+    with open(NOTIF_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def write_notifications(notifications):
+    import json
+    # Crée le dossier si nécessaire
+    os.makedirs(os.path.dirname(NOTIF_FILE), exist_ok=True)
+    with open(NOTIF_FILE, "w", encoding="utf-8") as f:
+        json.dump(notifications, f, ensure_ascii=False, indent=4)
+
+def add_notification(to_user_id, from_user_id, notif_type, tweet_id, content=None):
+    from datetime import datetime
+
+    notifications = read_notifications()
+    notifications.append({
+        "to_user_id": to_user_id,
+        "from_user_id": from_user_id,
+        "type": notif_type,  # "like" ou "comment"
+        "tweet_id": tweet_id,
+        "content": content,
+        "seen": False,
+        "created_at": datetime.now().isoformat()
+    })
+    write_notifications(notifications)

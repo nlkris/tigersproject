@@ -4,7 +4,7 @@ from utils.data_manager import init_files, ensure_likes_field, ensure_follow_fie
 
 app = Flask(__name__)
 app.secret_key = 'votre_cle_secrete'
-
+app.debug = True
 # Enregistrement du blueprint
 app.register_blueprint(routes)
 

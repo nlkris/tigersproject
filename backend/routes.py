@@ -1,8 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field, ensure_follow_fields, ensure_comments_field, ensure_retweets_field
-
+from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field, ensure_follow_fields, ensure_comments_field, ensure_retweets_field, add_notification, read_notifications,write_notifications
 from datetime import datetime
 import os
 
@@ -209,9 +208,11 @@ def like_tweet(tweet_id):
             else:
                 tweet['likes'].append(user_id)
                 liked = True
+                # ✅ Ajouter notif si ce n'est pas son propre tweet
+                add_notification(tweet['user_id'], user_id, "like", tweet_id)
             write_tweets(tweets)
             return jsonify({"success": True, "liked": liked, "like_count": len(tweet['likes'])})
-
+    
     return jsonify({"success": False, "message": "Tweet non trouvé"}), 404
 
 # ------------------- TOGGLE FOLLOW -------------------
@@ -438,6 +439,10 @@ def comment_tweet(tweet_id):
                 'created_at': datetime.now().isoformat()
             }
             tweet['comments'].append(new_comment)
+            # ✅ Ajouter notification si ce n'est pas son propre tweet
+            if tweet['user_id'] != current_user_id:
+                add_notification(tweet['user_id'], current_user_id, "comment", tweet_id)
+
             write_tweets(tweets)
             return jsonify({
                 "success": True,
@@ -556,18 +561,31 @@ def reply_comment(tweet_id, comment_index):
     return jsonify({"success": True})
 
 # ------------------- NOTIFICATIONS -------------------
-@routes.route('/notifications', methods=['GET'])
+@routes.route('/notifications')
 def notifications():
     if 'user_id' not in session:
-        return jsonify({"success": False, "message": "Non connecté"}), 401
+        return redirect(url_for('routes.login'))
 
-    # Exemple : liste statique de notifications
-    notifications_list = [
-        {"message": "Nouvelle notification 1", "type": "info"},
-        {"message": "Nouvelle notification 2", "type": "warning"},
-        # Tu peux ajouter ici des notifications dynamiques liées à l'utilisateur
-    ]
-    return jsonify({"success": True, "notifications": notifications_list})
+    user_id = session['user_id']
+    notifications = read_notifications()
+    # Filtrer celles destinées à l'utilisateur
+    user_notifs = [n for n in notifications if n['to_user_id'] == user_id]
+
+    # Ajouter le username de l'auteur de chaque notif
+    users = read_users()
+    for n in user_notifs:
+        from_user = next((u for u in users if u['id'] == n['from_user_id']), None)
+        n['from_user_username'] = from_user['username'] if from_user else "Utilisateur inconnu"
+    # Tu peux les trier par date décroissante
+    user_notifs.sort(key=lambda x: x['created_at'], reverse=True)
+    users = read_users()
+    current_user = next((u for u in users if u['id'] == session['user_id']), None)
+    if not current_user:
+        return redirect(url_for('routes.login'))
+
+    return render_template("notifications.html", notifications=user_notifs, current_user=current_user)
+
+
 
 
 

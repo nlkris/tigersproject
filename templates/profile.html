@@ -120,7 +120,22 @@ h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
   cursor: pointer;
 }
 
-
+.notif-shortcut {
+    float: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--accent);
+    font-weight: 600;
+    transition: 0.2s;
+}
+.notif-shortcut .notif-icon {
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
 /* Grid layout based on number of images */
 .tweet-gallery:has(img:nth-child(1)):not(:has(img:nth-child(2))) {
   grid-template-columns: 1fr;
@@ -199,6 +214,17 @@ input, textarea {
 </style>
 </head>
 <body>
+  <div class="header-top">
+    <!-- Bouton Notifications -->
+    <a href="{{ url_for('routes.notifications') }}" class="notif-shortcut" title="Voir mes notifications">
+      <svg viewBox="0 0 24 24" fill="none" class="notif-icon">
+        <path d="M12 2c-3 0-5 2.2-5 5v2.2c0 .6-.3 1.2-.8 1.6L4 13v1h16v-1l-2.2-2.2c-.5-.4-.8-1-.8-1.6V7c0-2.8-2-5-5-5z"
+              stroke="#5eead4" stroke-width="1.6" stroke-linecap="round"
+              stroke-linejoin="round"/>
+        <path d="M10 18a2 2 0 004 0" stroke="#5eead4" stroke-width="1.6"
+              stroke-linecap="round"/>
+      </svg>
+    </a>
 
 <div class="container">
 

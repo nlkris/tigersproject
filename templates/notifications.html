@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TIGINSA — Notifications</title>
+<style>
+:root {
+  --bg:#0f1724; --card:#0b1220; --muted:#9aa8bf; --accent:#5eead4;
+  --radius:12px; --shadow:0 6px 18px rgba(2,6,23,0.6);
+  font-family: Inter, sans-serif;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+
+body {
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  background: linear-gradient(135deg,#071226,#0f1724);
+  color:#e6eef8;
+  font-size:16px;
+  padding:20px;
+}
+
+.container {
+  background:var(--card);
+  padding:32px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  width:100%;
+  max-width:800px;
+}
+
+/* HEADER */
+.header-top {
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:16px;
+  margin-bottom:24px;
+}
+
+.notif-shortcut, .profile-shortcut {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:600;
+}
+.notif-shortcut svg, .profile-shortcut svg {
+  width:50px;
+  height:50px;
+  cursor:pointer;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+.notif-shortcut:hover svg, .profile-shortcut:hover svg {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 12px var(--accent));
+}
+
+/* TITRE */
+h1 {
+  color:var(--accent);
+  text-align:center;
+  margin-bottom:24px;
+}
+
+/* LISTE NOTIFICATIONS */
+.notifications-list {
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.notification {
+  background: rgba(94,234,212,0.05);
+  padding:16px;
+  border-radius:var(--radius);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  transition: background 0.2s;
+}
+.notification:hover {
+  background: rgba(94,234,212,0.15);
+}
+
+.notification-text {
+  display:flex;
+  flex-direction:column;
+}
+.notification-text a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.notification-text a:hover {
+  text-decoration: underline;
+}
+
+.notification-time {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Boutons */
+.view-tweet-btn {
+  padding:8px 12px;
+  background: linear-gradient(90deg,#06b6d4,#7c3aed);
+  border:none;
+  border-radius:8px;
+  color:#021024;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.2s;
+  text-decoration:none;
+}
+.view-tweet-btn:hover {
+  opacity:0.9;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header-top">
+    <a href="{{ url_for('routes.feed') }}" class="notif-shortcut" title="Retour au feed">
+      🔙 Feed
+    </a>
+    <a href="{{ url_for('routes.profile', username=current_user.username) }}" class="profile-shortcut">
+      Profil
+    </a>
+  </div>
+
+  <h1>Mes notifications</h1>
+
+  {% if notifications %}
+  <div class="notifications-list">
+    {% for notif in notifications %}
+    <div class="notification">
+      <div class="notification-text">
+        {% if notif.type == 'like' %}
+          <span>
+            <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
+              {{ notif.from_user_username }}
+            </a> a aimé votre tweet.
+          </span>
+        {% elif notif.type == 'comment' %}
+          <span>
+            <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
+              {{ notif.from_user_username }}
+            </a> a commenté votre tweet : "{{ notif.content }}"
+          </span>
+        {% elif notif.type == 'retweet' %}
+          <span>
+            <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
+              {{ notif.from_user_username }}
+            </a> a retweeté votre tweet.
+          </span>
+        {% endif %}
+        <span class="notification-time">{{ notif.created_at | replace('T', ' ') | truncate(16) }}</span>
+      </div>
+      <a href="{{ url_for('routes.feed') }}#tweet-{{ notif.tweet_id }}" class="view-tweet-btn">
+        Voir
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <p style="text-align:center; color:var(--muted); margin-top:20px;">
+      Vous n'avez aucune notification pour le moment.
+    </p>
+  {% endif %}
+
+</div>
+</body>
+</html>
+
+
+
+
+
+<script>
+    /*AJAX*/
+async function fetchNotifications() {
+  const res = await fetch('/notifications');
+  const data = await res.json();
+  const list = document.getElementById('notificationList');
+  list.innerHTML = '';
+
+  data.notifications.forEach(n => {
+    const li = document.createElement('li');
+    if(n.type === 'like'){
+      li.textContent = `${n.from_user} a aimé votre tweet #${n.tweet_id}`;
+    } else if(n.type === 'comment'){
+      li.textContent = `${n.from_user} a commenté: "${n.content}" sur votre tweet #${n.tweet_id}`;
+    }
+    list.appendChild(li);
+  });
+}
+
+// Appel toutes les 15 secondes
+setInterval(fetchNotifications, 15000);
+fetchNotifications();
+</script>
+  
+
+
+</div>
+</body>
+</html>

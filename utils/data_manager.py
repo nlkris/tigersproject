@@ -187,6 +187,7 @@ def add_notification(to_user_id, from_user_id, notif_type, tweet_id, content=Non
     from datetime import datetime
 
     notifications = read_notifications()
+
     notifications.append({
         "to_user_id": to_user_id,
         "from_user_id": from_user_id,
@@ -196,4 +197,6 @@ def add_notification(to_user_id, from_user_id, notif_type, tweet_id, content=Non
         "seen": False,
         "created_at": datetime.now().isoformat()
     })
+
+    
     write_notifications(notifications)

@@ -151,5 +151,50 @@
         "content": null,
         "seen": false,
         "created_at": "2025-12-07T18:09:35.494864"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 7,
+        "type": "comment",
+        "tweet_id": 22,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T18:13:37.263967"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 7,
+        "type": "comment",
+        "tweet_id": 22,
+        "content": "un autre commentaire super intéressant",
+        "seen": false,
+        "created_at": "2025-12-07T18:16:57.855053"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 7,
+        "type": "comment",
+        "tweet_id": 22,
+        "content": "le commentaire test",
+        "seen": false,
+        "created_at": "2025-12-07T18:19:39.428289"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 7,
+        "type": "comment",
+        "tweet_id": 22,
+        "content": "le commentaire test",
+        "seen": false,
+        "created_at": "2025-12-07T18:19:39.428282"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 7,
+        "type": "comment",
+        "tweet_id": 22,
+        "content": "je commente",
+        "seen": false,
+        "created_at": "2025-12-07T18:20:56.252815"
     }
 ]

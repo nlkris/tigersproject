@@ -319,6 +319,33 @@
                 "content": "mais nooooon",
                 "created_at": "2025-12-06T14:05:15.613221",
                 "likes": []
+            },
+            {
+                "user_id": 7,
+                "username": "kris2.0",
+                "content": "Je commente qqch de tr\u00e8s important",
+                "created_at": "2025-12-07T18:13:37.263414",
+                "likes": []
+            },
+            {
+                "user_id": 7,
+                "username": "kris2.0",
+                "content": "un autre commentaire super int\u00e9ressant",
+                "created_at": "2025-12-07T18:16:57.854426",
+                "likes": []
+            },
+            {
+                "user_id": 7,
+                "username": "kris2.0",
+                "content": "le commentaire test",
+                "created_at": "2025-12-07T18:19:39.427605",
+                "likes": []
+            },
+            {
+                "user_id": 7,
+                "username": "kris2.0",
+                "content": "je commente",
+                "created_at": "2025-12-07T18:20:56.252496"
             }
         ],
         "retweets": [

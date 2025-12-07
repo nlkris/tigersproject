@@ -431,6 +431,9 @@ def comment_tweet(tweet_id):
     content = request.form.get('content', '').strip()
     if not content:
         return jsonify({"success": False, "message": "Le commentaire ne peut pas être vide"}), 400
+    
+
+    
     for tweet in tweets:
         if tweet['id'] == tweet_id:
             tweet.setdefault('comments', [])
@@ -442,7 +445,7 @@ def comment_tweet(tweet_id):
             }
             tweet['comments'].append(new_comment)
             # ✅ Ajouter notification si ce n'est pas son propre tweet
-            add_notification(tweet['user_id'], current_user_id, "comment", tweet_id)
+            add_notification(tweet['user_id'], current_user_id, "comment", tweet_id, content)
 
             write_tweets(tweets)
             return jsonify({

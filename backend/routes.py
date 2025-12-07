@@ -242,6 +242,8 @@ def toggle_follow(username):
         if current_user['id'] not in target_user['followers']:
             target_user['followers'].append(current_user['id'])
         is_following = True
+        # ✅ Ajouter notification de follow
+        add_notification(target_user['id'], current_user_id, "follow", None)
 
     write_users(users)
     return jsonify({
@@ -440,8 +442,7 @@ def comment_tweet(tweet_id):
             }
             tweet['comments'].append(new_comment)
             # ✅ Ajouter notification si ce n'est pas son propre tweet
-            if tweet['user_id'] != current_user_id:
-                add_notification(tweet['user_id'], current_user_id, "comment", tweet_id)
+            add_notification(tweet['user_id'], current_user_id, "comment", tweet_id)
 
             write_tweets(tweets)
             return jsonify({
@@ -517,6 +518,8 @@ def retweet(tweet_id):
         tweet["retweets"].remove(user_id)
     else:
         tweet["retweets"].append(user_id)
+        # ✅ Ajouter notification si ce n'est pas son propre tweet
+        add_notification(tweet['user_id'], user_id, "retweet", tweet_id)
 
     # Sauvegarder
     write_tweets(tweets)
@@ -556,6 +559,8 @@ def reply_comment(tweet_id, comment_index):
         'content': content,
         'created_at': datetime.now().isoformat()
     })
+    #ajout notif
+    add_notification(tweet['user_id'], user_id, "à répondu", tweet_id)
 
     write_tweets(tweets)
     return jsonify({"success": True})

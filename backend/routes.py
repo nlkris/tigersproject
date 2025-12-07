@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field, ensure_follow_fields, ensure_comments_field
+from utils.data_manager import read_users, write_users, read_tweets, write_tweets, init_files, ensure_likes_field, ensure_follow_fields, ensure_comments_field, ensure_retweets_field, add_notification, read_notifications,write_notifications
 from datetime import datetime
 import os
 
@@ -21,7 +21,8 @@ def allowed_file(filename):
 init_files()
 ensure_likes_field()
 ensure_follow_fields()
-ensure_comments_field() 
+ensure_comments_field()
+ensure_retweets_field()
 
 # ------------------- ACCUEIL -------------------
 @routes.route('/')
@@ -207,9 +208,11 @@ def like_tweet(tweet_id):
             else:
                 tweet['likes'].append(user_id)
                 liked = True
+                # ✅ Ajouter notif si ce n'est pas son propre tweet
+                add_notification(tweet['user_id'], user_id, "like", tweet_id)
             write_tweets(tweets)
             return jsonify({"success": True, "liked": liked, "like_count": len(tweet['likes'])})
-
+    
     return jsonify({"success": False, "message": "Tweet non trouvé"}), 404
 
 # ------------------- TOGGLE FOLLOW -------------------
@@ -239,6 +242,8 @@ def toggle_follow(username):
         if current_user['id'] not in target_user['followers']:
             target_user['followers'].append(current_user['id'])
         is_following = True
+        # ✅ Ajouter notification de follow
+        add_notification(target_user['id'], current_user_id, "follow", None, None)
 
     write_users(users)
     return jsonify({
@@ -260,28 +265,69 @@ def profile(username):
         flash("Utilisateur introuvable.", "error")
         return redirect(url_for('routes.feed'))
 
-    user_tweets = [t for t in tweets if t['user_id'] == profile_user['id']]
-    user_tweets.sort(key=lambda t: t.get('created_at', ''), reverse=True)
-
     current_user = next((u for u in users if u['id'] == session.get('user_id')), None)
     is_current_user = current_user['id'] == profile_user['id']
     is_following = profile_user['id'] in current_user.get('following', []) if current_user else False
 
-    for post in user_tweets:
+    # ----------- Tweets normaux de l'utilisateur -----------
+    user_tweets = [t for t in tweets if t['user_id'] == profile_user['id']]
+
+    # ----------- Retweets faits par l'utilisateur -----------
+    retweeted_tweets = []
+    for tweet in tweets:
+        retweets_list = tweet.get('retweets', [])
+    
+        # Check if this user has retweeted this tweet (supporting both old and new format)
+        has_retweeted = False
+        retweet_timestamp = None
+        
+        for retweet in retweets_list:
+            if isinstance(retweet, dict):
+                # New format: {"user_id": X, "retweeted_at": "timestamp"}
+                if retweet.get('user_id') == profile_user['id']:
+                    has_retweeted = True
+                    retweet_timestamp = retweet.get('retweeted_at')
+                    break
+            elif isinstance(retweet, int):
+                # Old format: just user_id
+                if retweet == profile_user['id']:
+                    has_retweeted = True
+                    # For old retweets, use the tweet's created_at as fallback
+                    retweet_timestamp = tweet.get('created_at')
+                    break
+        
+        if has_retweeted:
+            rt_copy = tweet.copy()
+            rt_copy['is_retweet'] = True
+            rt_copy['retweeted_by'] = profile_user['username']
+            rt_copy['retweeted_at'] = retweet_timestamp  # Store the retweet timestamp
+            retweeted_tweets.append(rt_copy)
+
+
+    # Fusion tweets + retweets
+    all_tweets = user_tweets + retweeted_tweets
+
+    # Tri par date (les retweets apparaissent aussi)
+    # Sort by retweet timestamp if it's a retweet, else by created_at
+    def get_sort_time(tweet):
+        if tweet.get('is_retweet') and tweet.get('retweeted_at'):
+            return tweet['retweeted_at']
+        return tweet.get('created_at', '')
+
+    all_tweets.sort(key=get_sort_time, reverse=True)
+
+    # Ajout des infos manquantes
+    for post in all_tweets:
         post.setdefault('likes', [])
         post['liked'] = session['user_id'] in post['likes']
 
-        # --- ENSURE username AND profile_pic_url ARE PRESENT ---
+        # Récupération de l'auteur réel du tweet
         tweet_user = next((u for u in users if u['id'] == post['user_id']), None)
         if tweet_user:
             post['username'] = tweet_user['username']
-            # Use uploaded file if exists, else fallback to default
-            if tweet_user.get('profile_pic_url'):
-                post['profile_pic_url'] = tweet_user['profile_pic_url']
-            else:
-                post['profile_pic_url'] = url_for('static', filename='default-avatar.png')
+            post['profile_pic_url'] = tweet_user.get('profile_pic_url') or url_for('static', filename='default-avatar.png')
         else:
-            post['username'] = 'Utilisateur'
+            post['username'] = "Utilisateur"
             post['profile_pic_url'] = url_for('static', filename='default-avatar.png')
 
     followers_list = [u for u in users if u['id'] in profile_user.get('followers', [])]
@@ -290,7 +336,7 @@ def profile(username):
     return render_template(
         'profile.html',
         profile_user=profile_user,
-        user_tweets=user_tweets,
+        user_tweets=all_tweets,
         is_current_user=is_current_user,
         is_following=is_following,
         followers_list=followers_list,
@@ -367,6 +413,9 @@ def comment_tweet(tweet_id):
     content = request.form.get('content', '').strip()
     if not content:
         return jsonify({"success": False, "message": "Le commentaire ne peut pas être vide"}), 400
+    
+
+    
     for tweet in tweets:
         if tweet['id'] == tweet_id:
             tweet.setdefault('comments', [])
@@ -377,6 +426,9 @@ def comment_tweet(tweet_id):
                 'created_at': datetime.now().isoformat()
             }
             tweet['comments'].append(new_comment)
+            # ✅ Ajouter notification si ce n'est pas son propre tweet
+            add_notification(tweet['user_id'], current_user_id, "comment", tweet_id, content)
+
             write_tweets(tweets)
             return jsonify({
                 "success": True,
@@ -429,9 +481,194 @@ def like_comment(tweet_id, comment_index):
         "liked": liked,
         "like_count": len(comment['likes'])
     })
+#------------------- RETWEET ---------------------
+@routes.route('/retweet/<int:tweet_id>', methods=['POST'])
+def retweet(tweet_id):
+    if 'user_id' not in session:
+        return jsonify({"success": False, "error": "Utilisateur non connecté"}), 403
+
+    user_id = session['user_id']
+    tweets = read_tweets()
+
+    # Trouver tweet
+    tweet = next((t for t in tweets if t['id'] == tweet_id), None)
+    if not tweet:
+        return jsonify({"success": False, "error": "Tweet non trouvé"}), 404
+
+    # Assurer que le champ existe avec la nouvelle structure
+    tweet.setdefault("retweets", [])
+    
+    # Convertir l'ancienne structure (liste d'IDs) vers la nouvelle structure (liste d'objets)
+    if tweet["retweets"] and isinstance(tweet["retweets"][0], int):
+        # Conversion avec un timestamp par défaut (date actuelle)
+        # [user_id1, user_id2] -> [{"user_id": user_id1, "retweeted_at": "timestamp"}, ...]
+        tweet["retweets"] = [{"user_id": uid, "retweeted_at": datetime.utcnow().isoformat()} for uid in tweet["retweets"]]
+
+    # Chercher si l'utilisateur a déjà retweeté
+    existing_retweet = next((rt for rt in tweet["retweets"] if rt["user_id"] == user_id), None)
+    
+    if existing_retweet:
+        # Supprimer le retweet
+        tweet["retweets"] = [rt for rt in tweet["retweets"] if rt["user_id"] != user_id]
+        is_retweeted = False
+    else:
+        # Ajouter un nouveau retweet avec timestamp
+        from datetime import datetime
+        new_retweet = {
+            "user_id": user_id,
+            "retweeted_at": datetime.utcnow().isoformat()
+        }
+        tweet["retweets"].append(new_retweet)
+        is_retweeted = True
+        # ✅ Ajouter notification si ce n'est pas son propre tweet
+        add_notification(tweet['user_id'], user_id, "retweet", tweet_id)
+
+    # Sauvegarder
+    write_tweets(tweets)
+
+    # Réponse envoyée au front
+    return jsonify({
+        "success": True,
+        "is_retweeted": is_retweeted,
+        "retweet_count": len(tweet["retweets"])
+    })
+#-------------------com de comment----------------------------------
+# Répondre à un commentaire
+@routes.route('/reply_comment/<int:tweet_id>/<int:comment_index>', methods=['POST'])
+def reply_comment(tweet_id, comment_index):
+    if 'user_id' not in session:
+        return jsonify({"success": False, "message": "Non connecté"}), 401
+
+    tweets = read_tweets()
+    user_id = session['user_id']
+    users = read_users()
+    user = next((u for u in users if u['id'] == user_id), None)
+    if not user:
+        return jsonify({"success": False, "message": "Utilisateur introuvable"}), 404
+
+    tweet = next((t for t in tweets if t['id'] == tweet_id), None)
+    if not tweet or 'comments' not in tweet or comment_index >= len(tweet['comments']):
+        return jsonify({"success": False, "message": "Commentaire introuvable"}), 404
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"success": False, "message": "Données JSON manquantes"}), 400
+        
+    content = data.get('content', '').strip()
+    if not content:
+        return jsonify({"success": False, "message": "Le contenu est vide"}), 400
+
+    # Ensure replies list exists
+    if 'replies' not in tweet['comments'][comment_index]:
+        tweet['comments'][comment_index]['replies'] = []
+    
+    # Add the reply
+    tweet['comments'][comment_index]['replies'].append({
+        'user_id': user_id,
+        'username': user['username'],
+        'content': content,
+        'created_at': datetime.now().isoformat()
+    })
+    
+    # ✅ NOTIFICATION 1: Notify the TWEET AUTHOR
+    tweet_author_id = tweet['user_id']
+    
+    # Only notify tweet author if it's not the same person replying
+    if tweet_author_id != user_id:
+        # Get the original comment that's being replied to
+        original_comment = tweet['comments'][comment_index]
+        original_comment_content = original_comment.get('content', '')
+        
+        # Truncate if too long
+        if len(original_comment_content) > 50:
+            original_comment_content = original_comment_content[:47] + "..."
+        
+        # Format: Someone replied to a comment on your tweet
+        notification_content = f"REPLY_ON_TWEET:'{original_comment_content}'|REPLY:'{content}'"
+        
+        add_notification(tweet_author_id, user_id, "reply_on_tweet", tweet_id, notification_content)
+    
+    # ✅ NOTIFICATION 2: Notify the COMMENT AUTHOR (original code)
+    original_comment = tweet['comments'][comment_index]
+    original_comment_author_id = original_comment.get('user_id')
+    
+    # Only notify comment author if replying to someone else's comment
+    if original_comment_author_id != user_id:
+        # Get the original comment content
+        original_comment_content = original_comment.get('content', '')
+        
+        # Truncate if too long
+        if len(original_comment_content) > 50:
+            original_comment_content = original_comment_content[:47] + "..."
+        
+        # Create formatted content
+        notification_content = f"REPLY_TO:'{original_comment_content}'|REPLY:'{content}'"
+        
+        add_notification(original_comment_author_id, user_id, "reply", tweet_id, notification_content)
+    
+    write_tweets(tweets)
+    return jsonify({"success": True, "message": "Réponse ajoutée"})
+
+# ------------------- NOTIFICATIONS -------------------
+@routes.route('/notifications')
+def notifications():
+    if 'user_id' not in session:
+        return redirect(url_for('routes.login'))
+
+    user_id = session['user_id']
+    notifications = read_notifications()
+    # Filtrer celles destinées à l'utilisateur
+    user_notifs = [n for n in notifications if n['to_user_id'] == user_id]
+
+    # Ajouter le username de l'auteur de chaque notif
+    users = read_users()
+    for n in user_notifs:
+        from_user = next((u for u in users if u['id'] == n['from_user_id']), None)
+        n['from_user_username'] = from_user['username'] if from_user else "Utilisateur inconnu"
+    # Tu peux les trier par date décroissante
+    user_notifs.sort(key=lambda x: x['created_at'], reverse=True)
+    users = read_users()
+    current_user = next((u for u in users if u['id'] == session['user_id']), None)
+    if not current_user:
+        return redirect(url_for('routes.login'))
+
+    return render_template("notifications.html", notifications=user_notifs, current_user=current_user)
+
+# ------------------- MIGRATE RETWEETS (one-time) -------------------
+@routes.route('/migrate-retweets')
+def migrate_retweets():
+    """Migrate all old retweets (list of IDs) to new format (list of objects with timestamp)"""
+    if 'user_id' not in session:
+        return redirect(url_for('routes.login'))
+    
+    tweets = read_tweets()
+    updated_count = 0
+    
+    for tweet in tweets:
+        retweets = tweet.get('retweets', [])
+        if retweets and isinstance(retweets[0], int):
+            # Convert old format to new format
+            # Use the tweet's created_at as the retweet timestamp (best guess)
+            tweet['retweets'] = [
+                {
+                    "user_id": uid, 
+                    "retweeted_at": tweet.get('created_at', datetime.utcnow().isoformat())
+                } 
+                for uid in retweets
+            ]
+            updated_count += 1
+    
+    if updated_count > 0:
+        write_tweets(tweets)
+        return f"Migrated {updated_count} tweets with old retweet format to new format."
+    else:
+        return "No tweets needed migration."
+
+
+
+
 
 
 
    
-
 

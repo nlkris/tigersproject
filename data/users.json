@@ -25,9 +25,12 @@
         "username": "nlkris",
         "email": "cnguyenluc@gmail.com",
         "password": "scrypt:32768:8:1$sK4xKROPnmcPMlnN$40a382f141378b3a1972aac5e012d780217bd232d53697fb36dc4284026ca3da0e8a6d3ca612ed847724800761afaf9f1dfa72814c2cc493567e860ffd0f671f",
-        "followers": [],
+        "followers": [
+            7
+        ],
         "following": [
-            2
+            2,
+            5
         ],
         "profile_pic_url": "/uploads/profile_pics/3___1.jpeg",
         "bio": "beurre"
@@ -49,7 +52,8 @@
             2
         ],
         "followers": [
-            2
+            2,
+            3
         ],
         "profile_pic_url": "/uploads/profile_pics/5_IMG_2722.JPG",
         "bio": "starlife"
@@ -62,5 +66,17 @@
         "following": [],
         "followers": [],
         "profile_pic_url": null
+    },
+    {
+        "id": 7,
+        "username": "kris2.0",
+        "email": "cnguyen@gmail.com",
+        "password": "scrypt:32768:8:1$LJ5385HDz7GdzEQc$778b1d9c96725a91f28ae0cd516c96fe77ead65b93044a94295ebbf9e7abceea33c4f02601645797a931fb6e2f37d83fba1a068feb3994a36b0257244c6c7744",
+        "following": [
+            3
+        ],
+        "followers": [],
+        "profile_pic_url": null,
+        "bio": ""
     }
 ]

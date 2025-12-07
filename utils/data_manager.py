@@ -127,4 +127,76 @@ def ensure_comments_field():
                     comment['likes'] = []
     write_tweets(tweets)
 
+import json
+from datetime import datetime
 
+def retweet_user(tweet_id: str, user_id: str, db_path: str = "user.json"):
+    """Ajoute un retweet à la base de données."""
+    with open(db_path, "r+") as f:
+        data = json.load(f)
+        for user in data["users"]:
+            if user["id"] == user_id:
+                # Vérifie si le tweet original existe
+                original_tweet = None
+                for u in data["users"]:
+                    for tweet in u["tweets"]:
+                        if tweet["id"] == tweet_id:
+                            original_tweet = tweet
+                            break
+                if not original_tweet:
+                    raise ValueError("Tweet original introuvable.")
+
+                # Crée le retweet
+                retweet = {
+                    "id": f"retweet_{len(user['retweets'])+1}",
+                    "original_tweet_id": tweet_id,
+                    "author": original_tweet["author"],
+                    "date": datetime.now().strftime("%Y-%m-%d")
+                }
+                user["retweets"].append(retweet)
+                f.seek(0)
+                json.dump(data, f, indent=2)
+                return retweet
+    raise ValueError("Utilisateur introuvable.")
+
+def ensure_retweets_field():
+    tweets = read_tweets()
+    for tweet in tweets:
+        if 'retweets' not in tweet:
+            tweet['retweets'] = []
+    write_tweets(tweets)
+
+
+NOTIF_FILE = os.path.join(os.getcwd(), "backend", "data", "notifications.json")
+
+def read_notifications():
+    import json
+    if not os.path.exists(NOTIF_FILE):
+        return []
+    with open(NOTIF_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def write_notifications(notifications):
+    import json
+    # Crée le dossier si nécessaire
+    os.makedirs(os.path.dirname(NOTIF_FILE), exist_ok=True)
+    with open(NOTIF_FILE, "w", encoding="utf-8") as f:
+        json.dump(notifications, f, ensure_ascii=False, indent=4)
+
+def add_notification(to_user_id, from_user_id, notif_type, tweet_id, content=None):
+    from datetime import datetime
+
+    notifications = read_notifications()
+
+    notifications.append({
+        "to_user_id": to_user_id,
+        "from_user_id": from_user_id,
+        "type": notif_type,  # "like" ou "comment"
+        "tweet_id": tweet_id,
+        "content": content,
+        "seen": False,
+        "created_at": datetime.now().isoformat()
+    })
+
+    
+    write_notifications(notifications)

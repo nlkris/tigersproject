@@ -1,0 +1,452 @@
+[
+    {
+        "to_user_id": 2,
+        "from_user_id": 2,
+        "type": "like",
+        "tweet_id": 23,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-06T16:10:06.523176"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "like",
+        "tweet_id": 22,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T13:56:55.565648"
+    },
+    {
+        "to_user_id": 2,
+        "from_user_id": 2,
+        "type": "like",
+        "tweet_id": 23,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T17:20:09.748180"
+    },
+    {
+        "to_user_id": 2,
+        "from_user_id": 2,
+        "type": "retweet",
+        "tweet_id": 23,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T17:20:10.932007"
+    },
+    {
+        "to_user_id": 2,
+        "from_user_id": 2,
+        "type": "comment",
+        "tweet_id": 23,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T17:20:49.795397"
+    },
+    {
+        "to_user_id": 2,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 23,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T17:31:32.817090"
+    },
+    {
+        "to_user_id": 2,
+        "from_user_id": 3,
+        "type": "like",
+        "tweet_id": 23,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T17:31:33.420952"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 22,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T17:31:35.672442"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "like",
+        "tweet_id": 22,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T17:31:37.090371"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 21,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T17:31:39.389892"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "like",
+        "tweet_id": 21,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T17:31:39.853760"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "like",
+        "tweet_id": 21,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T17:31:59.388844"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 21,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T17:32:00.014867"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 14,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T17:32:14.962393"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 15,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T17:32:15.754537"
+    },
+    {
+        "to_user_id": 5,
+        "from_user_id": 3,
+        "type": "follow",
+        "tweet_id": null,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T18:02:14.995509"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 7,
+        "type": "follow",
+        "tweet_id": null,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T18:09:35.494864"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 7,
+        "type": "comment",
+        "tweet_id": 22,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T18:13:37.263967"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 7,
+        "type": "comment",
+        "tweet_id": 22,
+        "content": "un autre commentaire super intéressant",
+        "seen": false,
+        "created_at": "2025-12-07T18:16:57.855053"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 7,
+        "type": "comment",
+        "tweet_id": 22,
+        "content": "le commentaire test",
+        "seen": false,
+        "created_at": "2025-12-07T18:19:39.428289"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 7,
+        "type": "comment",
+        "tweet_id": 22,
+        "content": "le commentaire test",
+        "seen": false,
+        "created_at": "2025-12-07T18:19:39.428282"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 7,
+        "type": "comment",
+        "tweet_id": 22,
+        "content": "je commente",
+        "seen": false,
+        "created_at": "2025-12-07T18:20:56.252815"
+    },
+    {
+        "to_user_id": 7,
+        "from_user_id": 3,
+        "type": "reply",
+        "tweet_id": 22,
+        "content": "je réponds",
+        "seen": false,
+        "created_at": "2025-12-07T18:29:09.052331"
+    },
+    {
+        "to_user_id": 7,
+        "from_user_id": 3,
+        "type": "reply",
+        "tweet_id": 22,
+        "content": "REPLY_TO:'je commente'|REPLY:'je réponds mais la notif dois être plus stylée'",
+        "seen": false,
+        "created_at": "2025-12-07T18:34:38.225610"
+    },
+    {
+        "to_user_id": 7,
+        "from_user_id": 3,
+        "type": "reply",
+        "tweet_id": 22,
+        "content": "REPLY_TO:'je commente'|REPLY:'je réponds mais la notif est plus stylée'",
+        "seen": false,
+        "created_at": "2025-12-07T18:40:53.703559"
+    },
+    {
+        "to_user_id": 7,
+        "from_user_id": 3,
+        "type": "reply",
+        "tweet_id": 22,
+        "content": "REPLY_TO:'je commente'|REPLY:'ça à pas fonctionné je debug'",
+        "seen": false,
+        "created_at": "2025-12-07T18:43:14.559300"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "comment",
+        "tweet_id": 22,
+        "content": "je redébug on y crois",
+        "seen": false,
+        "created_at": "2025-12-07T18:47:30.003008"
+    },
+    {
+        "to_user_id": 7,
+        "from_user_id": 3,
+        "type": "reply",
+        "tweet_id": 22,
+        "content": "REPLY_TO:'je commente'|REPLY:'je redébug'",
+        "seen": false,
+        "created_at": "2025-12-07T18:47:38.802331"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 7,
+        "type": "reply",
+        "tweet_id": 22,
+        "content": "REPLY_TO:'je redébug on y crois'|REPLY:'notif hyper stylée'",
+        "seen": false,
+        "created_at": "2025-12-07T18:50:46.248732"
+    },
+    {
+        "to_user_id": 5,
+        "from_user_id": 3,
+        "type": "comment",
+        "tweet_id": 12,
+        "content": "je commente chez claire",
+        "seen": false,
+        "created_at": "2025-12-07T19:22:12.824834"
+    },
+    {
+        "to_user_id": 5,
+        "from_user_id": 7,
+        "type": "reply_on_tweet",
+        "tweet_id": 12,
+        "content": "REPLY_ON_TWEET:'je commente chez claire'|REPLY:'je réponds avec un autre compte chez claire'",
+        "seen": false,
+        "created_at": "2025-12-07T19:22:55.877212"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 7,
+        "type": "reply",
+        "tweet_id": 12,
+        "content": "REPLY_TO:'je commente chez claire'|REPLY:'je réponds avec un autre compte chez claire'",
+        "seen": false,
+        "created_at": "2025-12-07T19:22:55.879303"
+    },
+    {
+        "to_user_id": 2,
+        "from_user_id": 3,
+        "type": "like",
+        "tweet_id": 23,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:09:47.228249"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "comment",
+        "tweet_id": 22,
+        "content": "AAAAAAAAAAAA",
+        "seen": false,
+        "created_at": "2025-12-07T20:15:06.275917"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "like",
+        "tweet_id": 20,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:15:13.619068"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 20,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:15:14.373533"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "comment",
+        "tweet_id": 22,
+        "content": "depuis le profil ?",
+        "seen": false,
+        "created_at": "2025-12-07T20:19:17.975670"
+    },
+    {
+        "to_user_id": 2,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 23,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:26:30.279791"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 16,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:26:36.248378"
+    },
+    {
+        "to_user_id": 2,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 23,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:26:44.127421"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 15,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:27:02.201557"
+    },
+    {
+        "to_user_id": 2,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 23,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:27:07.009587"
+    },
+    {
+        "to_user_id": 2,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 23,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:32:55.851348"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 17,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:33:03.880135"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 21,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:33:23.953392"
+    },
+    {
+        "to_user_id": 5,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 4,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:33:35.005142"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 6,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:41:45.635622"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 6,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:42:13.293875"
+    },
+    {
+        "to_user_id": 5,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 7,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:47:40.590872"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 20,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:48:07.049956"
+    }
+]

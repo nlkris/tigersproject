@@ -542,7 +542,8 @@ def reply_comment(tweet_id, comment_index):
 
     tweets = read_tweets()
     user_id = session['user_id']
-    user = next((u for u in read_users() if u['id'] == user_id), None)
+    users = read_users()
+    user = next((u for u in users if u['id'] == user_id), None)
     if not user:
         return jsonify({"success": False, "message": "Utilisateur introuvable"}), 404
 
@@ -551,22 +552,58 @@ def reply_comment(tweet_id, comment_index):
         return jsonify({"success": False, "message": "Commentaire introuvable"}), 404
 
     data = request.get_json()
+    if not data:
+        return jsonify({"success": False, "message": "Données JSON manquantes"}), 400
+        
     content = data.get('content', '').strip()
     if not content:
         return jsonify({"success": False, "message": "Le contenu est vide"}), 400
 
-    tweet['comments'][comment_index].setdefault('replies', [])
+    print(f"🔧 DEBUG reply_comment:")
+    print(f"   - User {user_id} ({user['username']}) is replying")
+    print(f"   - Reply content: '{content}'")
+    
+    # Ensure replies list exists
+    if 'replies' not in tweet['comments'][comment_index]:
+        tweet['comments'][comment_index]['replies'] = []
+    
+    # Add the reply
     tweet['comments'][comment_index]['replies'].append({
         'user_id': user_id,
         'username': user['username'],
         'content': content,
         'created_at': datetime.now().isoformat()
     })
-    #ajout notif
-    add_notification(tweet['user_id'], user_id, "à répondu", tweet_id)
+    
+    # ✅ FIXED: Add notification with both contents
+    original_comment = tweet['comments'][comment_index]
+    original_comment_author_id = original_comment['user_id']
+    
+    print(f"   - Original comment author ID: {original_comment_author_id}")
+    print(f"   - Original comment: {original_comment}")
 
+    # Only notify if replying to someone else's comment
+    if original_comment_author_id != user_id:
+        # Get the original comment content
+        original_comment_content = original_comment.get('content', '')
+        
+        print(f"   - Original comment content: '{original_comment_content}'")
+        
+        # Truncate if too long
+        if len(original_comment_content) > 50:
+            original_comment_content = original_comment_content[:47] + "..."
+        
+        # Create formatted content
+        notification_content = f"REPLY_TO:'{original_comment_content}'|REPLY:'{content}'"
+        
+        print(f"   - Notification content to save: '{notification_content}'")
+        
+        add_notification(original_comment_author_id, user_id, "reply", tweet_id, notification_content)
+    else:
+        print("   - Skipping notification (replying to own comment)")
+    
     write_tweets(tweets)
-    return jsonify({"success": True})
+    return jsonify({"success": True, "message": "Réponse ajoutée"})
 
 # ------------------- NOTIFICATIONS -------------------
 @routes.route('/notifications')

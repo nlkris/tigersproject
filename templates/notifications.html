@@ -83,6 +83,30 @@ h1 {
   align-items:center;
   transition: background 0.2s;
 }
+
+.notification-original {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 14px;
+  padding-left: 10px;
+  border-left: 2px solid rgba(156, 163, 175, 0.5);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 8px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.notification-content {
+  margin-top: 4px;
+  color: var(--accent);
+  font-size: 14px;
+  padding-left: 10px;
+  border-left: 2px solid rgba(94, 234, 212, 0.5);
+  background: rgba(94, 234, 212, 0.05);
+  padding: 8px;
+  border-radius: 4px;
+}
+
 .notification:hover {
   background: rgba(94,234,212,0.15);
 }
@@ -165,12 +189,66 @@ h1 {
               {{ notif.from_user_username }}
             </a> vous suit maintenant.
           </span>
+        {% elif notif.type == 'reply' %}
+          <span>
+            <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
+              {{ notif.from_user_username }}
+            </a> a répondu à votre commentaire.
+          </span>
+          {% if notif.content %}
+            {# Parse the formatted content string #}
+            {% set content_str = notif.content %}
+            {% set original_comment = '' %}
+            {% set reply_content = '' %}
+            
+            {# First part: REPLY_TO:'...' #}
+            {% if 'REPLY_TO:' in content_str %}
+              {% set parts = content_str.split('|') %}
+              {% if parts|length >= 2 %}
+                {# Extract REPLY_TO part #}
+                {% set reply_to_part = parts[0] %}  {# REPLY_TO:'je commente' #}
+                {% set original_comment = reply_to_part[9:] %}  {# Remove 'REPLY_TO:' #}
+                
+                {# Remove surrounding quotes - handle both regular and encoded quotes #}
+                {% if original_comment.startswith("'") and original_comment.endswith("'") %}
+                  {% set original_comment = original_comment[1:-1] %}
+                {% elif original_comment.startswith("\u0027") and original_comment.endswith("\u0027") %}
+                  {% set original_comment = original_comment[6:-6] %}
+                {% endif %}
+                
+                {# Extract REPLY part #}
+                {% set reply_part = parts[1] %}  {# REPLY:'je redébug' #}
+                {% set reply_content = reply_part[6:] %}  {# Remove 'REPLY:' #}
+                
+                {% if reply_content.startswith("'") and reply_content.endswith("'") %}
+                  {% set reply_content = reply_content[1:-1] %}
+                {% elif reply_content.startswith("\u0027") and reply_content.endswith("\u0027") %}
+                  {% set reply_content = reply_content[6:-6] %}
+                {% endif %}
+              {% endif %}
+            {% endif %}
+            
+            {% if original_comment %}
+              <div class="notification-original">
+                <strong>Votre commentaire:</strong> "{{ original_comment|safe }}"
+              </div>
+            {% endif %}
+            
+            {% if reply_content %}
+              <div class="notification-content">
+                <strong>Réponse:</strong> "{{ reply_content|safe }}"
+              </div>
+            {% endif %}
+          {% endif %}
         {% endif %}
-        <span class="notification-time">{{ notif.created_at | replace('T', ' ') | truncate(16) }}</span>
       </div>
       {% if notif.type == 'follow' %}
         <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}" class="view-tweet-btn">
           Voir profil
+        </a>
+      {% elif notif.type == 'reply' %}  <!-- ADD THIS SECTION -->
+        <a href="{{ url_for('routes.feed') }}#tweet-{{ notif.tweet_id }}" class="view-tweet-btn">
+          Voir discussion
         </a>
       {% else %}
         <a href="{{ url_for('routes.feed') }}#tweet-{{ notif.tweet_id }}" class="view-tweet-btn">

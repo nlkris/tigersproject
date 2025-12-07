@@ -345,7 +345,49 @@
                 "user_id": 7,
                 "username": "kris2.0",
                 "content": "je commente",
-                "created_at": "2025-12-07T18:20:56.252496"
+                "created_at": "2025-12-07T18:20:56.252496",
+                "likes": [],
+                "replies": [
+                    {
+                        "user_id": 3,
+                        "username": "nlkris",
+                        "content": "je r\u00e9ponds",
+                        "created_at": "2025-12-07T18:29:09.051876"
+                    },
+                    {
+                        "user_id": 3,
+                        "username": "nlkris",
+                        "content": "je r\u00e9ponds mais la notif est plus styl\u00e9e",
+                        "created_at": "2025-12-07T18:40:53.702644"
+                    },
+                    {
+                        "user_id": 3,
+                        "username": "nlkris",
+                        "content": "\u00e7a \u00e0 pas fonctionn\u00e9 je debug",
+                        "created_at": "2025-12-07T18:43:14.558581"
+                    },
+                    {
+                        "user_id": 3,
+                        "username": "nlkris",
+                        "content": "je red\u00e9bug",
+                        "created_at": "2025-12-07T18:47:38.801992"
+                    }
+                ]
+            },
+            {
+                "user_id": 3,
+                "username": "nlkris",
+                "content": "je red\u00e9bug on y crois",
+                "created_at": "2025-12-07T18:47:30.002258",
+                "likes": [],
+                "replies": [
+                    {
+                        "user_id": 7,
+                        "username": "kris2.0",
+                        "content": "notif hyper styl\u00e9e",
+                        "created_at": "2025-12-07T18:50:46.248235"
+                    }
+                ]
             }
         ],
         "retweets": [

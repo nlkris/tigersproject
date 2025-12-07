@@ -68,6 +68,120 @@ button, .btn {
 button:hover, .btn:hover { opacity:0.9; }
 h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
 
+/* POST BUTTONS - Under tweet in a line */
+.post-buttons {
+  display: flex;
+  gap: 20px;
+  margin-top: 12px;
+  padding-left: 52px; /* Align with tweet content */
+}
+
+.post-buttons button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.post-buttons button:hover {
+  background: rgba(94, 234, 212, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.05);
+}
+
+/* Specific button styles */
+.like-btn.liked {
+  color: #f87171 !important;
+  border-color: #f87171 !important;
+}
+
+.retweet-btn.retweeted {
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+}
+
+/* Button counts */
+.post-buttons button span {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.view-comments-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.view-comments-btn:hover {
+  background: rgba(94, 234, 212, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.05);
+}
+
+/* Comment styling */
+.comment {
+  background: rgba(255,255,255,0.05);
+  padding: 8px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.comment .reply {
+  margin-left: 20px;
+  background: rgba(94,234,212,0.05);
+  padding: 6px;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+.comment button.reply-btn {
+  background:none;
+  border:none;
+  color: var(--accent);
+  cursor:pointer;
+  font-size: 14px;
+  margin-top:4px;
+}
+
+/* Retweet button specific */
+.retweet-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.retweet-btn:hover {
+  background: rgba(94, 234, 212, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.05);
+}
+
 .post-header {
   display: flex;
   align-items: center;
@@ -94,15 +208,7 @@ h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
   position:relative;
 }
 .post strong { color:var(--accent); cursor:pointer; }
-.like-btn {
-  position:absolute; top:12px; right:12px;
-  background:none; border:none;
-  color:#ffffff; cursor:pointer; font-size:18px;
-  display:flex; align-items:center; gap:6px;
-  transition:0.2s;
-}
-.like-btn:hover { transform: scale(1.1); }
-.like-btn.liked { color:#f87171; }
+
 
 .tweet-gallery {
   display: grid;
@@ -337,11 +443,23 @@ input, textarea {
           {% endif %}
         </div>
       </div>
-      <!-- Bouton Like -->
-      <button class="like-btn {% if session['user_id'] in post.likes %}liked{% endif %}"
-              data-tweet-id="{{ post.id }}">
-        ❤️ <span class="like-count">{{ post.likes|length }}</span>
-      </button>
+      
+      <!-- POST BUTTONS -->
+      <div class="post-buttons">
+        <button class="retweet-btn {% if session['user_id'] in post.get('retweets', []) %}retweeted{% endif %}"
+                data-tweet-id="{{ post.id }}">
+          🔄 <span class="retweet-count">{{ post.get('retweets', [])|length }}</span>
+        </button>
+
+        <button class="like-btn {% if session['user_id'] in post.likes %}liked{% endif %}"
+                data-tweet-id="{{ post.id }}">
+          ❤️ <span class="like-count">{{ post.likes|length }}</span>
+        </button>
+
+        <button class="view-comments-btn" data-tweet-id="{{ post.id }}">
+          💬 <span class="comment-count">{{ post.get('comments', [])|length }}</span>
+        </button>
+      </div>
     </div>
   {% endfor %}
 {% else %}
@@ -350,9 +468,22 @@ input, textarea {
 
 
 
+
 <p style="text-align:center; margin-top:16px;">
   <a href="{{ url_for('routes.feed') }}">⬅ Retour au fil</a>
 </p>
+
+<!-- MODAL COMMENTAIRES -->
+<div id="commentsModal" class="img-modal" style="display:none;">
+  <div style="background:rgba(11,18,32,0.95); border-radius:12px; padding:20px; max-width:600px; width:90%; max-height:80vh; overflow-y:auto;">
+    <div id="commentsList"></div>
+
+    <form id="newCommentForm" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
+      <textarea name="content" placeholder="Ajouter un commentaire..." required></textarea>
+      <button type="submit">Commenter</button>
+    </form>
+  </div>
+</div>
 
 </div>
 
@@ -391,20 +522,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   overlay.addEventListener('click', closePopup);
 
-  // LIKE AJAX
-  document.querySelectorAll('.like-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const tweetId = btn.dataset.tweetId;
-      const countEl = btn.querySelector('.like-count');
-      btn.disabled = true;
-      try {
-        const res = await fetch(`/like/${tweetId}`, { method: 'POST' });
-        const data = await res.json();
+ // LIKE AJAX
+document.querySelectorAll('.like-btn').forEach(btn => {
+  btn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const tweetId = btn.dataset.tweetId;
+    const countEl = btn.querySelector('.like-count');
+    btn.disabled = true;
+    try {
+      const res = await fetch(`/like/${tweetId}`, { method:'POST' });
+      const data = await res.json();
+      if(data.success){
         countEl.textContent = data.like_count;
         btn.classList.toggle('liked', data.liked);
-      } finally { btn.disabled = false; }
-    });
+      }
+    } finally {
+      btn.disabled = false;
+    }
   });
+});
 
   // EDIT PROFILE POPUP
   if(editBtn && editModal){
@@ -535,6 +671,140 @@ function closeImageModal() {
 }
 </script>
 
+<script>
+/*AJAX MODAL COMMENTAIRES */
+let currentTweetId = null;
+
+// Ouvrir modal avec commentaires
+document.querySelectorAll('.view-comments-btn').forEach(btn => {
+  btn.addEventListener('click', async (e) => {
+    e.stopPropagation(); // Prevent event from bubbling up
+    currentTweetId = btn.dataset.tweetId;
+    document.getElementById('commentsModal').style.display = 'flex';
+    await loadComments(currentTweetId);
+  });
+});
+
+// Fermer modal en cliquant en dehors
+document.addEventListener('click', (e) => {
+  const modal = document.getElementById('commentsModal');
+  const modalContent = modal.querySelector('div'); // The wrapper div
+  
+  if (modal.style.display === 'flex' && 
+      !modalContent.contains(e.target)) {
+    closeCommentModal();
+  }
+});
+
+// Fonction pour fermer le modal
+function closeCommentModal() {
+  document.getElementById('commentsModal').style.display = 'none';
+  document.getElementById('commentsList').innerHTML = '';
+  currentTweetId = null;
+}
+
+// Charger les commentaires
+async function loadComments(tweetId) {
+  try {
+    const res = await fetch(`/comments/${tweetId}`);
+    const data = await res.json();
+    const container = document.getElementById('commentsList');
+    container.innerHTML = '';
+
+    if (data.success && data.comments && data.comments.length > 0) {
+      data.comments.forEach((comment, idx) => {
+        const div = document.createElement('div');
+        div.classList.add('comment');
+        div.dataset.index = idx;
+
+        let repliesHtml = '';
+        if(comment.replies && comment.replies.length) {
+          repliesHtml = comment.replies.map(r => `<div class="reply"><strong>${r.username}</strong>: ${r.content}</div>`).join('');
+        }
+
+        div.innerHTML = `
+          <strong>${comment.username}</strong>: ${comment.content}
+          <button class="reply-btn" data-index="${idx}">Répondre</button>
+          ${repliesHtml}
+        `;
+
+        // Bouton réponse
+        const replyBtn = div.querySelector('.reply-btn');
+        replyBtn.addEventListener('click', (e) => {
+          e.stopPropagation(); // Prevent click from bubbling to parent
+          
+          // Remove any existing reply form
+          const existingForm = div.querySelector('form');
+          if (existingForm) existingForm.remove();
+          
+          const replyForm = document.createElement('form');
+          replyForm.style.display = 'flex';
+          replyForm.style.flexDirection = 'column';
+          replyForm.style.marginTop = '10px';
+          replyForm.innerHTML = `
+            <textarea name="replyContent" placeholder="Répondre..." required style="margin-bottom: 8px;"></textarea>
+            <button type="submit">Envoyer</button>
+          `;
+          
+          div.appendChild(replyForm);
+
+          replyForm.addEventListener('submit', async (submitEvent) => {
+            submitEvent.preventDefault();
+            const content = replyForm.replyContent.value.trim();
+            if(!content) return;
+
+            const res = await fetch(`/reply_comment/${tweetId}/${idx}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ content })
+            });
+            const result = await res.json();
+            if(result.success){
+              await loadComments(tweetId);
+            } else {
+              alert(result.message);
+            }
+          });
+        });
+
+        container.appendChild(div);
+      });
+    } else {
+      container.innerHTML = '<p style="text-align:center; color:var(--muted);">Aucun commentaire pour le moment.</p>';
+    }
+  } catch (error) {
+    console.error('Error loading comments:', error);
+    document.getElementById('commentsList').innerHTML = '<p style="color:#f87171;">Erreur de chargement des commentaires</p>';
+  }
+}
+
+// Ajouter un nouveau commentaire
+document.getElementById('newCommentForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const content = e.target.content.value.trim();
+  if(!content || !currentTweetId) return;
+
+  const formData = new FormData();
+  formData.append('content', content);
+
+  try {
+    const res = await fetch(`/comment/${currentTweetId}`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if(data.success){
+      e.target.content.value = '';
+      await loadComments(currentTweetId);
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    alert('Erreur lors de l\'ajout du commentaire');
+  }
+});
+</script>
 
 </body>
 </html>

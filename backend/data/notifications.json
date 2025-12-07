@@ -286,5 +286,50 @@
         "content": "REPLY_TO:'je commente chez claire'|REPLY:'je réponds avec un autre compte chez claire'",
         "seen": false,
         "created_at": "2025-12-07T19:22:55.879303"
+    },
+    {
+        "to_user_id": 2,
+        "from_user_id": 3,
+        "type": "like",
+        "tweet_id": 23,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:09:47.228249"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "comment",
+        "tweet_id": 22,
+        "content": "AAAAAAAAAAAA",
+        "seen": false,
+        "created_at": "2025-12-07T20:15:06.275917"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "like",
+        "tweet_id": 20,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:15:13.619068"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "retweet",
+        "tweet_id": 20,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:15:14.373533"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "comment",
+        "tweet_id": 22,
+        "content": "depuis le profil ?",
+        "seen": false,
+        "created_at": "2025-12-07T20:19:17.975670"
     }
 ]

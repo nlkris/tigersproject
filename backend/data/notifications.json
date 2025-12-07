@@ -448,5 +448,104 @@
         "content": null,
         "seen": false,
         "created_at": "2025-12-07T20:48:07.049956"
+    },
+    {
+        "to_user_id": 5,
+        "from_user_id": 5,
+        "type": "retweet",
+        "tweet_id": 5,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:56:54.586958"
+    },
+    {
+        "to_user_id": 5,
+        "from_user_id": 5,
+        "type": "like",
+        "tweet_id": 24,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:57:27.884675"
+    },
+    {
+        "to_user_id": 5,
+        "from_user_id": 5,
+        "type": "retweet",
+        "tweet_id": 24,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:58:59.609079"
+    },
+    {
+        "to_user_id": 2,
+        "from_user_id": 5,
+        "type": "retweet",
+        "tweet_id": 13,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:59:10.811136"
+    },
+    {
+        "to_user_id": 2,
+        "from_user_id": 5,
+        "type": "retweet",
+        "tweet_id": 23,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T20:59:14.246979"
+    },
+    {
+        "to_user_id": 2,
+        "from_user_id": 5,
+        "type": "like",
+        "tweet_id": 23,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T21:11:22.609488"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 5,
+        "type": "follow",
+        "tweet_id": null,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T21:11:29.474061"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 5,
+        "type": "retweet",
+        "tweet_id": 20,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T21:11:30.977937"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 5,
+        "type": "like",
+        "tweet_id": 20,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T21:11:31.572562"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 5,
+        "type": "comment",
+        "tweet_id": 21,
+        "content": "Mon mood après EDP !!!",
+        "seen": false,
+        "created_at": "2025-12-07T21:11:48.562296"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 5,
+        "type": "retweet",
+        "tweet_id": 19,
+        "content": null,
+        "seen": false,
+        "created_at": "2025-12-07T21:11:56.393334"
     }
 ]

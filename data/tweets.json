@@ -47,7 +47,12 @@
         "content": "coucou",
         "likes": [],
         "comments": [],
-        "retweets": []
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:33:35.004737"
+            }
+        ]
     },
     {
         "id": 5,
@@ -70,7 +75,12 @@
             3
         ],
         "comments": [],
-        "retweets": []
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:42:13.293068"
+            }
+        ]
     },
     {
         "id": 7,
@@ -79,7 +89,12 @@
         "content": "coucou cela fonctionne !",
         "likes": [],
         "comments": [],
-        "retweets": []
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:47:40.589401"
+            }
+        ]
     },
     {
         "id": 8,
@@ -129,7 +144,10 @@
             }
         ],
         "retweets": [
-            2
+            {
+                "user_id": 2,
+                "retweeted_at": "2025-10-14T14:57:57.782891"
+            }
         ]
     },
     {
@@ -144,7 +162,10 @@
         "created_at": "2025-10-14T15:01:44.166193",
         "comments": [],
         "retweets": [
-            2
+            {
+                "user_id": 2,
+                "retweeted_at": "2025-10-14T15:01:44.166193"
+            }
         ]
     },
     {
@@ -175,7 +196,10 @@
             }
         ],
         "retweets": [
-            2
+            {
+                "user_id": 2,
+                "retweeted_at": "2025-10-14T15:02:28.813005"
+            }
         ]
     },
     {
@@ -212,7 +236,10 @@
         "created_at": "2025-10-25T16:32:39.453113",
         "comments": [],
         "retweets": [
-            3
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-10-25T16:32:39.453113"
+            }
         ]
     },
     {
@@ -225,7 +252,10 @@
         "created_at": "2025-10-25T17:29:41.969099",
         "comments": [],
         "retweets": [
-            3
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:27:02.200922"
+            }
         ]
     },
     {
@@ -236,7 +266,12 @@
         "likes": [],
         "created_at": "2025-11-19T16:07:03.441946",
         "comments": [],
-        "retweets": []
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:26:36.247928"
+            }
+        ]
     },
     {
         "id": 17,
@@ -247,7 +282,12 @@
         "likes": [],
         "created_at": "2025-11-19T16:08:46.877943",
         "comments": [],
-        "retweets": []
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:33:03.879820"
+            }
+        ]
     },
     {
         "id": 18,
@@ -290,7 +330,10 @@
         "created_at": "2025-11-19T16:31:00.937909",
         "comments": [],
         "retweets": [
-            3
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:48:07.049354"
+            }
         ]
     },
     {
@@ -308,9 +351,7 @@
         ],
         "created_at": "2025-11-19T19:47:32.332813",
         "comments": [],
-        "retweets": [
-            3
-        ]
+        "retweets": []
     },
     {
         "id": 22,
@@ -420,12 +461,19 @@
                 "user_id": 3,
                 "username": "nlkris",
                 "content": "depuis le profil ?",
-                "created_at": "2025-12-07T20:19:17.974770"
+                "created_at": "2025-12-07T20:19:17.974770",
+                "likes": []
             }
         ],
         "retweets": [
-            2,
-            3
+            {
+                "user_id": 2,
+                "retweeted_at": "2025-11-19T20:01:49.562197"
+            },
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-11-19T20:01:49.562197"
+            }
         ]
     },
     {
@@ -491,8 +539,14 @@
             }
         ],
         "retweets": [
-            2,
-            3
+            {
+                "user_id": 2,
+                "retweeted_at": null
+            },
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:32:55.850793"
+            }
         ]
     }
 ]

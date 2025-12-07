@@ -273,13 +273,34 @@ def profile(username):
     user_tweets = [t for t in tweets if t['user_id'] == profile_user['id']]
 
     # ----------- Retweets faits par l'utilisateur -----------
-    # ----------- Retweets faits par l'utilisateur -----------
     retweeted_tweets = []
     for tweet in tweets:
-        if profile_user['id'] in tweet.get('retweets', []):
+        retweets_list = tweet.get('retweets', [])
+    
+        # Check if this user has retweeted this tweet (supporting both old and new format)
+        has_retweeted = False
+        retweet_timestamp = None
+        
+        for retweet in retweets_list:
+            if isinstance(retweet, dict):
+                # New format: {"user_id": X, "retweeted_at": "timestamp"}
+                if retweet.get('user_id') == profile_user['id']:
+                    has_retweeted = True
+                    retweet_timestamp = retweet.get('retweeted_at')
+                    break
+            elif isinstance(retweet, int):
+                # Old format: just user_id
+                if retweet == profile_user['id']:
+                    has_retweeted = True
+                    # For old retweets, use the tweet's created_at as fallback
+                    retweet_timestamp = tweet.get('created_at')
+                    break
+        
+        if has_retweeted:
             rt_copy = tweet.copy()
             rt_copy['is_retweet'] = True
             rt_copy['retweeted_by'] = profile_user['username']
+            rt_copy['retweeted_at'] = retweet_timestamp  # Store the retweet timestamp
             retweeted_tweets.append(rt_copy)
 
 
@@ -287,7 +308,13 @@ def profile(username):
     all_tweets = user_tweets + retweeted_tweets
 
     # Tri par date (les retweets apparaissent aussi)
-    all_tweets.sort(key=lambda t: t.get('created_at', ''), reverse=True)
+    # Sort by retweet timestamp if it's a retweet, else by created_at
+    def get_sort_time(tweet):
+        if tweet.get('is_retweet') and tweet.get('retweeted_at'):
+            return tweet['retweeted_at']
+        return tweet.get('created_at', '')
+
+    all_tweets.sort(key=get_sort_time, reverse=True)
 
     # Ajout des infos manquantes
     for post in all_tweets:
@@ -310,51 +337,6 @@ def profile(username):
         'profile.html',
         profile_user=profile_user,
         user_tweets=all_tweets,
-        is_current_user=is_current_user,
-        is_following=is_following,
-        followers_list=followers_list,
-        following_list=following_list
-    )
-
-    users = read_users()
-    tweets = read_tweets()
-
-    profile_user = next((u for u in users if u['username'] == username), None)
-    if not profile_user:
-        flash("Utilisateur introuvable.", "error")
-        return redirect(url_for('routes.feed'))
-
-    user_tweets = [t for t in tweets if t['user_id'] == profile_user['id']]
-    user_tweets.sort(key=lambda t: t.get('created_at', ''), reverse=True)
-
-    current_user = next((u for u in users if u['id'] == session.get('user_id')), None)
-    is_current_user = current_user['id'] == profile_user['id']
-    is_following = profile_user['id'] in current_user.get('following', []) if current_user else False
-
-    for post in user_tweets:
-        post.setdefault('likes', [])
-        post['liked'] = session['user_id'] in post['likes']
-
-        # --- ENSURE username AND profile_pic_url ARE PRESENT ---
-        tweet_user = next((u for u in users if u['id'] == post['user_id']), None)
-        if tweet_user:
-            post['username'] = tweet_user['username']
-            # Use uploaded file if exists, else fallback to default
-            if tweet_user.get('profile_pic_url'):
-                post['profile_pic_url'] = tweet_user['profile_pic_url']
-            else:
-                post['profile_pic_url'] = url_for('static', filename='default-avatar.png')
-        else:
-            post['username'] = 'Utilisateur'
-            post['profile_pic_url'] = url_for('static', filename='default-avatar.png')
-
-    followers_list = [u for u in users if u['id'] in profile_user.get('followers', [])]
-    following_list = [u for u in users if u['id'] in profile_user.get('following', [])]
-
-    return render_template(
-        'profile.html',
-        profile_user=profile_user,
-        user_tweets=user_tweets,
         is_current_user=is_current_user,
         is_following=is_following,
         followers_list=followers_list,
@@ -513,14 +495,31 @@ def retweet(tweet_id):
     if not tweet:
         return jsonify({"success": False, "error": "Tweet non trouvé"}), 404
 
-    # Assurer que le champ existe
+    # Assurer que le champ existe avec la nouvelle structure
     tweet.setdefault("retweets", [])
+    
+    # Convertir l'ancienne structure (liste d'IDs) vers la nouvelle structure (liste d'objets)
+    if tweet["retweets"] and isinstance(tweet["retweets"][0], int):
+        # Conversion avec un timestamp par défaut (date actuelle)
+        # [user_id1, user_id2] -> [{"user_id": user_id1, "retweeted_at": "timestamp"}, ...]
+        tweet["retweets"] = [{"user_id": uid, "retweeted_at": datetime.utcnow().isoformat()} for uid in tweet["retweets"]]
 
-    # Toggle retweet
-    if user_id in tweet["retweets"]:
-        tweet["retweets"].remove(user_id)
+    # Chercher si l'utilisateur a déjà retweeté
+    existing_retweet = next((rt for rt in tweet["retweets"] if rt["user_id"] == user_id), None)
+    
+    if existing_retweet:
+        # Supprimer le retweet
+        tweet["retweets"] = [rt for rt in tweet["retweets"] if rt["user_id"] != user_id]
+        is_retweeted = False
     else:
-        tweet["retweets"].append(user_id)
+        # Ajouter un nouveau retweet avec timestamp
+        from datetime import datetime
+        new_retweet = {
+            "user_id": user_id,
+            "retweeted_at": datetime.utcnow().isoformat()
+        }
+        tweet["retweets"].append(new_retweet)
+        is_retweeted = True
         # ✅ Ajouter notification si ce n'est pas son propre tweet
         add_notification(tweet['user_id'], user_id, "retweet", tweet_id)
 
@@ -530,7 +529,7 @@ def retweet(tweet_id):
     # Réponse envoyée au front
     return jsonify({
         "success": True,
-        "is_retweeted": user_id in tweet["retweets"],
+        "is_retweeted": is_retweeted,
         "retweet_count": len(tweet["retweets"])
     })
 #-------------------com de comment----------------------------------
@@ -635,7 +634,35 @@ def notifications():
 
     return render_template("notifications.html", notifications=user_notifs, current_user=current_user)
 
-
+# ------------------- MIGRATE RETWEETS (one-time) -------------------
+@routes.route('/migrate-retweets')
+def migrate_retweets():
+    """Migrate all old retweets (list of IDs) to new format (list of objects with timestamp)"""
+    if 'user_id' not in session:
+        return redirect(url_for('routes.login'))
+    
+    tweets = read_tweets()
+    updated_count = 0
+    
+    for tweet in tweets:
+        retweets = tweet.get('retweets', [])
+        if retweets and isinstance(retweets[0], int):
+            # Convert old format to new format
+            # Use the tweet's created_at as the retweet timestamp (best guess)
+            tweet['retweets'] = [
+                {
+                    "user_id": uid, 
+                    "retweeted_at": tweet.get('created_at', datetime.utcnow().isoformat())
+                } 
+                for uid in retweets
+            ]
+            updated_count += 1
+    
+    if updated_count > 0:
+        write_tweets(tweets)
+        return f"Migrated {updated_count} tweets with old retweet format to new format."
+    else:
+        return "No tweets needed migration."
 
 
 

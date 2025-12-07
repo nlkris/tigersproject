@@ -159,12 +159,24 @@ h1 {
               {{ notif.from_user_username }}
             </a> a retweeté votre tweet.
           </span>
+        {% elif notif.type == 'follow' %}
+          <span>
+            <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
+              {{ notif.from_user_username }}
+            </a> vous suit maintenant.
+          </span>
         {% endif %}
         <span class="notification-time">{{ notif.created_at | replace('T', ' ') | truncate(16) }}</span>
       </div>
-      <a href="{{ url_for('routes.feed') }}#tweet-{{ notif.tweet_id }}" class="view-tweet-btn">
-        Voir
-      </a>
+      {% if notif.type == 'follow' %}
+        <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}" class="view-tweet-btn">
+          Voir profil
+        </a>
+      {% else %}
+        <a href="{{ url_for('routes.feed') }}#tweet-{{ notif.tweet_id }}" class="view-tweet-btn">
+          Voir
+        </a>
+      {% endif %}
     </div>
     {% endfor %}
   </div>

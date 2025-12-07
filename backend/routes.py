@@ -243,7 +243,7 @@ def toggle_follow(username):
             target_user['followers'].append(current_user['id'])
         is_following = True
         # ✅ Ajouter notification de follow
-        add_notification(target_user['id'], current_user_id, "follow", None)
+        add_notification(target_user['id'], current_user_id, "follow", None, None)
 
     write_users(users)
     return jsonify({

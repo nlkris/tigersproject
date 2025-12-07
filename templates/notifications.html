@@ -159,110 +159,164 @@ h1 {
   </div>
 
   <h1>Mes notifications</h1>
-
   {% if notifications %}
-  <div class="notifications-list">
-    {% for notif in notifications %}
-    <div class="notification">
-      <div class="notification-text">
-        {% if notif.type == 'like' %}
-          <span>
-            <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
-              {{ notif.from_user_username }}
-            </a> a aimé votre tweet.
-          </span>
-        {% elif notif.type == 'comment' %}
-          <span>
-            <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
-              {{ notif.from_user_username }}
-            </a> a commenté votre tweet : "{{ notif.content }}"
-          </span>
-        {% elif notif.type == 'retweet' %}
-          <span>
-            <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
-              {{ notif.from_user_username }}
-            </a> a retweeté votre tweet.
-          </span>
-        {% elif notif.type == 'follow' %}
-          <span>
-            <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
-              {{ notif.from_user_username }}
-            </a> vous suit maintenant.
-          </span>
-        {% elif notif.type == 'reply' %}
-          <span>
-            <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
-              {{ notif.from_user_username }}
-            </a> a répondu à votre commentaire.
-          </span>
-          {% if notif.content %}
-            {# Parse the formatted content string #}
-            {% set content_str = notif.content %}
-            {% set original_comment = '' %}
-            {% set reply_content = '' %}
-            
-            {# First part: REPLY_TO:'...' #}
-            {% if 'REPLY_TO:' in content_str %}
-              {% set parts = content_str.split('|') %}
-              {% if parts|length >= 2 %}
-                {# Extract REPLY_TO part #}
-                {% set reply_to_part = parts[0] %}  {# REPLY_TO:'je commente' #}
-                {% set original_comment = reply_to_part[9:] %}  {# Remove 'REPLY_TO:' #}
-                
-                {# Remove surrounding quotes - handle both regular and encoded quotes #}
-                {% if original_comment.startswith("'") and original_comment.endswith("'") %}
-                  {% set original_comment = original_comment[1:-1] %}
-                {% elif original_comment.startswith("\u0027") and original_comment.endswith("\u0027") %}
-                  {% set original_comment = original_comment[6:-6] %}
-                {% endif %}
-                
-                {# Extract REPLY part #}
-                {% set reply_part = parts[1] %}  {# REPLY:'je redébug' #}
-                {% set reply_content = reply_part[6:] %}  {# Remove 'REPLY:' #}
-                
-                {% if reply_content.startswith("'") and reply_content.endswith("'") %}
-                  {% set reply_content = reply_content[1:-1] %}
-                {% elif reply_content.startswith("\u0027") and reply_content.endswith("\u0027") %}
-                  {% set reply_content = reply_content[6:-6] %}
-                {% endif %}
+<div class="notifications-list">
+  {% for notif in notifications %}
+  <div class="notification">
+    <div class="notification-text">
+      {% if notif.type == 'like' %}
+        <span>
+          <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
+            {{ notif.from_user_username }}
+          </a> a aimé votre tweet.
+        </span>
+      {% elif notif.type == 'comment' %}
+        <span>
+          <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
+            {{ notif.from_user_username }}
+          </a> a commenté votre tweet : "{{ notif.content }}"
+        </span>
+      {% elif notif.type == 'retweet' %}
+        <span>
+          <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
+            {{ notif.from_user_username }}
+          </a> a retweeté votre tweet.
+        </span>
+      {% elif notif.type == 'follow' %}
+        <span>
+          <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
+            {{ notif.from_user_username }}
+          </a> vous suit maintenant.
+        </span>
+      {% elif notif.type == 'reply' %}
+        <span>
+          <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
+            {{ notif.from_user_username }}
+          </a> a répondu à votre commentaire.
+        </span>
+        {% if notif.content %}
+          {# Parse the formatted content string #}
+          {% set content_str = notif.content %}
+          {% set original_comment = '' %}
+          {% set reply_content = '' %}
+          
+          {# Find REPLY_TO part #}
+          {% if 'REPLY_TO:' in content_str %}
+            {% set parts = content_str.split('|') %}
+            {% if parts|length >= 2 %}
+              {# Extract REPLY_TO part #}
+              {% set reply_to_part = parts[0] %}
+              {% set original_comment = reply_to_part[9:] %}  {# Remove 'REPLY_TO:' #}
+              
+              {# Remove surrounding quotes #}
+              {% if original_comment.startswith("'") and original_comment.endswith("'") %}
+                {% set original_comment = original_comment[1:-1] %}
+              {% elif original_comment.startswith("\u0027") and original_comment.endswith("\u0027") %}
+                {% set original_comment = original_comment[6:-6] %}
+              {% endif %}
+              
+              {# Extract REPLY part #}
+              {% set reply_part = parts[1] %}
+              {% set reply_content = reply_part[6:] %}  {# Remove 'REPLY:' #}
+              
+              {% if reply_content.startswith("'") and reply_content.endswith("'") %}
+                {% set reply_content = reply_content[1:-1] %}
+              {% elif reply_content.startswith("\u0027") and reply_content.endswith("\u0027") %}
+                {% set reply_content = reply_content[6:-6] %}
               {% endif %}
             {% endif %}
-            
-            {% if original_comment %}
-              <div class="notification-original">
-                <strong>Votre commentaire:</strong> "{{ original_comment|safe }}"
-              </div>
-            {% endif %}
-            
-            {% if reply_content %}
-              <div class="notification-content">
-                <strong>Réponse:</strong> "{{ reply_content|safe }}"
-              </div>
-            {% endif %}
+          {% endif %}
+          
+          {% if original_comment %}
+            <div class="notification-original">
+              <strong>Votre commentaire:</strong> "{{ original_comment|safe }}"
+            </div>
+          {% endif %}
+          
+          {% if reply_content %}
+            <div class="notification-content">
+              <strong>Réponse:</strong> "{{ reply_content|safe }}"
+            </div>
           {% endif %}
         {% endif %}
-      </div>
-      {% if notif.type == 'follow' %}
-        <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}" class="view-tweet-btn">
-          Voir profil
-        </a>
-      {% elif notif.type == 'reply' %}  <!-- ADD THIS SECTION -->
-        <a href="{{ url_for('routes.feed') }}#tweet-{{ notif.tweet_id }}" class="view-tweet-btn">
-          Voir discussion
-        </a>
-      {% else %}
-        <a href="{{ url_for('routes.feed') }}#tweet-{{ notif.tweet_id }}" class="view-tweet-btn">
-          Voir
-        </a>
-      {% endif %}
+      {% elif notif.type == 'reply_on_tweet' %}
+        <span>
+          <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}">
+            {{ notif.from_user_username }}
+          </a> a répondu à un commentaire sur votre tweet.
+        </span>
+        {% if notif.content %}
+          {# Parse the formatted content string #}
+          {% set content_str = notif.content %}
+          {% set original_comment = '' %}
+          {% set reply_content = '' %}
+          
+          {# Find REPLY_ON_TWEET part #}
+          {% if 'REPLY_ON_TWEET:' in content_str %}
+            {% set parts = content_str.split('|') %}
+            {% if parts|length >= 2 %}
+              {# Extract REPLY_ON_TWEET part #}
+              {% set reply_on_tweet_part = parts[0] %}
+              {% set original_comment = reply_on_tweet_part[15:] %}  {# Remove 'REPLY_ON_TWEET:' #}
+              
+              {# Remove surrounding quotes #}
+              {% if original_comment.startswith("'") and original_comment.endswith("'") %}
+                {% set original_comment = original_comment[1:-1] %}
+              {% elif original_comment.startswith("\u0027") and original_comment.endswith("\u0027") %}
+                {% set original_comment = original_comment[6:-6] %}
+              {% endif %}
+              
+              {# Extract REPLY part #}
+              {% set reply_part = parts[1] %}
+              {% set reply_content = reply_part[6:] %}  {# Remove 'REPLY:' #}
+              
+              {% if reply_content.startswith("'") and reply_content.endswith("'") %}
+                {% set reply_content = reply_content[1:-1] %}
+              {% elif reply_content.startswith("\u0027") and reply_content.endswith("\u0027") %}
+                {% set reply_content = reply_content[6:-6] %}
+              {% endif %}
+            {% endif %}
+          {% endif %}
+          
+          {% if original_comment %}
+            <div class="notification-original">
+              <strong>Commentaire original:</strong> "{{ original_comment|safe }}"
+            </div>
+          {% endif %}
+          
+          {% if reply_content %}
+            <div class="notification-content">
+              <strong>Réponse:</strong> "{{ reply_content|safe }}"
+            </div>
+          {% endif %}
+        {% endif %}
+      {% endif %}  <!-- ← THIS WAS MISSING! -->
+      
+      <span class="notification-time">{{ notif.created_at | replace('T', ' ') | truncate(16) }}</span>
     </div>
-    {% endfor %}
+    
+    {% if notif.type == 'follow' %}
+      <a href="{{ url_for('routes.profile', username=notif.from_user_username) }}" class="view-tweet-btn">
+        Voir profil
+      </a>
+    {% elif notif.type == 'reply' or notif.type == 'reply_on_tweet' %}
+      <a href="{{ url_for('routes.feed') }}#tweet-{{ notif.tweet_id }}" class="view-tweet-btn">
+        Voir discussion
+      </a>
+    {% else %}
+      <a href="{{ url_for('routes.feed') }}#tweet-{{ notif.tweet_id }}" class="view-tweet-btn">
+        Voir
+      </a>
+    {% endif %}
   </div>
-  {% else %}
-    <p style="text-align:center; color:var(--muted); margin-top:20px;">
-      Vous n'avez aucune notification pour le moment.
-    </p>
-  {% endif %}
+  {% endfor %}
+</div>
+{% else %}
+  <p style="text-align:center; color:var(--muted); margin-top:20px;">
+    Vous n'avez aucune notification pour le moment.
+  </p>
+{% endif %}
+
 
 </div>
 </body>

@@ -559,10 +559,6 @@ def reply_comment(tweet_id, comment_index):
     if not content:
         return jsonify({"success": False, "message": "Le contenu est vide"}), 400
 
-    print(f"🔧 DEBUG reply_comment:")
-    print(f"   - User {user_id} ({user['username']}) is replying")
-    print(f"   - Reply content: '{content}'")
-    
     # Ensure replies list exists
     if 'replies' not in tweet['comments'][comment_index]:
         tweet['comments'][comment_index]['replies'] = []
@@ -575,19 +571,32 @@ def reply_comment(tweet_id, comment_index):
         'created_at': datetime.now().isoformat()
     })
     
-    # ✅ FIXED: Add notification with both contents
-    original_comment = tweet['comments'][comment_index]
-    original_comment_author_id = original_comment['user_id']
+    # ✅ NOTIFICATION 1: Notify the TWEET AUTHOR
+    tweet_author_id = tweet['user_id']
     
-    print(f"   - Original comment author ID: {original_comment_author_id}")
-    print(f"   - Original comment: {original_comment}")
-
-    # Only notify if replying to someone else's comment
+    # Only notify tweet author if it's not the same person replying
+    if tweet_author_id != user_id:
+        # Get the original comment that's being replied to
+        original_comment = tweet['comments'][comment_index]
+        original_comment_content = original_comment.get('content', '')
+        
+        # Truncate if too long
+        if len(original_comment_content) > 50:
+            original_comment_content = original_comment_content[:47] + "..."
+        
+        # Format: Someone replied to a comment on your tweet
+        notification_content = f"REPLY_ON_TWEET:'{original_comment_content}'|REPLY:'{content}'"
+        
+        add_notification(tweet_author_id, user_id, "reply_on_tweet", tweet_id, notification_content)
+    
+    # ✅ NOTIFICATION 2: Notify the COMMENT AUTHOR (original code)
+    original_comment = tweet['comments'][comment_index]
+    original_comment_author_id = original_comment.get('user_id')
+    
+    # Only notify comment author if replying to someone else's comment
     if original_comment_author_id != user_id:
         # Get the original comment content
         original_comment_content = original_comment.get('content', '')
-        
-        print(f"   - Original comment content: '{original_comment_content}'")
         
         # Truncate if too long
         if len(original_comment_content) > 50:
@@ -596,11 +605,7 @@ def reply_comment(tweet_id, comment_index):
         # Create formatted content
         notification_content = f"REPLY_TO:'{original_comment_content}'|REPLY:'{content}'"
         
-        print(f"   - Notification content to save: '{notification_content}'")
-        
         add_notification(original_comment_author_id, user_id, "reply", tweet_id, notification_content)
-    else:
-        print("   - Skipping notification (replying to own comment)")
     
     write_tweets(tweets)
     return jsonify({"success": True, "message": "Réponse ajoutée"})

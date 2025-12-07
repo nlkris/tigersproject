@@ -259,5 +259,32 @@
         "content": "REPLY_TO:'je redébug on y crois'|REPLY:'notif hyper stylée'",
         "seen": false,
         "created_at": "2025-12-07T18:50:46.248732"
+    },
+    {
+        "to_user_id": 5,
+        "from_user_id": 3,
+        "type": "comment",
+        "tweet_id": 12,
+        "content": "je commente chez claire",
+        "seen": false,
+        "created_at": "2025-12-07T19:22:12.824834"
+    },
+    {
+        "to_user_id": 5,
+        "from_user_id": 7,
+        "type": "reply_on_tweet",
+        "tweet_id": 12,
+        "content": "REPLY_ON_TWEET:'je commente chez claire'|REPLY:'je réponds avec un autre compte chez claire'",
+        "seen": false,
+        "created_at": "2025-12-07T19:22:55.877212"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 7,
+        "type": "reply",
+        "tweet_id": 12,
+        "content": "REPLY_TO:'je commente chez claire'|REPLY:'je réponds avec un autre compte chez claire'",
+        "seen": false,
+        "created_at": "2025-12-07T19:22:55.879303"
     }
 ]

@@ -370,7 +370,8 @@
                 "user_id": 5,
                 "username": "clairoew",
                 "content": "Mon mood apr\u00e8s EDP !!!",
-                "created_at": "2025-12-07T21:11:48.560647"
+                "created_at": "2025-12-07T21:11:48.560647",
+                "likes": []
             }
         ],
         "retweets": []
@@ -603,7 +604,9 @@
             "/uploads/tweet_images/5_1765138263.505458_.jpg"
         ],
         "likes": [],
-        "created_at": "2025-12-07T21:11:03.506183"
+        "created_at": "2025-12-07T21:11:03.506183",
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 26,
@@ -614,7 +617,9 @@
             "/uploads/tweet_images/5_1765138267.943582_IMG_2898.JPG"
         ],
         "likes": [],
-        "created_at": "2025-12-07T21:11:07.944349"
+        "created_at": "2025-12-07T21:11:07.944349",
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 27,
@@ -625,7 +630,9 @@
             "/uploads/tweet_images/5_1765138273.360577_IMG_2897.JPG"
         ],
         "likes": [],
-        "created_at": "2025-12-07T21:11:13.361802"
+        "created_at": "2025-12-07T21:11:13.361802",
+        "comments": [],
+        "retweets": []
     },
     {
         "id": 28,
@@ -637,6 +644,8 @@
             "/uploads/tweet_images/5_1765138280.275874_IMG_2900.JPG"
         ],
         "likes": [],
-        "created_at": "2025-12-07T21:11:20.277014"
+        "created_at": "2025-12-07T21:11:20.277014",
+        "comments": [],
+        "retweets": []
     }
 ]

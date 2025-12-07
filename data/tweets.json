@@ -222,7 +222,12 @@
                 "likes": []
             }
         ],
-        "retweets": []
+        "retweets": [
+            {
+                "user_id": 5,
+                "retweeted_at": "2025-12-07T19:59:10.810550"
+            }
+        ]
     },
     {
         "id": 14,
@@ -314,7 +319,12 @@
         "likes": [],
         "created_at": "2025-11-19T16:28:57.565762",
         "comments": [],
-        "retweets": []
+        "retweets": [
+            {
+                "user_id": 5,
+                "retweeted_at": "2025-12-07T20:11:56.392796"
+            }
+        ]
     },
     {
         "id": 20,
@@ -325,7 +335,8 @@
             "/uploads/tweet_images/3_1763566260.937092_bread.jpeg"
         ],
         "likes": [
-            3
+            3,
+            5
         ],
         "created_at": "2025-11-19T16:31:00.937909",
         "comments": [],
@@ -333,6 +344,10 @@
             {
                 "user_id": 3,
                 "retweeted_at": "2025-12-07T19:48:07.049354"
+            },
+            {
+                "user_id": 5,
+                "retweeted_at": "2025-12-07T20:11:30.977281"
             }
         ]
     },
@@ -350,7 +365,14 @@
             3
         ],
         "created_at": "2025-11-19T19:47:32.332813",
-        "comments": [],
+        "comments": [
+            {
+                "user_id": 5,
+                "username": "clairoew",
+                "content": "Mon mood apr\u00e8s EDP !!!",
+                "created_at": "2025-12-07T21:11:48.560647"
+            }
+        ],
         "retweets": []
     },
     {
@@ -486,7 +508,8 @@
         ],
         "likes": [
             2,
-            3
+            3,
+            5
         ],
         "created_at": "2025-11-20T15:00:43.568828",
         "comments": [
@@ -546,7 +569,74 @@
             {
                 "user_id": 3,
                 "retweeted_at": "2025-12-07T19:32:55.850793"
+            },
+            {
+                "user_id": 5,
+                "retweeted_at": "2025-12-07T19:59:14.246415"
             }
         ]
+    },
+    {
+        "id": 24,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "ouiiiii",
+        "image_urls": [],
+        "likes": [],
+        "created_at": "2025-12-07T20:57:23.101251",
+        "retweets": [
+            {
+                "user_id": 5,
+                "retweeted_at": "2025-12-07T19:58:59.607674"
+            }
+        ],
+        "comments": []
+    },
+    {
+        "id": 25,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "",
+        "image_urls": [
+            "/uploads/tweet_images/5_1765138263.502612__-2.jpg",
+            "/uploads/tweet_images/5_1765138263.50467__.jpg",
+            "/uploads/tweet_images/5_1765138263.505458_.jpg"
+        ],
+        "likes": [],
+        "created_at": "2025-12-07T21:11:03.506183"
+    },
+    {
+        "id": 26,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "",
+        "image_urls": [
+            "/uploads/tweet_images/5_1765138267.943582_IMG_2898.JPG"
+        ],
+        "likes": [],
+        "created_at": "2025-12-07T21:11:07.944349"
+    },
+    {
+        "id": 27,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "",
+        "image_urls": [
+            "/uploads/tweet_images/5_1765138273.360577_IMG_2897.JPG"
+        ],
+        "likes": [],
+        "created_at": "2025-12-07T21:11:13.361802"
+    },
+    {
+        "id": 28,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "",
+        "image_urls": [
+            "/uploads/tweet_images/5_1765138280.275252_IMG_2899.JPG",
+            "/uploads/tweet_images/5_1765138280.275874_IMG_2900.JPG"
+        ],
+        "likes": [],
+        "created_at": "2025-12-07T21:11:20.277014"
     }
 ]

@@ -490,6 +490,93 @@ button:hover { opacity:0.9; }
 a { color:var(--accent); text-decoration:none; }
 a:hover { text-decoration:underline; }
 
+/* Flash Messages */
+#flash-messages-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 350px;
+}
+
+.flash-message {
+  padding: 15px 20px;
+  border-radius: 8px;
+  color: #021024;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  animation: slideInRight 0.3s ease-out, fadeOut 0.3s ease-out 2.7s forwards;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.flash-message.success {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.flash-message.error {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.flash-message.info {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.flash-close {
+  background: none;
+  border: none;
+  color: #021024;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.flash-close:hover {
+  background-color: rgba(2, 16, 36, 0.1);
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+/* Remove old flashes style */
+.flashes {
+  display: none; /* Hide old style */
+}
+
 .flashes {
   list-style:none;
   padding:0;
@@ -544,16 +631,19 @@ a:hover { text-decoration:underline; }
   </a>
 </div>
 
-  <!-- FLASH -->
+<!-- FLASH MESSAGES (Auto-hide after 3 seconds) -->
+<div id="flash-messages-container">
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      <ul class="flashes">
-        {% for category, message in messages %}
-          <li class="{{ category }}">{{ message }}</li>
-        {% endfor %}
-      </ul>
+      {% for category, message in messages %}
+        <div class="flash-message {{ category }}" data-delay="3000">
+          {{ message }}
+          <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+        </div>
+      {% endfor %}
     {% endif %}
   {% endwith %}
+</div>
 
   <!-- LOGO + NOUVELLE BARRE -->
   <div class="header-center">
@@ -1053,6 +1143,29 @@ document.getElementById('newCommentForm').addEventListener('submit', async (e) =
     console.error('Error adding comment:', error);
     alert('Erreur lors de l\'ajout du commentaire');
   }
+});
+
+/* AUTO-HIDE FLASH MESSAGES */
+document.addEventListener('DOMContentLoaded', () => {
+  const flashMessages = document.querySelectorAll('.flash-message');
+  
+  flashMessages.forEach(message => {
+    const delay = message.dataset.delay || 3000; // Default 3 seconds
+    
+    // Auto-remove after delay
+    setTimeout(() => {
+      message.style.animation = 'fadeOut 0.3s ease-out forwards';
+      setTimeout(() => message.remove(), 300); // Wait for animation
+    }, delay);
+    
+    // Remove on click (optional)
+    message.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('flash-close')) {
+        message.style.animation = 'fadeOut 0.3s ease-out forwards';
+        setTimeout(() => message.remove(), 300);
+      }
+    });
+  });
 });
 </script>
 

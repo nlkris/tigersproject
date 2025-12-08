@@ -316,6 +316,36 @@ body {
   border-radius: 12px;
   box-shadow: 0 0 20px rgba(0,0,0,0.4);
 }
+/* Logout button */
+.logout-shortcut {
+  float: left;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--accent);
+  font-weight: 600;
+  transition: 0.2s;
+}
+.logout-shortcut .logout-icon {
+  width: 70px;
+  height: 70px;
+  cursor: pointer;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+.logout-shortcut:hover .logout-icon {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 12px var(--accent));
+}
+
+/* Update header-top to space buttons properly */
+.header-top {
+  display: flex;
+  justify-content: space-between; /* Changed from flex-end */
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
 
 form { display:flex; flex-direction:column; gap:16px; margin-bottom:32px; }
 textarea {
@@ -385,29 +415,38 @@ a:hover { text-decoration:underline; }
 <body>
 <div class="container">
 
-  <!-- HEADER TOP : Notifications + Profil -->
-  <div class="header-top">
-    <!-- Bouton Notifications -->
-    <a href="{{ url_for('routes.notifications') }}" class="notif-shortcut" title="Voir mes notifications">
-      <svg viewBox="0 0 24 24" fill="none" class="notif-icon">
-        <path d="M12 2c-3 0-5 2.2-5 5v2.2c0 .6-.3 1.2-.8 1.6L4 13v1h16v-1l-2.2-2.2c-.5-.4-.8-1-.8-1.6V7c0-2.8-2-5-5-5z"
-              stroke="#5eead4" stroke-width="1.6" stroke-linecap="round"
-              stroke-linejoin="round"/>
-        <path d="M10 18a2 2 0 004 0" stroke="#5eead4" stroke-width="1.6"
-              stroke-linecap="round"/>
-      </svg>
-    </a>
+<!-- HEADER TOP : Logout + Notifications + Profil -->
+<div class="header-top">
+  <!-- Bouton Déconnexion (NEW) - Top Left -->
+  <a href="{{ url_for('routes.logout') }}" class="logout-shortcut" title="Déconnexion">
+    <svg viewBox="0 0 24 24" fill="none" class="logout-icon">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="#5eead4" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M16 17l5-5-5-5" stroke="#5eead4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M21 12H9" stroke="#5eead4" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </a>
 
-    <!-- Profil -->
-    <a href="{{ url_for('routes.profile', username=current_user.username) }}" class="profile-shortcut">
-      <svg viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 10px #5eead4);">
-        <circle cx="12" cy="12" r="10" stroke="#5eead4" stroke-width="0.8" style="filter: blur(3px); opacity:0.55;"></circle>
-        <circle cx="12" cy="12" r="9" stroke="#5eead4" stroke-width="1.5"/>
-        <circle cx="12" cy="8" r="3.2" stroke="#5eead4" stroke-width="1.6"/>
-        <path d="M5.5 19.5c1.4-3.5 4.3-5.5 6.5-5.5s5.1 2 6.5 5.5" stroke="#5eead4" stroke-width="1.6" stroke-linecap="round"/>
-      </svg>
-    </a>
-  </div>
+  <!-- Bouton Notifications -->
+  <a href="{{ url_for('routes.notifications') }}" class="notif-shortcut" title="Voir mes notifications">
+    <svg viewBox="0 0 24 24" fill="none" class="notif-icon">
+      <path d="M12 2c-3 0-5 2.2-5 5v2.2c0 .6-.3 1.2-.8 1.6L4 13v1h16v-1l-2.2-2.2c-.5-.4-.8-1-.8-1.6V7c0-2.8-2-5-5-5z"
+            stroke="#5eead4" stroke-width="1.6" stroke-linecap="round"
+            stroke-linejoin="round"/>
+      <path d="M10 18a2 2 0 004 0" stroke="#5eead4" stroke-width="1.6"
+            stroke-linecap="round"/>
+    </svg>
+  </a>
+
+  <!-- Profil -->
+  <a href="{{ url_for('routes.profile', username=current_user.username) }}" class="profile-shortcut">
+    <svg viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 10px #5eead4);">
+      <circle cx="12" cy="12" r="10" stroke="#5eead4" stroke-width="0.8" style="filter: blur(3px); opacity:0.55;"></circle>
+      <circle cx="12" cy="12" r="9" stroke="#5eead4" stroke-width="1.5"/>
+      <circle cx="12" cy="8" r="3.2" stroke="#5eead4" stroke-width="1.6"/>
+      <path d="M5.5 19.5c1.4-3.5 4.3-5.5 6.5-5.5s5.1 2 6.5 5.5" stroke="#5eead4" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </a>
+</div>
 
   <!-- FLASH -->
   {% with messages = get_flashed_messages(with_categories=true) %}
@@ -837,11 +876,6 @@ document.getElementById('newCommentForm').addEventListener('submit', async (e) =
   }
 });
 </script>
-
-<!-- Bouton de déconnexion -->
-<p style="text-align:center; margin-top:24px;">
-  <a href="{{ url_for('routes.logout') }}">Déconnexion</a>
-</p>
 
 
 

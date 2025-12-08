@@ -3,10 +3,10 @@
         "id": 1,
         "user_id": 3,
         "username": "nlkris",
-        "content": "test Z",
+        "content": "favoritisme",
         "image_urls": [],
         "likes": [],
-        "created_at": "2025-12-07T21:34:25.419280Z",
+        "created_at": "2025-12-07T21:42:29.486413Z",
         "comments": [],
         "retweets": []
     },
@@ -19,18 +19,13 @@
         "likes": [],
         "created_at": "2025-12-07T21:19:07.445516Z",
         "comments": [],
-        "retweets": [
-            {
-                "user_id": 3,
-                "retweeted_at": "2025-12-07T21:42:22.897686"
-            }
-        ]
+        "retweets": []
     },
     {
         "id": 3,
         "user_id": 3,
         "username": "nlkris",
-        "content": "sortez moi de l\u00e0",
+        "content": "sortez moi de là",
         "image_urls": [
             "/uploads/tweet_images/3_1765142065.128156___4.jpeg"
         ],
@@ -146,7 +141,7 @@
             {
                 "user_id": 2,
                 "username": "jeeaaannnne",
-                "content": "\u00e7a fct",
+                "content": "ça fct",
                 "created_at": "2025-12-06T13:21:17.889338Z",
                 "likes": [],
                 "replies": [
@@ -168,7 +163,7 @@
             {
                 "user_id": 2,
                 "username": "jeeaaannnne",
-                "content": "\u00e7a fct",
+                "content": "ça fct",
                 "created_at": "2025-12-07T17:20:49.795088Z",
                 "likes": []
             }
@@ -219,14 +214,14 @@
             {
                 "user_id": 7,
                 "username": "kris2.0",
-                "content": "Je commente qqch de tr\u00e8s important",
+                "content": "Je commente qqch de très important",
                 "created_at": "2025-12-07T18:13:37.263414Z",
                 "likes": []
             },
             {
                 "user_id": 7,
                 "username": "kris2.0",
-                "content": "un autre commentaire super int\u00e9ressant",
+                "content": "un autre commentaire super intéressant",
                 "created_at": "2025-12-07T18:16:57.854426Z",
                 "likes": []
             },
@@ -247,25 +242,25 @@
                     {
                         "user_id": 3,
                         "username": "nlkris",
-                        "content": "je r\u00e9ponds",
+                        "content": "je réponds",
                         "created_at": "2025-12-07T18:29:09.051876Z"
                     },
                     {
                         "user_id": 3,
                         "username": "nlkris",
-                        "content": "je r\u00e9ponds mais la notif est plus styl\u00e9e",
+                        "content": "je réponds mais la notif est plus stylée",
                         "created_at": "2025-12-07T18:40:53.702644Z"
                     },
                     {
                         "user_id": 3,
                         "username": "nlkris",
-                        "content": "\u00e7a \u00e0 pas fonctionn\u00e9 je debug",
+                        "content": "ça à pas fonctionné je debug",
                         "created_at": "2025-12-07T18:43:14.558581Z"
                     },
                     {
                         "user_id": 3,
                         "username": "nlkris",
-                        "content": "je red\u00e9bug",
+                        "content": "je redébug",
                         "created_at": "2025-12-07T18:47:38.801992Z"
                     }
                 ]
@@ -273,14 +268,14 @@
             {
                 "user_id": 3,
                 "username": "nlkris",
-                "content": "je red\u00e9bug on y crois",
+                "content": "je redébug on y crois",
                 "created_at": "2025-12-07T18:47:30.002258Z",
                 "likes": [],
                 "replies": [
                     {
                         "user_id": 7,
                         "username": "kris2.0",
-                        "content": "notif hyper styl\u00e9e",
+                        "content": "notif hyper stylée",
                         "created_at": "2025-12-07T18:50:46.248235Z"
                     }
                 ]
@@ -315,7 +310,7 @@
         "id": 11,
         "user_id": 3,
         "username": "nlkris",
-        "content": "des chats avec diff\u00e9rentes dimensions d'images",
+        "content": "des chats avec différentes dimensions d'images",
         "image_urls": [
             "/uploads/tweet_images/3_1763578052.329676_chat_grand.jpeg",
             "/uploads/tweet_images/3_1763578052.332405_chat1.jpeg",
@@ -329,7 +324,7 @@
             {
                 "user_id": 5,
                 "username": "clairoew",
-                "content": "Mon mood apr\u00e8s EDP !!!",
+                "content": "Mon mood après EDP !!!",
                 "created_at": "2025-12-07T21:11:48.560647Z",
                 "likes": []
             }
@@ -430,7 +425,7 @@
         "id": 17,
         "user_id": 3,
         "username": "nlkris",
-        "content": "test message de tweet publi\u00e9",
+        "content": "test message de tweet publié",
         "likes": [],
         "reactions": {},
         "created_at": "2025-10-25T17:29:41.969099Z",
@@ -447,7 +442,7 @@
         "id": 18,
         "user_id": 3,
         "username": "nlkris",
-        "content": "\u00e7a marche !",
+        "content": "ça marche !",
         "likes": [
             3
         ],
@@ -466,7 +461,7 @@
         "id": 19,
         "user_id": 2,
         "username": "jeeaaannnne",
-        "content": "\u00e7a fct ?",
+        "content": "ça fct ?",
         "likes": [
             2,
             3
@@ -510,7 +505,7 @@
                     {
                         "user_id": 7,
                         "username": "kris2.0",
-                        "content": "je r\u00e9ponds avec un autre compte chez claire",
+                        "content": "je réponds avec un autre compte chez claire",
                         "created_at": "2025-12-07T19:22:55.876564Z"
                     }
                 ],
@@ -575,7 +570,7 @@
         "content": "coucou",
         "likes": [],
         "reactions": {
-            "\ud83d\udd25": [
+            "🔥": [
                 5
             ]
         },
@@ -592,10 +587,10 @@
         "likes": [],
         "created_at": "2025-10-14T14:44:27.676306Z",
         "reactions": {
-            "\u2764\ufe0f": [],
-            "\ud83d\udd25": [],
-            "\ud83d\ude2e": [],
-            "\ud83d\ude02": []
+            "❤️": [],
+            "🔥": [],
+            "😮": [],
+            "😂": []
         },
         "comments": [],
         "retweets": [],
@@ -623,7 +618,7 @@
             5
         ],
         "reactions": {
-            "\ud83d\ude2e": [
+            "😮": [
                 5
             ]
         },
@@ -639,7 +634,7 @@
         "content": "fe,znfjkez",
         "likes": [],
         "reactions": {
-            "\ud83d\udd25": [
+            "🔥": [
                 5
             ]
         },
@@ -711,77 +706,5 @@
         ],
         "created_at": "1970-01-01T00:00:00Z",
         "image_urls": []
-    },
-    {
-        "id": 32,
-        "user_id": 3,
-        "username": "nlkris",
-        "content": "a",
-        "image_urls": [],
-        "likes": [],
-        "created_at": "2025-12-07T21:38:12.951992Z",
-        "comments": [],
-        "retweets": []
-    },
-    {
-        "id": 33,
-        "user_id": 3,
-        "username": "nlkris",
-        "content": "non au favoritisme",
-        "image_urls": [],
-        "likes": [],
-        "created_at": "2025-12-07T21:40:30.570956Z",
-        "comments": [],
-        "retweets": []
-    },
-    {
-        "id": 34,
-        "user_id": 3,
-        "username": "nlkris",
-        "content": "\u00e7a fonctionne je pourrais pleurer",
-        "image_urls": [
-            "/uploads/tweet_images/3_1765143719.096234_FREE.jpeg"
-        ],
-        "likes": [],
-        "created_at": "2025-12-07T21:41:59.096384Z",
-        "comments": [],
-        "retweets": []
-    },
-    {
-        "id": 35,
-        "user_id": 7,
-        "username": "kris2.0",
-        "content": "yaho :)",
-        "image_urls": [],
-        "likes": [
-            3
-        ],
-        "created_at": "2025-12-07T21:44:54.176481Z",
-        "comments": [
-            {
-                "user_id": 3,
-                "username": "nlkris",
-                "content": "yahotons",
-                "created_at": "2025-12-07T21:46:00.226938",
-                "likes": []
-            }
-        ],
-        "retweets": [
-            {
-                "user_id": 3,
-                "retweeted_at": "2025-12-07T21:45:50.643335"
-            }
-        ]
-    },
-    {
-        "id": 36,
-        "user_id": 7,
-        "username": "kris2.0",
-        "content": "c'est dans l'ordre ?",
-        "image_urls": [],
-        "likes": [],
-        "created_at": "2025-12-07T22:28:44.148925Z",
-        "comments": [],
-        "retweets": []
     }
 ]

@@ -1,0 +1,675 @@
+[
+    {
+        "id": 1,
+        "user_id": 2,
+        "username": "jeeaaannnne",
+        "content": "hjkhhjk\r\nkjhjkh",
+        "likes": [
+            5
+        ],
+        "comments": [],
+        "retweets": []
+    },
+    {
+        "id": 2,
+        "user_id": 2,
+        "username": "jeeaaannnne",
+        "content": "orieziorozei",
+        "likes": [
+            5
+        ],
+        "reactions": {
+            "\ud83d\ude2e": [
+                5
+            ]
+        },
+        "comments": [],
+        "retweets": []
+    },
+    {
+        "id": 3,
+        "user_id": 2,
+        "username": "jeeaaannnne",
+        "content": "fe,znfjkez",
+        "likes": [],
+        "reactions": {
+            "\ud83d\udd25": [
+                5
+            ]
+        },
+        "comments": [],
+        "retweets": []
+    },
+    {
+        "id": 4,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "coucou",
+        "likes": [],
+        "comments": [],
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:33:35.004737"
+            }
+        ]
+    },
+    {
+        "id": 5,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "coucou",
+        "likes": [
+            3,
+            5
+        ],
+        "comments": [],
+        "retweets": []
+    },
+    {
+        "id": 6,
+        "user_id": 3,
+        "username": "nlkris",
+        "content": "test 1",
+        "likes": [
+            3
+        ],
+        "comments": [],
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:42:13.293068"
+            }
+        ]
+    },
+    {
+        "id": 7,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "coucou cela fonctionne !",
+        "likes": [],
+        "comments": [],
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:47:40.589401"
+            }
+        ]
+    },
+    {
+        "id": 8,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "test",
+        "likes": [],
+        "created_at": "2025-10-14T14:44:27.676306",
+        "reactions": {
+            "\u2764\ufe0f": [],
+            "\ud83d\udd25": [],
+            "\ud83d\ude2e": [],
+            "\ud83d\ude02": []
+        },
+        "comments": [],
+        "retweets": []
+    },
+    {
+        "id": 9,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "coucou",
+        "likes": [],
+        "reactions": {
+            "\ud83d\udd25": [
+                5
+            ]
+        },
+        "created_at": "2025-10-14T14:49:20.209048",
+        "comments": [],
+        "retweets": []
+    },
+    {
+        "id": 10,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "tweet",
+        "likes": [],
+        "created_at": "2025-10-14T14:57:57.782891",
+        "comments": [
+            {
+                "user_id": 2,
+                "username": "jeeaaannnne",
+                "content": "louche",
+                "created_at": "2025-12-06T13:38:52.170106",
+                "likes": []
+            }
+        ],
+        "retweets": [
+            {
+                "user_id": 2,
+                "retweeted_at": "2025-10-14T14:57:57.782891"
+            }
+        ]
+    },
+    {
+        "id": 11,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "test mess",
+        "likes": [
+            5
+        ],
+        "reactions": {},
+        "created_at": "2025-10-14T15:01:44.166193",
+        "comments": [],
+        "retweets": [
+            {
+                "user_id": 2,
+                "retweeted_at": "2025-10-14T15:01:44.166193"
+            }
+        ]
+    },
+    {
+        "id": 12,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "ok ok",
+        "likes": [
+            2
+        ],
+        "reactions": {},
+        "created_at": "2025-10-14T15:02:28.813005",
+        "comments": [
+            {
+                "user_id": 3,
+                "username": "nlkris",
+                "content": "je commente chez claire",
+                "created_at": "2025-12-07T19:22:12.824175",
+                "replies": [
+                    {
+                        "user_id": 7,
+                        "username": "kris2.0",
+                        "content": "je r\u00e9ponds avec un autre compte chez claire",
+                        "created_at": "2025-12-07T19:22:55.876564"
+                    }
+                ],
+                "likes": []
+            }
+        ],
+        "retweets": [
+            {
+                "user_id": 2,
+                "retweeted_at": "2025-10-14T15:02:28.813005"
+            }
+        ]
+    },
+    {
+        "id": 13,
+        "user_id": 2,
+        "username": "jeeaaannnne",
+        "content": "\u00e7a fct ?",
+        "likes": [
+            2,
+            3
+        ],
+        "reactions": {},
+        "created_at": "2025-10-23T10:03:35.104324",
+        "comments": [
+            {
+                "user_id": 2,
+                "username": "jeeaaannnne",
+                "content": "oui",
+                "created_at": "2025-11-20T15:22:41.139363",
+                "likes": []
+            }
+        ],
+        "retweets": [
+            {
+                "user_id": 5,
+                "retweeted_at": "2025-12-07T19:59:10.810550"
+            }
+        ]
+    },
+    {
+        "id": 14,
+        "user_id": 3,
+        "username": "nlkris",
+        "content": "\u00e7a marche !",
+        "likes": [
+            3
+        ],
+        "reactions": {},
+        "created_at": "2025-10-25T16:32:39.453113",
+        "comments": [],
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-10-25T16:32:39.453113"
+            }
+        ]
+    },
+    {
+        "id": 15,
+        "user_id": 3,
+        "username": "nlkris",
+        "content": "test message de tweet publi\u00e9",
+        "likes": [],
+        "reactions": {},
+        "created_at": "2025-10-25T17:29:41.969099",
+        "comments": [],
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:27:02.200922"
+            }
+        ]
+    },
+    {
+        "id": 16,
+        "user_id": 3,
+        "username": "nlkris",
+        "content": "beurre sur le front",
+        "likes": [],
+        "created_at": "2025-11-19T16:07:03.441946",
+        "comments": [],
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:26:36.247928"
+            }
+        ]
+    },
+    {
+        "id": 17,
+        "user_id": 3,
+        "username": "nlkris",
+        "content": "beurre sur le front 2.0 stp met l'image",
+        "image_url": "/uploads/tweet_images/3_1763564926.875752___1.jpeg",
+        "likes": [],
+        "created_at": "2025-11-19T16:08:46.877943",
+        "comments": [],
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:33:03.879820"
+            }
+        ]
+    },
+    {
+        "id": 18,
+        "user_id": 3,
+        "username": "nlkris",
+        "content": "monkey menu",
+        "image_urls": [
+            "/uploads/tweet_images/3_1763565334.902444__FAIRIES_icons.jpeg",
+            "/uploads/tweet_images/3_1763565334.905828_slay_monkey.jpeg"
+        ],
+        "likes": [],
+        "created_at": "2025-11-19T16:15:34.906246",
+        "comments": [],
+        "retweets": []
+    },
+    {
+        "id": 19,
+        "user_id": 3,
+        "username": "nlkris",
+        "content": "beurre sur le front 3.0 tada",
+        "image_urls": [
+            "/uploads/tweet_images/3_1763566137.564582___1.jpeg"
+        ],
+        "likes": [],
+        "created_at": "2025-11-19T16:28:57.565762",
+        "comments": [],
+        "retweets": [
+            {
+                "user_id": 5,
+                "retweeted_at": "2025-12-07T20:11:56.392796"
+            }
+        ]
+    },
+    {
+        "id": 20,
+        "user_id": 3,
+        "username": "nlkris",
+        "content": "",
+        "image_urls": [
+            "/uploads/tweet_images/3_1763566260.937092_bread.jpeg"
+        ],
+        "likes": [
+            3,
+            5
+        ],
+        "created_at": "2025-11-19T16:31:00.937909",
+        "comments": [],
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:48:07.049354"
+            },
+            {
+                "user_id": 5,
+                "retweeted_at": "2025-12-07T20:11:30.977281"
+            }
+        ]
+    },
+    {
+        "id": 21,
+        "user_id": 3,
+        "username": "nlkris",
+        "content": "des chats avec diff\u00e9rentes dimensions d'images",
+        "image_urls": [
+            "/uploads/tweet_images/3_1763578052.329676_chat_grand.jpeg",
+            "/uploads/tweet_images/3_1763578052.332405_chat1.jpeg",
+            "/uploads/tweet_images/3_1763578052.332623_toro.jpeg"
+        ],
+        "likes": [
+            3
+        ],
+        "created_at": "2025-11-19T19:47:32.332813",
+        "comments": [
+            {
+                "user_id": 5,
+                "username": "clairoew",
+                "content": "Mon mood apr\u00e8s EDP !!!",
+                "created_at": "2025-12-07T21:11:48.560647",
+                "likes": []
+            }
+        ],
+        "retweets": []
+    },
+    {
+        "id": 22,
+        "user_id": 3,
+        "username": "nlkris",
+        "content": "beaucoup d'images...",
+        "image_urls": [
+            "/uploads/tweet_images/3_1763578909.554006__.jpeg",
+            "/uploads/tweet_images/3_1763578909.558398___2.jpeg",
+            "/uploads/tweet_images/3_1763578909.558859___3.jpeg",
+            "/uploads/tweet_images/3_1763578909.559441_-Toro-___Happy_birthday_.jpeg",
+            "/uploads/tweet_images/3_1763578909.559871_Catty.jpeg",
+            "/uploads/tweet_images/3_1763578909.560395_toro_1.jpeg",
+            "/uploads/tweet_images/3_1763578909.560783_toro.jpeg",
+            "/uploads/tweet_images/3_1763578909.561547__.jpeg"
+        ],
+        "likes": [
+            2,
+            3
+        ],
+        "created_at": "2025-11-19T20:01:49.562197",
+        "comments": [
+            {
+                "user_id": 2,
+                "username": "jeeaaannnne",
+                "content": "mais nooooon",
+                "created_at": "2025-12-06T14:05:15.613221",
+                "likes": []
+            },
+            {
+                "user_id": 7,
+                "username": "kris2.0",
+                "content": "Je commente qqch de tr\u00e8s important",
+                "created_at": "2025-12-07T18:13:37.263414",
+                "likes": []
+            },
+            {
+                "user_id": 7,
+                "username": "kris2.0",
+                "content": "un autre commentaire super int\u00e9ressant",
+                "created_at": "2025-12-07T18:16:57.854426",
+                "likes": []
+            },
+            {
+                "user_id": 7,
+                "username": "kris2.0",
+                "content": "le commentaire test",
+                "created_at": "2025-12-07T18:19:39.427605",
+                "likes": []
+            },
+            {
+                "user_id": 7,
+                "username": "kris2.0",
+                "content": "je commente",
+                "created_at": "2025-12-07T18:20:56.252496",
+                "likes": [],
+                "replies": [
+                    {
+                        "user_id": 3,
+                        "username": "nlkris",
+                        "content": "je r\u00e9ponds",
+                        "created_at": "2025-12-07T18:29:09.051876"
+                    },
+                    {
+                        "user_id": 3,
+                        "username": "nlkris",
+                        "content": "je r\u00e9ponds mais la notif est plus styl\u00e9e",
+                        "created_at": "2025-12-07T18:40:53.702644"
+                    },
+                    {
+                        "user_id": 3,
+                        "username": "nlkris",
+                        "content": "\u00e7a \u00e0 pas fonctionn\u00e9 je debug",
+                        "created_at": "2025-12-07T18:43:14.558581"
+                    },
+                    {
+                        "user_id": 3,
+                        "username": "nlkris",
+                        "content": "je red\u00e9bug",
+                        "created_at": "2025-12-07T18:47:38.801992"
+                    }
+                ]
+            },
+            {
+                "user_id": 3,
+                "username": "nlkris",
+                "content": "je red\u00e9bug on y crois",
+                "created_at": "2025-12-07T18:47:30.002258",
+                "likes": [],
+                "replies": [
+                    {
+                        "user_id": 7,
+                        "username": "kris2.0",
+                        "content": "notif hyper styl\u00e9e",
+                        "created_at": "2025-12-07T18:50:46.248235"
+                    }
+                ]
+            },
+            {
+                "user_id": 3,
+                "username": "nlkris",
+                "content": "AAAAAAAAAAAA",
+                "created_at": "2025-12-07T20:15:06.275406",
+                "likes": []
+            },
+            {
+                "user_id": 3,
+                "username": "nlkris",
+                "content": "depuis le profil ?",
+                "created_at": "2025-12-07T20:19:17.974770",
+                "likes": []
+            }
+        ],
+        "retweets": [
+            {
+                "user_id": 2,
+                "retweeted_at": "2025-11-19T20:01:49.562197"
+            },
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-11-19T20:01:49.562197"
+            }
+        ]
+    },
+    {
+        "id": 23,
+        "user_id": 2,
+        "username": "jeeaaannnne",
+        "content": "les meules bleues",
+        "image_urls": [
+            "/uploads/tweet_images/2_1763647243.566817_mbf2025_post-prog-carre-completev23.png"
+        ],
+        "likes": [
+            2,
+            3,
+            5
+        ],
+        "created_at": "2025-11-20T15:00:43.568828",
+        "comments": [
+            {
+                "user_id": 2,
+                "username": "jeeaaannnne",
+                "content": "stylax",
+                "created_at": "2025-11-20T15:19:09.625715",
+                "likes": [
+                    2
+                ]
+            },
+            {
+                "user_id": 2,
+                "username": "jeeaaannnne",
+                "content": "stylax",
+                "created_at": "2025-11-20T15:21:47.024497",
+                "likes": [
+                    2
+                ]
+            },
+            {
+                "user_id": 2,
+                "username": "jeeaaannnne",
+                "content": "\u00e7a fct",
+                "created_at": "2025-12-06T13:21:17.889338",
+                "likes": [],
+                "replies": [
+                    {
+                        "user_id": 2,
+                        "username": "jeeaaannnne",
+                        "content": "incroyable",
+                        "created_at": "2025-12-06T13:56:41.286491"
+                    }
+                ]
+            },
+            {
+                "user_id": 2,
+                "username": "jeeaaannnne",
+                "content": "je commente",
+                "created_at": "2025-12-06T16:00:30.128081",
+                "likes": []
+            },
+            {
+                "user_id": 2,
+                "username": "jeeaaannnne",
+                "content": "\u00e7a fct",
+                "created_at": "2025-12-07T17:20:49.795088",
+                "likes": []
+            }
+        ],
+        "retweets": [
+            {
+                "user_id": 2,
+                "retweeted_at": null
+            },
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-07T19:32:55.850793"
+            },
+            {
+                "user_id": 5,
+                "retweeted_at": "2025-12-07T19:59:14.246415"
+            }
+        ]
+    },
+    {
+        "id": 24,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "ouiiiii",
+        "image_urls": [],
+        "likes": [],
+        "created_at": "2025-12-07T20:57:23.101251",
+        "retweets": [
+            {
+                "user_id": 5,
+                "retweeted_at": "2025-12-07T19:58:59.607674"
+            }
+        ],
+        "comments": []
+    },
+    {
+        "id": 25,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "",
+        "image_urls": [
+            "/uploads/tweet_images/5_1765138263.502612__-2.jpg",
+            "/uploads/tweet_images/5_1765138263.50467__.jpg",
+            "/uploads/tweet_images/5_1765138263.505458_.jpg"
+        ],
+        "likes": [],
+        "created_at": "2025-12-07T21:11:03.506183",
+        "comments": [],
+        "retweets": []
+    },
+    {
+        "id": 26,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "",
+        "image_urls": [
+            "/uploads/tweet_images/5_1765138267.943582_IMG_2898.JPG"
+        ],
+        "likes": [],
+        "created_at": "2025-12-07T21:11:07.944349",
+        "comments": [],
+        "retweets": []
+    },
+    {
+        "id": 27,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "",
+        "image_urls": [
+            "/uploads/tweet_images/5_1765138273.360577_IMG_2897.JPG"
+        ],
+        "likes": [],
+        "created_at": "2025-12-07T21:11:13.361802",
+        "comments": [],
+        "retweets": []
+    },
+    {
+        "id": 28,
+        "user_id": 5,
+        "username": "clairoew",
+        "content": "",
+        "image_urls": [
+            "/uploads/tweet_images/5_1765138280.275252_IMG_2899.JPG",
+            "/uploads/tweet_images/5_1765138280.275874_IMG_2900.JPG"
+        ],
+        "likes": [],
+        "created_at": "2025-12-07T21:11:20.277014",
+        "comments": [],
+        "retweets": []
+    },
+    {
+        "id": 29,
+        "user_id": 3,
+        "username": "nlkris",
+        "content": "favoritisme",
+        "image_urls": [],
+        "likes": [],
+        "created_at": "2025-12-07T21:42:29.486413",
+        "comments": [],
+        "retweets": []
+    },
+    {
+        "id": 30,
+        "user_id": 3,
+        "username": "nlkris",
+        "content": "sortez moi de l\u00e0",
+        "image_urls": [
+            "/uploads/tweet_images/3_1765142065.128156___4.jpeg"
+        ],
+        "likes": [],
+        "created_at": "2025-12-07T21:14:25.129702Z",
+        "comments": [],
+        "retweets": []
+    }
+]

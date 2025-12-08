@@ -146,9 +146,11 @@ def feed():
                 'user_id': current_user_id,
                 'username': session['username'],
                 'content': content,
-                'image_urls': image_urls,   # <--- HERE: A LIST
+                'image_urls': image_urls,
                 'likes': [],
-                'created_at': datetime.now().isoformat()
+                'created_at': datetime.utcnow().isoformat() + 'Z',  # ← FIXED
+                'comments': [],  # ← ADD THIS
+                'retweets': []   # ← ADD THIS
             }
             tweets.append(new_tweet)
             write_tweets(tweets)
@@ -159,17 +161,23 @@ def feed():
         flash("Votre tweet doit contenir un texte ou une image.", "error")
         return redirect(url_for('routes.feed'))
 
+    # First, ensure all tweets have created_at
+    for tweet in tweets:
+        if 'created_at' not in tweet:
+            tweet['created_at'] = '1970-01-01T00:00:00Z'  # Very old date
+    
+     # Now sort ALL tweets by date
+    tweets.sort(key=lambda t: t.get('created_at', '1970-01-01T00:00:00Z'), reverse=True)
 
-    # Tri et ajout du champ liked
-    tweets.sort(key=lambda t: t.get('created_at', ''), reverse=True)
+    # Add liked field
     for post in tweets:
         post.setdefault('likes', [])
         post['liked'] = current_user_id in post['likes']
-
+   
+    # Filter tweets
     followed_ids = current_user.get('following', [])
     followed_tweets = [t for t in tweets if t['user_id'] in followed_ids or t['user_id'] == current_user_id]
     recommended_tweets = [t for t in tweets if t['user_id'] not in followed_ids and t['user_id'] != current_user_id]
-
     view = request.args.get('view', 'followed')
 
     return render_template(
@@ -314,6 +322,16 @@ def profile(username):
             return tweet['retweeted_at']
         return tweet.get('created_at', '')
 
+    def get_sort_time(tweet):
+        if tweet.get('is_retweet') and tweet.get('retweeted_at'):
+            ts = tweet['retweeted_at']
+        else:
+            ts = tweet.get('created_at', '')
+        
+        if not ts:
+            return '1970-01-01T00:00:00Z'
+        return ts
+    
     all_tweets.sort(key=get_sort_time, reverse=True)
 
     # Ajout des infos manquantes

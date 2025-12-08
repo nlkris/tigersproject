@@ -224,6 +224,34 @@ h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
   margin-left: 42px; /* Align with profile picture */
 }
 
+.comment-username {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer; /* Make it look clickable */
+  transition: all 0.2s ease;
+  display: inline-block; /* Better click area */
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.comment-username:hover {
+  text-decoration: underline;
+  background: rgba(94, 234, 212, 0.1);
+}
+
+/* For reply usernames */
+.comment-reply .comment-username {
+  font-size: 13px;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.comment-reply .comment-username:hover {
+  text-decoration: underline;
+  background: rgba(94, 234, 212, 0.05);
+}
+
 .reply-btn {
   background: none;
   border: none;
@@ -929,11 +957,15 @@ async function loadComments(tweetId) {
         let commentHtml = `
           <div class="comment-header">
             <img src="${comment.profile_pic_url || '/static/default-avatar.png'}" 
-                 class="comment-profile-pic" 
-                 alt="${comment.username}"
-                 onclick="window.location.href='/profile/${comment.username}'"
-                 style="cursor:pointer;">
-            <strong class="comment-username">${comment.username}</strong>
+                class="comment-profile-pic" 
+                alt="${comment.username}"
+                onclick="window.location.href='/profile/${comment.username}'"
+                style="cursor:pointer;">
+            <strong class="comment-username" 
+                    onclick="window.location.href='/profile/${comment.username}'"
+                    style="cursor:pointer;">
+              ${comment.username}
+            </strong>
           </div>
           <div class="comment-content">${comment.content}</div>
           <button class="reply-btn" data-index="${idx}">Répondre</button>
@@ -943,20 +975,24 @@ async function loadComments(tweetId) {
         if (comment.replies && comment.replies.length > 0) {
           commentHtml += '<div class="comment-replies" style="margin-top: 8px;">';
           comment.replies.forEach(reply => {
-            commentHtml += `
-              <div class="comment-reply">
-                <div class="comment-header">
-                  <img src="${reply.profile_pic_url || '/static/default-avatar.png'}" 
-                       class="comment-profile-pic" 
-                       alt="${reply.username}"
-                       onclick="window.location.href='/profile/${reply.username}'"
-                       style="width: 24px; height: 24px; cursor:pointer;">
-                  <strong class="comment-username">${reply.username}</strong>
-                </div>
-                <div class="comment-content">${reply.content}</div>
+          commentHtml += `
+            <div class="comment-reply">
+              <div class="comment-header">
+                <img src="${reply.profile_pic_url || '/static/default-avatar.png'}" 
+                    class="comment-profile-pic" 
+                    alt="${reply.username}"
+                    onclick="window.location.href='/profile/${reply.username}'"
+                    style="width: 24px; height: 24px; cursor:pointer;">
+                <strong class="comment-username" 
+                        onclick="window.location.href='/profile/${reply.username}'"
+                        style="cursor:pointer;">
+                  ${reply.username}
+                </strong>
               </div>
-            `;
-          });
+              <div class="comment-content">${reply.content}</div>
+            </div>
+          `;
+        });
           commentHtml += '</div>';
         }
         

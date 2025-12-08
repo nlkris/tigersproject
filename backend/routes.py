@@ -480,10 +480,38 @@ def comment_tweet(tweet_id):
 @routes.route('/comments/<int:tweet_id>', methods=['GET'])
 def get_comments(tweet_id):
     tweets = read_tweets()
+    users = read_users()
+    
     tweet = next((t for t in tweets if t['id'] == tweet_id), None)
     if not tweet or 'comments' not in tweet:
         return jsonify({"success": False, "message": "Tweet ou commentaires introuvables"}), 404
-    return jsonify({"success": True, "comments": tweet['comments']})
+    
+    # Enhance comments with profile picture URLs
+    enhanced_comments = []
+    for comment in tweet['comments']:
+        # Find user for this comment
+        user = next((u for u in users if u['id'] == comment.get('user_id')), None)
+        
+        # Create enhanced comment
+        enhanced_comment = comment.copy()
+        enhanced_comment['profile_pic_url'] = user.get('profile_pic_url') if user else None
+        
+        # Also enhance replies
+        if 'replies' in comment:
+            enhanced_replies = []
+            for reply in comment['replies']:
+                reply_user = next((u for u in users if u['id'] == reply.get('user_id')), None)
+                enhanced_reply = reply.copy()
+                enhanced_reply['profile_pic_url'] = reply_user.get('profile_pic_url') if reply_user else None
+                enhanced_replies.append(enhanced_reply)
+            enhanced_comment['replies'] = enhanced_replies
+        
+        enhanced_comments.append(enhanced_comment)
+    
+    return jsonify({
+        "success": True, 
+        "comments": enhanced_comments
+    })
 
 #------------------- like com----------------------------------
 @routes.route('/like_comment/<int:tweet_id>/<int:comment_index>', methods=['POST'])

@@ -97,6 +97,187 @@ h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
   transform: scale(1.05);
 }
 
+/* Modal de commentaires - Match feed style */
+.comments-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.comments-modal-content {
+  background: rgba(11, 18, 32, 0.95);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  border: 1px solid rgba(94, 234, 212, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.comments-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comments-modal-title {
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.close-comments-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.close-comments-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--accent);
+}
+
+/* Comment styling to match feed */
+.comment-item {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: left; /* Ensure text alignment is left */
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.comment-profile-pic {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--accent);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.comment-profile-pic:hover {
+  transform: scale(1.1);
+}
+
+.comment-username {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.comment-username:hover {
+  text-decoration: underline;
+}
+
+
+
+.comment-reply {
+  margin-left: 20px;
+  background: rgba(94, 234, 212, 0.05);
+  padding: 8px;
+  border-radius: 6px;
+  margin-top: 6px;
+  border-left: 2px solid var(--accent);
+}
+
+.comment-reply .comment-username {
+  font-size: 13px;
+}
+
+.comment-content {
+  color: #e6eef8;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  margin-left: 42px; /* Align with profile picture */
+}
+
+.reply-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  margin-left: 42px;
+  display: inline-block; /* Added this */
+}
+
+.reply-btn:hover {
+  background: rgba(94, 234, 212, 0.1);
+}
+
+/* Form styling */
+.comment-form-container {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comment-form-container textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #e6eef8;
+  outline: none;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 60px;
+  margin-bottom: 10px;
+}
+
+.comment-form-container button[type="submit"] {
+  padding: 8px 16px;
+  background: linear-gradient(90deg, #06b6d4, #7c3aed);
+  border: none;
+  border-radius: 8px;
+  color: #021024;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.comment-form-container button[type="submit"]:hover {
+  opacity: 0.9;
+}
+
 /* Specific button styles */
 .like-btn.liked {
   color: #f87171 !important;
@@ -158,6 +339,30 @@ h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
   cursor:pointer;
   font-size: 14px;
   margin-top:4px;
+}
+
+/* Profile picture in comments */
+.comment-header-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--accent);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.comment-header-img:hover {
+  transform: scale(1.1);
+}
+
+.reply-img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--accent);
+  cursor: pointer;
 }
 
 /* Retweet button specific */
@@ -473,15 +678,22 @@ input, textarea {
   <a href="{{ url_for('routes.feed') }}">⬅ Retour au fil</a>
 </p>
 
-<!-- MODAL COMMENTAIRES -->
-<div id="commentsModal" class="img-modal" style="display:none;">
-  <div style="background:rgba(11,18,32,0.95); border-radius:12px; padding:20px; max-width:600px; width:90%; max-height:80vh; overflow-y:auto;">
+<!-- MODAL COMMENTAIRES (Updated to match feed) -->
+<div id="commentsModal" class="comments-modal">
+  <div class="comments-modal-content">
+    <div class="comments-modal-header">
+      <h3 class="comments-modal-title">Commentaires</h3>
+      <button class="close-comments-btn" onclick="closeCommentModal()">×</button>
+    </div>
+    
     <div id="commentsList"></div>
-
-    <form id="newCommentForm" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
-      <textarea name="content" placeholder="Ajouter un commentaire..." required></textarea>
-      <button type="submit">Commenter</button>
-    </form>
+    
+    <div class="comment-form-container">
+      <form id="newCommentForm">
+        <textarea name="content" placeholder="Ajouter un commentaire..." required></textarea>
+        <button type="submit">Commenter</button>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -685,25 +897,22 @@ document.querySelectorAll('.view-comments-btn').forEach(btn => {
   });
 });
 
-// Fermer modal en cliquant en dehors
-document.addEventListener('click', (e) => {
-  const modal = document.getElementById('commentsModal');
-  const modalContent = modal.querySelector('div'); // The wrapper div
-  
-  if (modal.style.display === 'flex' && 
-      !modalContent.contains(e.target)) {
-    closeCommentModal();
-  }
-});
-
-// Fonction pour fermer le modal
+// Close modal with X button or clicking outside
 function closeCommentModal() {
   document.getElementById('commentsModal').style.display = 'none';
   document.getElementById('commentsList').innerHTML = '';
   currentTweetId = null;
 }
 
-// Charger les commentaires
+// Close when clicking outside modal
+document.addEventListener('click', (e) => {
+  const modal = document.getElementById('commentsModal');
+  if (modal.style.display === 'flex' && e.target === modal) {
+    closeCommentModal();
+  }
+});
+
+// Charger les commentaires (updated with profile pictures)
 async function loadComments(tweetId) {
   try {
     const res = await fetch(`/comments/${tweetId}`);
@@ -713,68 +922,115 @@ async function loadComments(tweetId) {
 
     if (data.success && data.comments && data.comments.length > 0) {
       data.comments.forEach((comment, idx) => {
-        const div = document.createElement('div');
-        div.classList.add('comment');
-        div.dataset.index = idx;
-
-        let repliesHtml = '';
-        if(comment.replies && comment.replies.length) {
-          repliesHtml = comment.replies.map(r => `<div class="reply"><strong>${r.username}</strong>: ${r.content}</div>`).join('');
-        }
-
-        div.innerHTML = `
-          <strong>${comment.username}</strong>: ${comment.content}
+        const commentDiv = document.createElement('div');
+        commentDiv.classList.add('comment-item');
+        
+        // Créer HTML du commentaire principal AVEC PHOTO DE PROFIL
+        let commentHtml = `
+          <div class="comment-header">
+            <img src="${comment.profile_pic_url || '/static/default-avatar.png'}" 
+                 class="comment-profile-pic" 
+                 alt="${comment.username}"
+                 onclick="window.location.href='/profile/${comment.username}'"
+                 style="cursor:pointer;">
+            <strong class="comment-username">${comment.username}</strong>
+          </div>
+          <div class="comment-content">${comment.content}</div>
           <button class="reply-btn" data-index="${idx}">Répondre</button>
-          ${repliesHtml}
         `;
+        
+        // Ajouter les réponses si elles existent AVEC PHOTOS DE PROFIL
+        if (comment.replies && comment.replies.length > 0) {
+          commentHtml += '<div class="comment-replies" style="margin-top: 8px;">';
+          comment.replies.forEach(reply => {
+            commentHtml += `
+              <div class="comment-reply">
+                <div class="comment-header">
+                  <img src="${reply.profile_pic_url || '/static/default-avatar.png'}" 
+                       class="comment-profile-pic" 
+                       alt="${reply.username}"
+                       onclick="window.location.href='/profile/${reply.username}'"
+                       style="width: 24px; height: 24px; cursor:pointer;">
+                  <strong class="comment-username">${reply.username}</strong>
+                </div>
+                <div class="comment-content">${reply.content}</div>
+              </div>
+            `;
+          });
+          commentHtml += '</div>';
+        }
+        
+        commentDiv.innerHTML = commentHtml;
+        container.appendChild(commentDiv);
 
-        // Bouton réponse
-        const replyBtn = div.querySelector('.reply-btn');
+        // Ajouter l'événement pour répondre
+        const replyBtn = commentDiv.querySelector('.reply-btn');
         replyBtn.addEventListener('click', (e) => {
-          e.stopPropagation(); // Prevent click from bubbling to parent
+          e.stopPropagation();
           
-          // Remove any existing reply form
-          const existingForm = div.querySelector('form');
+          // Supprimer tout formulaire de réponse existant
+          const existingForm = commentDiv.querySelector('.reply-form');
           if (existingForm) existingForm.remove();
           
+          // Créer le formulaire de réponse
           const replyForm = document.createElement('form');
-          replyForm.style.display = 'flex';
-          replyForm.style.flexDirection = 'column';
-          replyForm.style.marginTop = '10px';
+          replyForm.classList.add('reply-form');
+          replyForm.style.marginTop = '8px';
           replyForm.innerHTML = `
-            <textarea name="replyContent" placeholder="Répondre..." required style="margin-bottom: 8px;"></textarea>
-            <button type="submit">Envoyer</button>
+            <textarea name="replyContent" placeholder="Répondre à ${comment.username}..." required 
+                      style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); 
+                             background: rgba(255,255,255,0.05); color: #e6eef8; font-size: 13px;"></textarea>
+            <div style="display: flex; gap: 8px; margin-top: 6px;">
+              <button type="submit" style="padding: 6px 12px; background: linear-gradient(90deg,#06b6d4,#7c3aed); 
+                     border: none; border-radius: 6px; color: #021024; font-size: 13px; cursor: pointer;">
+                Envoyer
+              </button>
+              <button type="button" class="cancel-reply" style="padding: 6px 12px; background: rgba(255,255,255,0.1); 
+                     border: none; border-radius: 6px; color: var(--muted); font-size: 13px; cursor: pointer;">
+                Annuler
+              </button>
+            </div>
           `;
           
-          div.appendChild(replyForm);
-
+          commentDiv.appendChild(replyForm);
+          
+          // Annuler la réponse
+          replyForm.querySelector('.cancel-reply').addEventListener('click', () => {
+            replyForm.remove();
+          });
+          
+          // Envoyer la réponse
           replyForm.addEventListener('submit', async (submitEvent) => {
             submitEvent.preventDefault();
             const content = replyForm.replyContent.value.trim();
-            if(!content) return;
-
-            const res = await fetch(`/reply_comment/${tweetId}/${idx}`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ content })
-            });
-            const result = await res.json();
-            if(result.success){
-              await loadComments(tweetId);
-            } else {
-              alert(result.message);
+            if (!content) return;
+            
+            try {
+              const res = await fetch(`/reply_comment/${tweetId}/${idx}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content })
+              });
+              
+              const result = await res.json();
+              if (result.success) {
+                await loadComments(tweetId); // Recharger les commentaires
+              } else {
+                alert(result.message);
+              }
+            } catch (error) {
+              console.error('Error replying:', error);
+              alert('Erreur lors de l\'envoi de la réponse');
             }
           });
         });
-
-        container.appendChild(div);
       });
     } else {
-      container.innerHTML = '<p style="text-align:center; color:var(--muted);">Aucun commentaire pour le moment.</p>';
+      container.innerHTML = '<p style="text-align:center; color:var(--muted); padding: 20px;">Aucun commentaire pour le moment.</p>';
     }
   } catch (error) {
     console.error('Error loading comments:', error);
-    document.getElementById('commentsList').innerHTML = '<p style="color:#f87171;">Erreur de chargement des commentaires</p>';
+    container.innerHTML = '<p style="color:#f87171; text-align:center; padding: 20px;">Erreur de chargement des commentaires</p>';
   }
 }
 

@@ -48,7 +48,9 @@
             "/uploads/tweet_images/5_1765138280.275252_IMG_2899.JPG",
             "/uploads/tweet_images/5_1765138280.275874_IMG_2900.JPG"
         ],
-        "likes": [],
+        "likes": [
+            3
+        ],
         "created_at": "2025-12-07T21:11:20.277014Z",
         "comments": [],
         "retweets": []
@@ -267,6 +269,12 @@
                         "username": "nlkris",
                         "content": "je red\u00e9bug",
                         "created_at": "2025-12-07T18:47:38.801992Z"
+                    },
+                    {
+                        "user_id": 3,
+                        "username": "nlkris",
+                        "content": "je sais pas \u00e9crire c'est terrible",
+                        "created_at": "2025-12-08T21:18:50.115259"
                     }
                 ]
             },
@@ -297,6 +305,34 @@
                 "username": "nlkris",
                 "content": "depuis le profil ?",
                 "created_at": "2025-12-07T20:19:17.974770Z",
+                "likes": []
+            },
+            {
+                "user_id": 3,
+                "username": "nlkris",
+                "content": "le glow up du modal commentaire",
+                "created_at": "2025-12-08T21:10:00.466086",
+                "replies": [
+                    {
+                        "user_id": 3,
+                        "username": "nlkris",
+                        "content": "\u00e7a n'a rien cass\u00e9 :D",
+                        "created_at": "2025-12-08T21:10:26.686889"
+                    },
+                    {
+                        "user_id": 7,
+                        "username": "kris2.0",
+                        "content": "c'est ok les notifs ?",
+                        "created_at": "2025-12-08T21:11:14.968569"
+                    }
+                ],
+                "likes": []
+            },
+            {
+                "user_id": 3,
+                "username": "nlkris",
+                "content": "??",
+                "created_at": "2025-12-08T21:14:33.660560",
                 "likes": []
             }
         ],
@@ -809,10 +845,23 @@
                 "username": "nlkris",
                 "content": "non",
                 "created_at": "2025-12-08T16:56:03.253244",
-                "likes": []
+                "likes": [],
+                "replies": [
+                    {
+                        "user_id": 3,
+                        "username": "nlkris",
+                        "content": "oui",
+                        "created_at": "2025-12-08T21:22:24.445135"
+                    }
+                ]
             }
         ],
-        "retweets": []
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-08T19:57:23.329872"
+            }
+        ]
     },
     {
         "id": 39,

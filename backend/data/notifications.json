@@ -547,5 +547,14 @@
         "content": null,
         "seen": false,
         "created_at": "2025-12-07T21:11:56.393334"
+    },
+    {
+        "to_user_id": 3,
+        "from_user_id": 3,
+        "type": "comment",
+        "tweet_id": 38,
+        "content": "non",
+        "seen": false,
+        "created_at": "2025-12-08T16:56:03.254224"
     }
 ]

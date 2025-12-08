@@ -391,6 +391,102 @@ button:hover { opacity:0.9; }
   margin-top:4px;
 }
 
+/* Search Modal */
+.search-modal {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+  background: rgba(11, 18, 32, 0.98);
+  border: 1px solid rgba(94, 234, 212, 0.3);
+  border-radius: 8px;
+  margin-top: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+.search-modal-content {
+  padding: 12px;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+}
+
+.search-result-item:hover {
+  background: rgba(94, 234, 212, 0.15);
+  border-color: var(--accent);
+  transform: translateX(4px);
+}
+
+.search-result-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent);
+}
+
+.search-result-info {
+  flex: 1;
+}
+
+.search-result-username {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.search-result-follow {
+  background: linear-gradient(90deg, #06b6d4, #7c3aed);
+  border: none;
+  border-radius: 20px;
+  color: #021024;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.search-result-follow:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(94, 234, 212, 0.5);
+}
+
+.search-result-follow.following {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--muted);
+  border: 1px solid var(--muted);
+}
+
+/* Search input focus state */
+#live-search:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.2);
+}
+
+/* No results message */
+.no-results {
+  text-align: center;
+  color: var(--muted);
+  padding: 20px;
+  font-style: italic;
+}
+
 a { color:var(--accent); text-decoration:none; }
 a:hover { text-decoration:underline; }
 
@@ -464,10 +560,12 @@ a:hover { text-decoration:underline; }
     <img src="{{ url_for('static', filename='tiger.png') }}" alt="Logo TIGINSA" class="logo">
 
     <div class="search-bar">
-      <form method="GET" action="{{ url_for('routes.search') }}">
-        <input type="text" name="q" id="live-search" placeholder="Rechercher des utilisateurs..." required>
-      </form>
-      <ul id="search-suggestions"></ul>
+      <input type="text" id="live-search" placeholder="Rechercher des utilisateurs..." autocomplete="off">
+      <div id="search-results-modal" class="search-modal">
+        <div class="search-modal-content">
+          <div id="search-results-list"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -585,31 +683,112 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-/* LIVE SEARCH AJAX */
+/* ENHANCED LIVE SEARCH WITH MODAL */
+let currentFollowing = new Set(); // Store followed users
+
+// Load current user's following list
+async function loadFollowing() {
+  try {
+    const res = await fetch('/api/current_user');
+    if (res.ok) {
+      const user = await res.json();
+      currentFollowing = new Set(user.following || []);
+    }
+  } catch (error) {
+    console.error('Error loading following:', error);
+  }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', loadFollowing);
+
+// Search input handler
 document.getElementById("live-search").addEventListener("input", async function () {
   const q = this.value.trim();
-  const box = document.getElementById("search-suggestions");
+  const modal = document.getElementById("search-results-modal");
+  const resultsList = document.getElementById("search-results-list");
 
   if (!q) {
-    box.style.display = "none";
-    box.innerHTML = "";
+    modal.style.display = "none";
     return;
   }
 
-  const res = await fetch(`/search_live?q=${encodeURIComponent(q)}`);
-  const data = await res.json();
+  try {
+    const res = await fetch(`/search_live?q=${encodeURIComponent(q)}`);
+    const users = await res.json();
 
-  if (!data.length) {
-    box.style.display = "none";
-    box.innerHTML = "";
-    return;
+    if (!users.length) {
+      resultsList.innerHTML = '<div class="no-results">Aucun utilisateur trouvé</div>';
+      modal.style.display = "block";
+      return;
+    }
+
+    // Render search results
+    resultsList.innerHTML = users.map(user => `
+      <div class="search-result-item" data-user-id="${user.id}">
+        <img src="${user.profile_pic_url || '/static/default-avatar.png'}" 
+             alt="${user.username}"
+             onclick="window.location.href='/profile/${user.username}'">
+        <div class="search-result-info" onclick="window.location.href='/profile/${user.username}'">
+          <div class="search-result-username">@${user.username}</div>
+        </div>
+        <button class="search-result-follow ${currentFollowing.has(user.id) ? 'following' : ''}"
+                data-user-id="${user.id}"
+                data-username="${user.username}">
+          ${currentFollowing.has(user.id) ? 'Suivi' : 'Suivre'}
+        </button>
+      </div>
+    `).join('');
+
+    modal.style.display = "block";
+
+    // Add follow/unfollow handlers
+    document.querySelectorAll('.search-result-follow').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const username = btn.dataset.username;
+        const userId = btn.dataset.userId;
+        
+        const res = await fetch(`/toggle_follow/${username}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          if (data.is_following) {
+            currentFollowing.add(parseInt(userId));
+            btn.textContent = 'Suivi';
+            btn.classList.add('following');
+          } else {
+            currentFollowing.delete(parseInt(userId));
+            btn.textContent = 'Suivre';
+            btn.classList.remove('following');
+          }
+        }
+      });
+    });
+
+  } catch (error) {
+    console.error('Search error:', error);
+    resultsList.innerHTML = '<div class="no-results">Erreur de recherche</div>';
+    modal.style.display = "block";
   }
+});
 
-  box.innerHTML = data
-    .map(user => `<li onclick="window.location.href='/profile/${user.username}'">@${user.username}</li>`)
-    .join("");
+// Close modal when clicking outside
+document.addEventListener("click", (e) => {
+  const modal = document.getElementById("search-results-modal");
+  const searchInput = document.getElementById("live-search");
+  
+  if (!modal.contains(e.target) && e.target !== searchInput) {
+    modal.style.display = "none";
+  }
+});
 
-  box.style.display = "block";
+// Keep modal open when clicking inside it
+document.getElementById("search-results-modal").addEventListener("click", (e) => {
+  e.stopPropagation();
 });
 
 document.addEventListener("click", (e) => {

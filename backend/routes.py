@@ -98,21 +98,43 @@ def search():
     if 'user_id' not in session:
         return redirect(url_for('routes.login'))
 
-    users = read_users()
     query = request.args.get("q", "").strip()
-
-    matched_users = []
+    
     if query:
-        matched_users = [
-            u for u in users
-            if query.lower() in u['username'].lower()
-        ]
+        users = read_users()
+        matched_user = next((u for u in users if query.lower() in u['username'].lower()), None)
+        
+        if matched_user:
+            # Redirect directly to profile instead of search page
+            return redirect(url_for('routes.profile', username=matched_user['username']))
+    
+    # If no match or no query, go to feed
+    return redirect(url_for('routes.feed'))
 
-    return render_template(
-        'search.html',
-        query=query,
-        matched_users=matched_users
-    )
+@routes.route('/search_live')
+def search_live():
+    """Return JSON for live search suggestions."""
+    if 'user_id' not in session:
+        return jsonify([])
+    
+    query = request.args.get('q', '').lower().strip()
+    if not query:
+        return jsonify([])
+    
+    users = read_users()
+    # Exclude current user from results
+    current_user_id = session['user_id']
+    
+    matched = []
+    for user in users:
+        if user['id'] != current_user_id and query in user['username'].lower():
+            matched.append({
+                'id': user['id'],
+                'username': user['username'],
+                'profile_pic_url': user.get('profile_pic_url')
+            })
+    
+    return jsonify(matched[:10])  # Limit to 10 results
 
 # ------------------- FEED -------------------
 @routes.route('/feed', methods=['GET', 'POST'])
@@ -651,6 +673,23 @@ def notifications():
         return redirect(url_for('routes.login'))
 
     return render_template("notifications.html", notifications=user_notifs, current_user=current_user)
+
+@routes.route('/api/current_user')
+def get_current_user():
+    if 'user_id' not in session:
+        return jsonify({}), 401
+    
+    users = read_users()
+    user = next((u for u in users if u['id'] == session['user_id']), None)
+    
+    if user:
+        return jsonify({
+            'id': user['id'],
+            'username': user['username'],
+            'following': user.get('following', [])
+        })
+    
+    return jsonify({}), 404
 
 # ------------------- MIGRATE RETWEETS (one-time) -------------------
 @routes.route('/migrate-retweets')

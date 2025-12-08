@@ -545,6 +545,7 @@ def like_comment(tweet_id, comment_index):
     write_tweets(tweets)
 
     return jsonify({
+        
         "success": True,
         "liked": liked,
         "like_count": len(comment['likes'])

@@ -860,6 +860,13 @@ a:hover { text-decoration:underline; }
   <div class="header-center">
     <img src="{{ url_for('static', filename='tiger.png') }}" alt="Logo TIGINSA" class="logo">
 
+    <!-- Tiger Roar Easter Egg - WAV version -->
+    <audio id="tigerRoar" preload="auto" style="display: none;">
+      <source src="{{ url_for('static', filename='sounds/tiger-roar.wav') }}" type="audio/wav">
+      <!-- Fallback message -->
+      Your browser doesn't support audio.
+    </audio>
+
     <div class="search-bar">
       <input type="text" id="live-search" placeholder="Rechercher des utilisateurs..." autocomplete="off">
       <div id="search-results-modal" class="search-modal">
@@ -1495,6 +1502,237 @@ function triggerRetweetEffect(button) {
     button.style.boxShadow = '';
   }, 300);
 }
+</script>
+
+<script>
+/* ====================
+   SECRET TIGER ROAR EASTER EGG
+   Click logo 3 times quickly to trigger
+   ==================== */
+document.addEventListener('DOMContentLoaded', function() {
+  const logo = document.querySelector('.logo');
+  const roarSound = document.getElementById('tigerRoar');
+  
+  if (!logo || !roarSound) return; // Exit if elements not found
+  
+  let clickCount = 0;
+  let clickTimer;
+  const CLICK_TIMEOUT = 1000; // 1 second to click 3 times
+  
+  // Handle logo clicks
+  logo.addEventListener('click', function(e) {
+    e.stopPropagation();
+    
+    // Increment click counter
+    clickCount++;
+    
+    // Clear previous timer
+    clearTimeout(clickTimer);
+    
+    // Set new timer to reset counter
+    clickTimer = setTimeout(() => {
+      clickCount = 0;
+      console.log('Click counter reset');
+    }, CLICK_TIMEOUT);
+    
+    // Visual feedback for each click
+    logo.style.transition = 'transform 0.1s';
+    logo.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      logo.style.transform = 'scale(1)';
+    }, 100);
+    
+    console.log(`Click ${clickCount}/3`);
+    
+    // Check if 3 clicks reached
+    if (clickCount === 3) {
+      console.log('🎯 Triple click detected! Playing tiger roar...');
+      clickCount = 0; // Reset immediately
+      clearTimeout(clickTimer);
+      
+      // PLAY THE ROAR
+      playTigerRoar();
+    }
+  });
+  
+  // Function to play the roar
+  function playTigerRoar() {
+    // Reset audio to start
+    roarSound.currentTime = 0;
+    
+    // Set volume (0.0 to 1.0)
+    roarSound.volume = 0.6;
+    
+    // Play the sound
+    roarSound.play()
+      .then(() => {
+        console.log('✅ Tiger roar playing!');
+        showRoarEffect();
+      })
+      .catch(error => {
+        console.error('❌ Audio error:', error);
+        // Fallback: Show visual effect anyway
+        showRoarEffect();
+        showFallbackMessage();
+      });
+  }
+  
+  // Visual effect when roar plays
+  function showRoarEffect() {
+    // 1. Logo animation
+    logo.style.animation = 'tigerRoarAnimation 1s ease-in-out';
+    
+    // 2. Page shake effect
+    document.body.style.animation = 'pageShake 0.5s ease-in-out';
+    
+    // 3. Remove animations after they complete
+    setTimeout(() => {
+      logo.style.animation = '';
+      document.body.style.animation = '';
+    }, 1000);
+    
+    // 4. Show notification
+    showRoarNotification();
+  }
+  
+  // Show a cool notification
+  function showRoarNotification() {
+    // Remove any existing notification
+    const oldNote = document.getElementById('roarNotification');
+    if (oldNote) oldNote.remove();
+    
+    // Create new notification
+    const notification = document.createElement('div');
+    notification.id = 'roarNotification';
+    notification.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 24px;">🐯</span>
+        <div>
+          <strong style="color: #fbbf24;">TIGER ROAR!</strong>
+          <div style="font-size: 12px; opacity: 0.8;">Easter egg unlocked!</div>
+        </div>
+        <span style="font-size: 24px;">🐅</span>
+      </div>
+    `;
+    
+    // Style the notification
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 36, 0.95);
+      color: #fbbf24;
+      padding: 15px 25px;
+      border-radius: 12px;
+      border: 2px solid #f59e0b;
+      box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+      z-index: 99999;
+      animation: slideInDown 0.5s ease-out, fadeOutUp 0.5s ease-in 2.5s forwards;
+      backdrop-filter: blur(10px);
+      min-width: 250px;
+      text-align: center;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.remove();
+      }
+    }, 3000);
+  }
+  
+  // Fallback if audio doesn't play
+  function showFallbackMessage() {
+    const fallback = document.createElement('div');
+    fallback.textContent = '🐯 ROAR! 🐯';
+    fallback.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+      font-weight: bold;
+      color: #f59e0b;
+      z-index: 99998;
+      animation: pulse 1s ease-in-out;
+      text-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+    `;
+    
+    document.body.appendChild(fallback);
+    setTimeout(() => fallback.remove(), 1000);
+  }
+  
+  // Add CSS animations
+  const style = document.createElement('style');
+  style.textContent = `
+    /* Tiger roar logo animation */
+    @keyframes tigerRoarAnimation {
+      0% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+      20% { transform: scale(1.3) rotate(-5deg); filter: brightness(1.8) drop-shadow(0 0 15px #f59e0b); }
+      40% { transform: scale(1.2) rotate(5deg); filter: brightness(2) drop-shadow(0 0 25px #fbbf24); }
+      60% { transform: scale(1.25) rotate(-3deg); filter: brightness(1.9) drop-shadow(0 0 20px #f59e0b); }
+      80% { transform: scale(1.15) rotate(2deg); filter: brightness(1.5) drop-shadow(0 0 10px #fbbf24); }
+      100% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+    }
+    
+    /* Page shake effect */
+    @keyframes pageShake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    /* Notification animations */
+    @keyframes slideInDown {
+      from { top: -100px; opacity: 0; }
+      to { top: 20px; opacity: 1; }
+    }
+    
+    @keyframes fadeOutUp {
+      from { top: 20px; opacity: 1; }
+      to { top: -100px; opacity: 0; }
+    }
+    
+    /* Fallback pulse */
+    @keyframes pulse {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.8; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+    }
+    
+    /* Make logo clickable */
+    .logo {
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    
+    .logo:hover {
+      transform: scale(1.05);
+      filter: drop-shadow(0 0 8px rgba(94, 234, 212, 0.3));
+    }
+  `;
+  
+  document.head.appendChild(style);
+  
+  // Debug helper
+  console.log('🐯 Tiger roar easter egg loaded! Click logo 3 times quickly.');
+});
+
+// Helper to check if audio can play
+function canPlayAudio() {
+  const audio = document.createElement('audio');
+  return !!(audio.canPlayType && audio.canPlayType('audio/wav; codecs="1"'));
+}
+
+// Check on page load
+document.addEventListener('DOMContentLoaded', () => {
+  if (!canPlayAudio()) {
+    console.warn('⚠️ Browser may not support WAV audio');
+  }
+});
 </script>
 </div>
 

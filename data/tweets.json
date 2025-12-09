@@ -16,9 +16,7 @@
         "username": "nlkris",
         "content": "AAAAAAARRRRRRR",
         "image_urls": [],
-        "likes": [
-            3
-        ],
+        "likes": [],
         "created_at": "2025-12-07T21:19:07.445516Z",
         "comments": [],
         "retweets": [
@@ -96,7 +94,12 @@
         "likes": [],
         "created_at": "2025-12-07T21:11:03.506183Z",
         "comments": [],
-        "retweets": []
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-09T01:39:20.657208"
+            }
+        ]
     },
     {
         "id": 8,
@@ -770,12 +773,7 @@
         "likes": [],
         "created_at": "2025-12-07T21:40:30.570956Z",
         "comments": [],
-        "retweets": [
-            {
-                "user_id": 3,
-                "retweeted_at": "2025-12-09T01:08:05.179899"
-            }
-        ]
+        "retweets": []
     },
     {
         "id": 34,
@@ -884,6 +882,10 @@
             {
                 "user_id": 8,
                 "retweeted_at": "2025-12-08T20:49:56.708496"
+            },
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-09T01:39:08.880894"
             }
         ]
     },
@@ -944,23 +946,5 @@
                 "retweeted_at": "2025-12-08T20:55:56.904875"
             }
         ]
-    },
-    {
-        "id": 42,
-        "user_id": 3,
-        "username": "nlkris",
-        "content": "hh",
-        "image_urls": [],
-        "likes": [],
-        "created_at": "2025-12-09T01:23:59.698690Z",
-        "comments": [
-            {
-                "user_id": 3,
-                "username": "nlkris",
-                "content": "nice",
-                "created_at": "2025-12-09T02:36:53.337943"
-            }
-        ],
-        "retweets": []
     }
 ]

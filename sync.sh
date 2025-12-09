@@ -6,17 +6,29 @@ VM="kris@35.223.234.71"
 LOCAL_DIR="/Users/kris/Documents/4AGMM/OutilsNUM/tigersproject"
 VM_DIR="/home/kris/tigersproject"
 
+# Chemins des fichiers de données
+LOCAL_DATA="$LOCAL_DIR/data"
+LOCAL_BACKEND_DATA="$LOCAL_DIR/backend/data"
+VM_DATA="$VM_DIR/data"
+VM_BACKEND_DATA="$VM_DIR/backend/data"
+
 case "$1" in
     "pull")
         # Pull ALL data FROM VM to local
         echo "📥 Pulling ALL data from VM..."
         
-        # 1. Pull JSON data files
+        # 1. Pull JSON data files (data/)
         echo "  ↳ Pulling tweets.json and users.json..."
-        scp -i $KEY $VM:$VM_DIR/data/tweets.json $LOCAL_DIR/data/
-        scp -i $KEY $VM:$VM_DIR/data/users.json $LOCAL_DIR/data/
+        scp -i $KEY $VM:$VM_DATA/tweets.json $LOCAL_DATA/
+        scp -i $KEY $VM:$VM_DATA/users.json $LOCAL_DATA/
         
-        # 2. Pull uploaded images (optional - can be large)
+        # 2. Pull notifications.json (backend/data/)
+        echo "  ↳ Pulling notifications.json..."
+        # Créer le dossier local s'il n'existe pas
+        mkdir -p $LOCAL_BACKEND_DATA
+        scp -i $KEY $VM:$VM_BACKEND_DATA/notifications.json $LOCAL_BACKEND_DATA/
+        
+        # 3. Pull uploaded images (optional - can be large)
         read -p "  Download uploaded images too? (y/n): " -n 1 -r
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -37,8 +49,17 @@ case "$1" in
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             echo "📤 Pushing data to VM..."
-            scp -i $KEY $LOCAL_DIR/data/tweets.json $VM:$VM_DIR/data/
-            scp -i $KEY $LOCAL_DIR/data/users.json $VM:$VM_DIR/data/
+            
+            # 1. Push fichiers principaux (data/)
+            scp -i $KEY $LOCAL_DATA/tweets.json $VM:$VM_DATA/
+            scp -i $KEY $LOCAL_DATA/users.json $VM:$VM_DATA/
+            
+            # 2. Push notifications.json (backend/data/)
+            echo "  ↳ Pushing notifications.json..."
+            # Créer le dossier sur la VM si besoin
+            ssh -i $KEY $VM "mkdir -p $VM_BACKEND_DATA"
+            scp -i $KEY $LOCAL_BACKEND_DATA/notifications.json $VM:$VM_BACKEND_DATA/
+            
             echo "✅ Data pushed to VM"
         fi
         ;;
@@ -60,7 +81,11 @@ case "$1" in
         echo "  ↳ Deploying static files..."
         scp -i $KEY -r $LOCAL_DIR/static $VM:$VM_DIR/ 2>/dev/null || true
         
-        # 4. Restart app
+        # 4. Data structure (folders only, not files)
+        echo "  ↳ Ensuring data folders exist..."
+        ssh -i $KEY $VM "mkdir -p $VM_DATA $VM_BACKEND_DATA $VM_DIR/backend/uploads"
+        
+        # 5. Restart app
         echo "  ↳ Restarting app..."
         ssh -i $KEY $VM "cd $VM_DIR && pkill -f python && nohup python3 app.py > app.log 2>&1 &"
         
@@ -83,11 +108,17 @@ case "$1" in
         # Backup VM data to local backup folder
         echo "💾 Backing up VM data..."
         BACKUP_DIR="$LOCAL_DIR/backups/$(date +%Y%m%d_%H%M%S)"
-        mkdir -p $BACKUP_DIR
+        BACKUP_BACKEND_DIR="$BACKUP_DIR/backend"
+        mkdir -p $BACKUP_DIR $BACKUP_BACKEND_DIR
         
         # Backup data files
-        scp -i $KEY $VM:$VM_DIR/data/tweets.json $BACKUP_DIR/
-        scp -i $KEY $VM:$VM_DIR/data/users.json $BACKUP_DIR/
+        echo "  ↳ Backing up tweets.json and users.json..."
+        scp -i $KEY $VM:$VM_DATA/tweets.json $BACKUP_DIR/ 2>/dev/null || echo "  ⚠️  tweets.json not found"
+        scp -i $KEY $VM:$VM_DATA/users.json $BACKUP_DIR/ 2>/dev/null || echo "  ⚠️  users.json not found"
+        
+        # Backup notifications.json
+        echo "  ↳ Backing up notifications.json..."
+        scp -i $KEY $VM:$VM_BACKEND_DATA/notifications.json $BACKUP_BACKEND_DIR/ 2>/dev/null || echo "  ⚠️  notifications.json not found"
         
         echo "✅ VM data backed up to: $BACKUP_DIR"
         ;;
@@ -96,26 +127,52 @@ case "$1" in
         # Check VM status
         echo "🔍 Checking VM status..."
         ssh -i $KEY $VM "cd $VM_DIR && \
-            echo 'Tweets: \$(python3 -c \"import json; print(len(json.load(open(\"data/tweets.json\"))))\" 2>/dev/null || echo 'N/A')' && \
-            echo 'Users: \$(python3 -c \"import json; print(len(json.load(open(\"data/users.json\"))))\" 2>/dev/null || echo 'N/A')' && \
+            echo '=== DATA STATUS ===' && \
+            echo 'Tweets: \$(python3 -c \"import json, os; f=\\\"data/tweets.json\\\"; print(len(json.load(open(f))) if os.path.exists(f) else \\\"N/A\\\")\" 2>/dev/null || echo 'N/A')' && \
+            echo 'Users: \$(python3 -c \"import json, os; f=\\\"data/users.json\\\"; print(len(json.load(open(f))) if os.path.exists(f) else \\\"N/A\\\")\" 2>/dev/null || echo 'N/A')' && \
+            echo 'Notifications: \$(python3 -c \"import json, os; f=\\\"backend/data/notifications.json\\\"; print(len(json.load(open(f))) if os.path.exists(f) else \\\"N/A\\\")\" 2>/dev/null || echo 'N/A')' && \
+            echo '' && \
+            echo '=== APP STATUS ===' && \
             echo 'App running: \$(pgrep -f python3 | wc -l) processes' && \
-            echo 'Last log: \$(tail -1 app.log 2>/dev/null || echo \"No log\")'"
+            echo 'Disk usage: \$(du -sh . 2>/dev/null | cut -f1) in $VM_DIR' && \
+            echo '' && \
+            echo '=== LAST LOG ===' && \
+            tail -5 app.log 2>/dev/null | sed 's/^/  /' || echo '  No log file'"
+        ;;
+        
+    "pull-notifications")
+        # Pull ONLY notifications
+        echo "📥 Pulling notifications only..."
+        mkdir -p $LOCAL_BACKEND_DATA
+        scp -i $KEY $VM:$VM_BACKEND_DATA/notifications.json $LOCAL_BACKEND_DATA/
+        echo "✅ Notifications pulled from VM"
+        ;;
+        
+    "push-notifications")
+        # Push ONLY notifications
+        echo "📤 Pushing notifications only..."
+        ssh -i $KEY $VM "mkdir -p $VM_BACKEND_DATA"
+        scp -i $KEY $LOCAL_BACKEND_DATA/notifications.json $VM:$VM_BACKEND_DATA/
+        echo "✅ Notifications pushed to VM"
         ;;
         
     *)
-        echo "Usage: $0 {pull|push|deploy|full-deploy|backup-vm|status}"
+        echo "Usage: $0 {pull|push|deploy|full-deploy|backup-vm|status|pull-notifications|push-notifications}"
         echo ""
-        echo "  pull         - Copy data FROM VM to local (safe)"
-        echo "  push         - Copy data FROM local to VM (overwrites!)"
-        echo "  deploy       - Deploy code only (preserves VM data)"
-        echo "  full-deploy  - Deploy code + data (overwrites!)"
-        echo "  backup-vm    - Backup VM data to local backups/"
-        echo "  status       - Check VM status"
+        echo "  pull                - Copy ALL data FROM VM to local (safe)"
+        echo "  push                - Copy ALL data FROM local to VM (overwrites!)"
+        echo "  deploy              - Deploy code only (preserves VM data)"
+        echo "  full-deploy         - Deploy code + data (overwrites!)"
+        echo "  backup-vm           - Backup VM data to local backups/"
+        echo "  status              - Check VM status"
+        echo "  pull-notifications  - Pull only notifications.json"
+        echo "  push-notifications  - Push only notifications.json"
         echo ""
         echo "📌 Recommended workflow:"
-        echo "  1. ./sync.sh pull        # Get latest VM data"
+        echo "  1. ./sync.sh pull              # Get latest VM data"
         echo "  2. Make code changes locally"
-        echo "  3. ./sync.sh deploy      # Deploy code only"
+        echo "  3. ./sync.sh deploy            # Deploy code only"
+        echo "  4. ./sync.sh pull-notifications # Update notifications"
         echo ""
         ;;
 esac

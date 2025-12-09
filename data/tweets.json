@@ -837,7 +837,9 @@
         "username": "nlkris",
         "content": "j'ai tout cass\u00e9 ?",
         "image_urls": [],
-        "likes": [],
+        "likes": [
+            8
+        ],
         "created_at": "2025-12-08T15:55:53.628075Z",
         "comments": [
             {
@@ -854,12 +856,31 @@
                         "created_at": "2025-12-08T21:22:24.445135"
                     }
                 ]
+            },
+            {
+                "user_id": 8,
+                "username": "younsfeur",
+                "content": "feur",
+                "created_at": "2025-12-08T20:50:06.088455",
+                "replies": [
+                    {
+                        "user_id": 8,
+                        "username": "younsfeur",
+                        "content": "ff",
+                        "created_at": "2025-12-08T20:50:58.948164"
+                    }
+                ],
+                "likes": []
             }
         ],
         "retweets": [
             {
                 "user_id": 3,
                 "retweeted_at": "2025-12-08T19:57:23.329872"
+            },
+            {
+                "user_id": 8,
+                "retweeted_at": "2025-12-08T20:49:56.708496"
             }
         ]
     },
@@ -873,5 +894,52 @@
         "created_at": "2025-12-08T16:00:39.713096Z",
         "comments": [],
         "retweets": []
+    },
+    {
+        "id": 40,
+        "user_id": 8,
+        "username": "younsfeur",
+        "content": "text",
+        "image_urls": [],
+        "likes": [],
+        "created_at": "2025-12-08T20:51:47.831624Z",
+        "comments": [],
+        "retweets": []
+    },
+    {
+        "id": 41,
+        "user_id": 8,
+        "username": "younsfeur",
+        "content": "chef",
+        "image_urls": [
+            "/uploads/tweet_images/8_1765227209.535932_351495706_788247399646466_3381153868989336067_n.jpg"
+        ],
+        "likes": [
+            3
+        ],
+        "created_at": "2025-12-08T20:53:29.536163Z",
+        "comments": [
+            {
+                "user_id": 3,
+                "username": "nlkris",
+                "content": "le chat",
+                "created_at": "2025-12-08T20:56:08.091759",
+                "replies": [
+                    {
+                        "user_id": 3,
+                        "username": "nlkris",
+                        "content": "wow",
+                        "created_at": "2025-12-08T20:56:12.375227"
+                    }
+                ],
+                "likes": []
+            }
+        ],
+        "retweets": [
+            {
+                "user_id": 3,
+                "retweeted_at": "2025-12-08T20:55:56.904875"
+            }
+        ]
     }
 ]

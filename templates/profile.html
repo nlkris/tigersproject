@@ -475,6 +475,18 @@ h2 { color:var(--accent); margin:24px 0 12px; text-align:left; }
     cursor: pointer;
     transition: transform 0.3s ease, filter 0.3s ease;
 }
+
+/* HOVER EFFECT - Add this */
+.notif-shortcut:hover .notif-icon {
+    filter: drop-shadow(0 0 10px rgba(94, 234, 212, 0.9));
+    transform: scale(1.1);
+}
+
+/* Optional: Also add hover effect to the text */
+.notif-shortcut:hover {
+    color: #5eead4;
+    text-shadow: 0 0 8px rgba(94, 234, 212, 0.7);
+}
 /* Grid layout based on number of images */
 .tweet-gallery:has(img:nth-child(1)):not(:has(img:nth-child(2))) {
   grid-template-columns: 1fr;
@@ -551,6 +563,8 @@ input, textarea {
   background:#2e2e2e; color:white; padding:8px; border-radius:6px; border:1px solid #555; width:100%;
 }
 </style>
+<!-- Add this line to profile.html -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 </head>
 <body>
   <div class="header-top">
@@ -679,6 +693,7 @@ input, textarea {
       
       <!-- POST BUTTONS -->
       <div class="post-buttons">
+        <!-- In profile.html, retweet buttons should look like this: -->
         <button class="retweet-btn {% if session['user_id'] in post.get('retweets', []) %}retweeted{% endif %}"
                 data-tweet-id="{{ post.id }}">
           🔄 <span class="retweet-count">{{ post.get('retweets', [])|length }}</span>
@@ -848,27 +863,36 @@ document.querySelectorAll('.like-btn').forEach(btn => {
 
 });
 
-//AJEX REtweet
+// AJAX RETWEET - Update this function in profile.html
 document.addEventListener("DOMContentLoaded", () => {
-
   document.querySelectorAll(".retweet-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
       const tweetId = btn.dataset.tweetId;
       const countEl = btn.querySelector(".retweet-count");
-
+      
       btn.disabled = true;
-
+      
       try {
         const res = await fetch(`/retweet/${tweetId}`, { method: "POST" });
         const data = await res.json();
 
         if (!data.success) throw new Error(data.error || "Erreur");
 
-        // Change l'état visuel du bouton
-        btn.classList.toggle("retweeted", data.is_retweeted);
-
-        // Mets à jour le compteur
+        // Get current state BEFORE updating
+        const wasRetweeted = btn.classList.contains("retweeted");
+        const isNowRetweeted = data.is_retweeted;
+        
+        // Change visual state
+        btn.classList.toggle("retweeted", isNowRetweeted);
+        
+        // Update counter
         countEl.textContent = data.retweet_count;
+        
+        // ONLY trigger confetti if we just ADDED a retweet
+        if (!wasRetweeted && isNowRetweeted) {
+          // Trigger confetti effect - ONLY ONCE
+          triggerRetweetEffect(btn);
+        }
 
       } catch (err) {
         console.error(err);
@@ -878,8 +902,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-
 });
+
 </script>
 <script>
 // Prévisualisation photo
@@ -1096,6 +1120,41 @@ document.getElementById('newCommentForm').addEventListener('submit', async (e) =
     alert('Erreur lors de l\'ajout du commentaire');
   }
 });
+</script>
+<script>
+/* Perfect localized button confetti - Same as feed */
+function triggerRetweetEffect(button) {
+  const rect = button.getBoundingClientRect();
+  const buttonX = rect.left + rect.width / 2;
+  const buttonY = rect.top + rect.height / 2;
+  
+  // Confetti that stays within button area
+  confetti({
+    particleCount: 25,
+    angle: 90,
+    spread: 40,
+    startVelocity: 18,
+    origin: { 
+      x: buttonX / window.innerWidth, 
+      y: buttonY / window.innerHeight 
+    },
+    colors: ['#5eead4', '#06b6d4'],
+    gravity: 1.0,
+    scalar: 0.5,
+    ticks: 70,
+    decay: 0.9,
+    drift: 0.3,
+    shapes: ['circle'],
+    disableForReducedMotion: true
+  });
+  
+  // Button visual feedback
+  button.style.boxShadow = '0 0 10px rgba(94, 234, 212, 0.5)';
+  
+  setTimeout(() => {
+    button.style.boxShadow = '';
+  }, 300);
+}
 </script>
 
 </body>

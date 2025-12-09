@@ -50,11 +50,13 @@ body {
   font-weight:600;
   transition:0.2s;
 }
+
 .profile-shortcut svg {
   width:70px;
   height:70px;
   cursor:pointer;
   transition: transform 0.3s ease, filter 0.3s ease;
+  /* REMOVE the permanent drop-shadow from here */
 }
 .profile-shortcut:hover svg {
   transform: scale(1.05);
@@ -801,6 +803,8 @@ a:hover { text-decoration:underline; }
 .flashes li.error   { color:#021024; background:rgba(248,113,113,1); }
 .flashes li.info    { color:#021024; background:rgba(94,165,255,1); }
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -829,7 +833,7 @@ a:hover { text-decoration:underline; }
 
   <!-- Profil -->
   <a href="{{ url_for('routes.profile', username=current_user.username) }}" class="profile-shortcut">
-    <svg viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 10px #5eead4);">
+    <svg viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="10" stroke="#5eead4" stroke-width="0.8" style="filter: blur(3px); opacity:0.55;"></circle>
       <circle cx="12" cy="12" r="9" stroke="#5eead4" stroke-width="1.5"/>
       <circle cx="12" cy="8" r="3.2" stroke="#5eead4" stroke-width="1.6"/>
@@ -1188,31 +1192,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
-</script>
 
 
-<script>
-  /* AJAX RETWEET SUBMISSION */
+
+/* AJAX RETWEET SUBMISSION */
 document.addEventListener("DOMContentLoaded", () => {
-
   document.querySelectorAll(".retweet-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
       const tweetId = btn.dataset.tweetId;
       const countEl = btn.querySelector(".retweet-count");
-
+      
       btn.disabled = true;
-
+      
       try {
         const res = await fetch(`/retweet/${tweetId}`, { method: "POST" });
         const data = await res.json();
 
         if (!data.success) throw new Error(data.error || "Erreur");
 
-        // Change l'état visuel du bouton
-        btn.classList.toggle("retweeted", data.is_retweeted);
-
-        // Mets à jour le compteur
+        // Get current state BEFORE updating
+        const wasRetweeted = btn.classList.contains("retweeted");
+        const isNowRetweeted = data.is_retweeted;
+        
+        // Change visual state
+        btn.classList.toggle("retweeted", isNowRetweeted);
+        
+        // Update counter
         countEl.textContent = data.retweet_count;
+        
+        // ONLY trigger confetti if we just ADDED a retweet
+        if (!wasRetweeted && isNowRetweeted) {
+          // Trigger confetti effect - ONLY ONCE
+          triggerRetweetEffect(btn);
+        }
 
       } catch (err) {
         console.error(err);
@@ -1222,10 +1234,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-
 });
-   
 </script>
+
+
+
 
 <script>
 /* AJAX MODAL COMMENTAIRES - Updated to match profile */
@@ -1437,8 +1450,54 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-
-
+<script>
+/* Perfect localized button confetti */
+function triggerRetweetEffect(button) {
+  const rect = button.getBoundingClientRect();
+  const buttonX = rect.left + rect.width / 2;
+  const buttonY = rect.top + rect.height / 2;
+  
+  // Calculate button boundaries
+  const buttonWidth = rect.width;
+  const buttonHeight = rect.height;
+  
+  // Confetti that stays within button area
+  confetti({
+    particleCount: 25,
+    angle: 90,
+    spread: 40,
+    startVelocity: 18, // Slow enough to stay near
+    origin: { 
+      x: buttonX / window.innerWidth, 
+      y: buttonY / window.innerHeight 
+    },
+    colors: ['#5eead4', '#06b6d4'],
+    gravity: 1.0, // Balanced gravity
+    scalar: 0.5, // Small particles
+    ticks: 70,
+    decay: 0.9,
+    drift: 0.3,
+    shapes: ['circle'],
+    
+    // Custom positioning to keep near button
+    disableForReducedMotion: true
+  });
+  
+  // Button visual feedback
+  const originalBorder = button.style.borderColor;
+  const originalBg = button.style.background;
+  
+  button.style.borderColor = '#5eead4';
+  button.style.boxShadow = '0 0 10px rgba(94, 234, 212, 0.5)';
+  
+  setTimeout(() => {
+    button.style.borderColor = originalBorder;
+    button.style.boxShadow = '';
+  }, 300);
+}
+</script>
 </div>
+
+
 </body>
 </html>
